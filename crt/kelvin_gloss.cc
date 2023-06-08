@@ -1,0 +1,104 @@
+// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Syscall stubs for newlib on Kelvin
+#include <errno.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+void* __dso_handle = reinterpret_cast<void*>(&__dso_handle);
+
+extern "C" int _close(int file) { return -1; }
+
+extern "C" int _fstat(int file, struct stat* st) {
+  if (file != STDOUT_FILENO && file != STDERR_FILENO) {
+    errno = EBADF;
+    return -1;
+  }
+
+  if (st == NULL) {
+    errno = EFAULT;
+    return -1;
+  }
+
+  st->st_mode = S_IFCHR;
+  return 0;
+}
+
+extern "C" int _isatty(int file) {
+  errno = ENOTTY;
+  return 1;
+}
+
+extern "C" int _lseek(int file, int ptr, int dir) {
+  if (file != STDOUT_FILENO && file != STDERR_FILENO) {
+    errno = EBADF;
+    return -1;
+  }
+
+  return 0;
+}
+
+extern "C" int _read(int file, char* ptr, int len) {
+  errno = EBADF;
+  return -1;
+}
+
+// TODO(hcindyl/lundong): implement printf properly.
+extern "C" int _write(int file, char* ptr, int len) {
+  errno = EBADF;
+  return -1;
+}
+
+extern "C" int _open(const char* path, int flags, ...) { return -1; }
+
+extern "C" void _exit(int status) {
+  asm volatile("ebreak");
+  while (1) {
+  }
+}
+
+extern "C" int _kill(int pid, int sig) {
+  asm volatile("ebreak");
+  return -1;
+}
+
+extern "C" int _getpid(void) {
+  asm volatile("ebreak");
+  return -1;
+}
+
+char* _heap_ptr;  // Set to __heap_start__ in kelvin_start.S
+
+extern "C" void* _sbrk(int bytes) {
+  extern char __heap_end__;
+  char* prev_heap_end;
+  if ((bytes < 0) || (_heap_ptr + bytes > &__heap_end__)) {
+    errno = ENOMEM;
+    return reinterpret_cast<void*>(-1);
+  }
+
+  prev_heap_end = _heap_ptr;
+  _heap_ptr += bytes;
+
+  return reinterpret_cast<void*>(prev_heap_end);
+}
+
+void operator delete(void* p) noexcept { free(p); }
+
+extern "C" void operator delete(void* p, uint32_t c) noexcept {
+  operator delete(p);
+}
