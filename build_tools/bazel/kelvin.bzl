@@ -2,7 +2,6 @@
 
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cc_toolchain")
 
-
 KELVIN_PLATFORM = "//platforms/riscv32:kelvin"
 
 def _kelvin_transition_impl(_settings, _attr):
@@ -142,7 +141,11 @@ kelvin_binary_impl = kelvin_rule(
     toolchains = ["@rules_cc//cc:toolchain_type"],
 )
 
-def kelvin_binary(name, srcs, **kwargs):
+def kelvin_binary(
+        name,
+        srcs,
+        is_riscv_test = False,
+        **kwargs):
     """A helper macro for generating binary artifacts for the kelvin core.
 
     This macro uses the kelvin toolchain, kelvin-specific starting asm,
@@ -151,6 +154,8 @@ def kelvin_binary(name, srcs, **kwargs):
     Args:
       name: The name of this rule.
       srcs: The c source files.
+      is_riscv_test: A bool flag to decide if a custom _start asm is included.
+        It is used by riscv-tests.
       **kwargs: Additional arguments forward to cc_binary.
     Emits rules:
       filegroup              named: <name>.bin
@@ -158,11 +163,13 @@ def kelvin_binary(name, srcs, **kwargs):
       filegroup              named: <name>.elf
         Containing all elf output for the target.
     """
-    srcs = srcs + [
-        "//crt:kelvin_gloss.cc",
-        "//crt:kelvin_start.S",
-        "//crt:crt.S",
-    ]
+    srcs.append("//crt:kelvin_gloss.cc")
+    if not is_riscv_test:
+        srcs += [
+            "//crt:crt.S",
+            "//crt:kelvin_start.S",
+        ]
+
     kelvin_binary_impl(
         name = name,
         srcs = srcs,
