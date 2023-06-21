@@ -197,6 +197,7 @@ vmuls           | 02 xxxxxU |
 vmulw           | 04 xxxxxU |
 vmulh.{ur}      | 08 xxxxRU |
 vdmulh.{rn}     | 16 xxxxRN |
+vmacc           | 20 xxxxxx |
 vmadd           | 21 xxxxxx |
 **Float**       | ...       | **101**
 --reserved--    | xx xxxxxx |
@@ -1293,6 +1294,24 @@ vlt.[b,h,w].{u}.vx.{m} vd, vs1, xs2
 ```
 for L in Op.typelen
   vd[L] = vs1[L] < vs2[L] ? 1 : 0
+```
+
+--------------------------------------------------------------------------------
+
+### VMACC
+
+Multiply accumulate.
+
+**Encodings**
+
+vmacc.[b,h,w].vv.{m} vd, vs1, vs2 \
+vmacc.[b,h,w].vx.{m} vd, vs1, xs2
+
+**Operation**
+
+```
+for L in Op.typelen
+  vd[N] += vs1[L] * vs2[L]
 ```
 
 --------------------------------------------------------------------------------
