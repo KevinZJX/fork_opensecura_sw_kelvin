@@ -1229,7 +1229,7 @@ Vector load from memory with optional post-increment by scalar.
 **Encodings**
 
 vld.[b,h,w].{p}.x.{m} vd, xs1 \
-vld.[b,h,w].[l,s,lp,sp,tp].xx.{m} vd, xs1, xs2
+vld.[b,h,w].[l,p,s,lp,sp,tp].xx.{m} vd, xs1, xs2
 
 **Operation**
 
@@ -1926,7 +1926,7 @@ Vector store to memory with optional post-increment by scalar.
 **Encodings**
 
 vst.[b,h,w].{p}.x.{m} vd, xs1 \
-vst.[b,h,w].[l,s,lp,sp,tp].xx.{m} vd, xs1, xs2
+vst.[b,h,w].[l,p,s,lp,sp,tp].xx.{m} vd, xs1, xs2
 
 **Operation**
 
