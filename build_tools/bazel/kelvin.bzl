@@ -90,6 +90,7 @@ def _kelvin_binary_impl(ctx):
         linking_contexts = linking_contexts,
         user_link_flags = ctx.attr.linkopts + [
             "-Wl,-T,{}".format(ctx.file.linker_script.path),
+            "-Wl,--no-warn-rwx-segments",
         ],
         additional_inputs = depset([ctx.file.linker_script] + ctx.files.linker_script_includes),
         output_type = "executable",
