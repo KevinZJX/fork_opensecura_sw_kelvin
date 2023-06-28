@@ -24,6 +24,7 @@ This project needs to be at `<dir>/sw/kelvin`.
 * platforms: Crosscompile platform setup for Bazel.
 * third_party: Third party repositories for Bazel.
 * toolchains: Crosscomple toolchain setup for Bazel.
+* host_tools: host tool to generate the intrinsic header and toolchain op files
 
 ## Build the project
 
