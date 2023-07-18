@@ -104,3 +104,14 @@ RV32UM_TESTS = [
         ":riscv_tests_base",
     ],
 ) for test in RV32UM_TESTS]
+
+
+kelvin_binary(
+    name = "branch_modulo_test",
+    srcs = [
+        "branch_modulo_test.cc",
+    ],
+    deps = [
+        "//crt:crt_header",
+    ],
+)
