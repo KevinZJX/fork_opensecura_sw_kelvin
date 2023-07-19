@@ -19,6 +19,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "crt/kelvin.h"
+
 void* __dso_handle = reinterpret_cast<void*>(&__dso_handle);
 
 extern "C" int _close(int file) { return -1; }
@@ -57,10 +59,47 @@ extern "C" int _read(int file, char* ptr, int len) {
   return -1;
 }
 
-// TODO(hcindyl/lundong): implement printf properly.
-extern "C" int _write(int file, char* ptr, int len) {
-  errno = EBADF;
-  return -1;
+#ifndef LOG_MAX_SZ
+#define LOG_MAX_SZ 256
+#endif
+// TODO(lundong): Handle stdout and stderr separately
+extern "C" int _write(int file, char* buf, int nbytes) {
+  static int _write_line_buffer_len = 0;
+  static char _write_line_buffer[LOG_MAX_SZ];
+
+  if (file != STDOUT_FILENO && file != STDERR_FILENO) {
+    errno = EBADF;
+    return -1;
+  }
+
+  if (nbytes <= 0) {
+    return 0;
+  }
+
+  if (buf == NULL) {
+    errno = EFAULT;
+    return -1;
+  }
+
+  int bytes_read = 0;
+  char c;
+  do {
+    int len = _write_line_buffer_len;
+    c = *(buf++);
+    bytes_read++;
+
+    _write_line_buffer[len++] = c;
+    if (len == LOG_MAX_SZ - 1 || c == '\n') {
+      _write_line_buffer[len] = '\0';
+    }
+    if ((_write_line_buffer[len] == '\0')) {
+      printf("%s", _write_line_buffer);
+      len = 0;
+    }
+    _write_line_buffer_len = len;
+  } while (bytes_read < nbytes);
+
+  return bytes_read;
 }
 
 extern "C" int _open(const char* path, int flags, ...) { return -1; }

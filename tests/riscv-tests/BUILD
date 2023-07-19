@@ -11,6 +11,9 @@ cc_library(
         "riscv_test.h",
         "@riscv-tests//:isa/macros/scalar/test_macros.h",
     ],
+    deps = [
+        "//crt:crt_header",
+    ],
 )
 
 RV32UI_TESTS = [

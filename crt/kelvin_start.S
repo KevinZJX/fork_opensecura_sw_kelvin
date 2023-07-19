@@ -15,7 +15,7 @@ _start:
         ###############################################
         # Put all scalar registers into a known state #
         ###############################################
-        la   sp, _stack_end
+        la   sp, __stack_end__
         la   gp, _global_pointer
         la   s0, __heap_start__
         sw   s0, _heap_ptr, s1
@@ -46,14 +46,16 @@ _start:
         mv   t5, zero
         mv   t6, zero
 
+        # (TODO:lundong) uncomment the following
+        # when runtime error in iree targets is resolved
         # Zero out the bss section
-        la   a0, __bss_start__
-        la   a1, __bss_end__
-        call crt_section_clear
+        # la   a0, __bss_start__
+        # la   a1, __bss_end__
+        # call crt_section_clear
 
         # Initialize arrays
-        la   s0, __init_array_start
-        la   s1, __init_array_end
+        la   s0, __init_array_start__
+        la   s1, __init_array_end__
         bgeu s0, s1, init_array_loop_end
 init_array_loop:
         lw   t0, 0(s0)

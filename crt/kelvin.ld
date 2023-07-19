@@ -51,15 +51,15 @@ SECTIONS {
     *(.text)
     *(.text.*)
     . = ALIGN(4);
-    __etext = .;
+    __text_end__ = .;
   } > TCM
 
   .init.array : ALIGN(4) {
-    __init_array_start = .;
+    __init_array_start__ = .;
     *(.init_array)
     *(.init_array.*)
     . = ALIGN(4);
-    __init_array_end = .;
+    __init_array_end__ = .;
   } > TCM
 
   .rodata : ALIGN(4) {
@@ -86,7 +86,7 @@ SECTIONS {
     *(.data.*)
     /* Align on 256 width. */
     . = ALIGN(256);
-      __data_end__ = .;
+    __data_end__ = .;
   } > TCM
 
   .bss : ALIGN(4) {
@@ -112,7 +112,6 @@ SECTIONS {
     . += STACK_SIZE;
     . = ALIGN(64);
     __stack_end__ = .;
-    _stack_end = .;
   } > TCM
 
   .model_output ORIGIN(TCM) + LENGTH(TCM) - OUTPUT_SIZE - __output_header_size__ (NOLOAD) : {
