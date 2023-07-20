@@ -91,8 +91,7 @@ RV32UM_TESTS = [
 [kelvin_binary(
     name = "rv32um_{}".format(test),
     srcs = [
-      "@riscv-tests//:isa/rv32um/{}.S".format(test),
-
+        "@riscv-tests//:isa/rv32um/{}.S".format(test),
     ],
     copts = [
         "-Itests/riscv-tests",
@@ -105,11 +104,20 @@ RV32UM_TESTS = [
     ],
 ) for test in RV32UM_TESTS]
 
-
 kelvin_binary(
     name = "branch_modulo_test",
     srcs = [
         "branch_modulo_test.cc",
+    ],
+    deps = [
+        "//crt:crt_header",
+    ],
+)
+
+kelvin_binary(
+    name = "branch_div_test",
+    srcs = [
+        "branch_div_test.cc",
     ],
     deps = [
         "//crt:crt_header",
