@@ -964,16 +964,19 @@ void Encode110(std::string name, const int index) {
   const uint32_t vmatch_base = VMatch(base);
   const uint32_t vmask_base = VMask(base);
 
-  std::vector<std::string> slide_group = {"vslidehn", "vslidevn", "vslidehp",
-                                          "vslidevp"};
+  std::vector<std::string> slide_group = {"vsliden", "vslidehn", "vslidevn",
+                                          "vslidep", "vslidehp", "vslidevp"};
 
   bool has_range = CheckVariant(name, slide_group);
   int range = has_range ? 3 : 0;
-  bool is_m = has_range;
+  bool is_m0 = CheckVariant(name, {"vsliden", "vslidep"});
+  bool is_m1 =
+      CheckVariant(name, {"vslidehn", "vslidehp", "vslidevn", "vslidevp"});
 
   for (int sz = 0; sz < 3; ++sz) {
     for (auto m : {false, true}) {
-      if (!m && is_m) continue;
+      if (!m && is_m1) continue;
+      if (m && is_m0) continue;
       for (int n = 0; n <= range; ++n) {
         for (auto x : {false, true}) {
           std::string op = name;
@@ -1131,8 +1134,10 @@ int main() {
 
   Space();
   Comment("110 Shuffle");
+  Encode110("vsliden", 0);
   Encode110("vslidevn", 0);
   Encode110("vslidehn", 4);
+  Encode110("vslidep", 8);
   Encode110("vslidevp", 8);
   Encode110("vslidehp", 12);
   Encode110("vsel", 16);

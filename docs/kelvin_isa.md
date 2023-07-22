@@ -1716,29 +1716,54 @@ xd[L] = vs1[L] <<< vs2[L][N-1:0]
 
 Slide next register by index.
 
+For the horizontal mode, it treats the stripmine `vm` register based on
+`vs1` as a contiguous block, and only the first `index` elements from `vs2`
+will be used.
+For the vertical mode, each stripmine vector register `op_index` is mapped
+separatedly. it mimics the imaging tiling process shift of
+
+ ```
+   |--------|--------|
+   | 4xVLEN | 4xVLEN |
+   |  (vs1) |  (vs2) |
+   |--------|--------|
+```
+
+The vertical mode can also support the non-stripmine version to handle
+the last columns of the image.
+
 **Encodings**
 
+Horizontal slide:
+
 vslidehn.[b,h,w].[1,2,3,4].vv.m vd, vs1, vs2 \
+vslidehn.[b,h,w].[1,2,3,4].vx.m vd, vs1, xs2
+
+Vertical slide:
+
+vsliden.[b,h,w].[1,2,3,4].vv vd, vs1, vs2 \
 vslidevn.[b,h,w].[1,2,3,4].vv.m vd, vs1, vs2 \
-vslidehn.[b,h,w].[1,2,3,4].vx.m vd, vs1, xs2 \
 vslidevn.[b,h,w].[1,2,3,4].vx.m vd, vs1, xs2
 
 **Operation**
 
 ```
 assert vd != vs1 && vd != vs2
-if Op.h
-  va = {{vs1+3},{vs1+2},{vs1+1},{vs1+0}}
-  vb = {{vs2+0},{vs1+3},{vs1+2},{vs1+1}}
-if Op.v
-  va = {{vs1+3},{vs1+2},{vs1+1},{vs1+0}}
-  vb = {{vs2+3},{vs2+2},{vs2+1},{vs2+0}}
-for M in Op.m
+if Op.h  // A contiguous horizontal slide based on vs1
+  va = {{vs1},{vs1+1},{vs1+2},{vs1+3}}
+  vb = {{vs1+1},{vs1+2},{vs1+3},{vs2}}
+if Op.v  // vs1/vs2 vertical slide
+  va = {{vs1},{vs1+1},{vs1+2},{vs1+3}}
+  vb = {{vs2},{vs2+1},{vs2+2},{vs2+3}}
+
+sm = Op.m ? 4 : 1
+
+for M in sm
   for L in Op.typelen
     if (L + index < Op.typelen)
       vd[L] = va[M][L + index]
     else
-      vd[L] = vb[M][L + index - Op.typelen]
+      vd[L] = is_vx ? xs2 : vb[M][L + index - Op.typelen]
 ```
 
 --------------------------------------------------------------------------------
@@ -1747,27 +1772,55 @@ for M in Op.m
 
 Slide previous register by index.
 
+For the horizontal mode, it treats the stripmine `vm` register based on
+**`vs2`** as a contiguous block, and only the _LAST_ `index` elements from
+stripmine vm register based on `vs1` will be used AT THE BEGINNING.
+For the vertical mode, each stripmine vector register `op_index` is mapped
+separatedly. it mimics the imaging tiling process shift of
+
+```
+  |--------|--------|
+  | 4xVLEN | 4xVLEN |
+  |  (vs1) |  (vs2) |
+  |--------|--------|
+```
+
+The vertical mode can also support the non-stripmine version to handle
+the last columns of the image.
+
 **Encodings**
 
+Horizontal slide:
+
 vslidehp.[b,h,w].[1,2,3,4].vv.m vd, vs1, vs2 \
-vslidevp.[b,h,w].[1,2,3,4].vv.m vd, vs1, vs2
+vslidehp.[b,h,w].[1,2,3,4].vx.m vd, vs1, xs2
+
+Vertical slide:
+
+vslidep.[b,h,w].[1,2,3,4].vv vd, vs1, vs2 \
+vslidevp.[b,h,w].[1,2,3,4].vv.m vd, vs1, vs2 \
+vslidevp.[b,h,w].[1,2,3,4].vv.m vd, vs1, xs2
 
 **Operation**
 
 ```
 assert vd != vs1 && vd != vs2
-if Op.h
-  va = {{vs1+3},{vs1+2},{vs1+1},{vs1+0}}
-  vb = {{vs2+0},{vs1+3},{vs1+2},{vs1+1}}
-if Op.v
-  va = {{vs1+3},{vs1+2},{vs1+1},{vs1+0}}
-  vb = {{vs1+2},{vs1+1},{vs1+0},{vs2+3}}
-for M in Op.m
+
+if Op.h  // A continuous horizontal slide based on vs2
+  va = {{vs1+3},{vs2},{vs2+1},{vs2+2}}
+  vb = {{vs2},{vs2+1},{vs2+2},{vs2+3}}
+if Op.v  // vs1/vs2 vertical slide
+  va = {{vs1},{vs1+1},{vs1+2},{vs1+3}}
+  vb = {{vs2},{vs2+1},{vs2+2},{vs2+3}}
+
+sm = Op.m ? 4 : 1
+
+for M in sm
   for L in Op.typelen
-    if (L >= index)
-      vd[L] = va[M][L - index]
+    if (L < index)
+      vd[L] = va[M][Op.typelen + L - index]
     else
-      vd[L] = vb[M][Op.typelen + L - index]
+      vd[L] = is_vx ? xs2 : vb[M][L - index]
 ```
 
 --------------------------------------------------------------------------------
