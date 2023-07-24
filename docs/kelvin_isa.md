@@ -219,7 +219,7 @@ vzip            | 28 xxxxxx |
 Instruction | func3 | Notes
 :---------: | :---: | :-----------------------:
 aconv       | 8     | scalar: sign
-adwconv     | 10    | scalar: sign/type/swizzle
+vdwconv     | 10    | scalar: sign/type/swizzle
 
 ### Typeless
 
