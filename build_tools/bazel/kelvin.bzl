@@ -223,3 +223,20 @@ def kelvin_test(
             "{}.elf".format(kelvin_elf),
         ],
     )
+
+# From @tflite-micro//tensorflow/lite/micro/build_def.bzl, and paths
+# modified to point to the external repo.
+def generate_cc_arrays(name, src, out, visibility = None, tags = []):
+    native.genrule(
+        name = name,
+        srcs = [
+            src,
+        ],
+        outs = [
+            out,
+        ],
+        tags = tags,
+        cmd = "$(location @tflite-micro//tensorflow/lite/micro/tools:generate_cc_arrays) $@ $<",
+        tools = ["@tflite-micro//tensorflow/lite/micro/tools:generate_cc_arrays"],
+        visibility = visibility,
+    )

@@ -6,3 +6,11 @@ build --conlyopt='-std=gnu11'
 build --incompatible_enable_cc_toolchain_resolution
 
 build:kelvin --platforms=//platforms/riscv32:kelvin
+
+# Set preprocessor defines for tflite-micro.
+build --copt=-DTF_LITE_USE_GLOBAL_CMATH_FUNCTIONS
+build --copt=-DTF_LITE_USE_GLOBAL_MIN
+build --copt=-DTF_LITE_USE_GLOBAL_MAX
+build --copt=-DTF_LITE_MCU_DEBUG_LOG
+build --copt=-DTF_LITE_STATIC_MEMORY
+build:opt --copt=-DTF_LITE_STRIP_ERROR_STRINGS

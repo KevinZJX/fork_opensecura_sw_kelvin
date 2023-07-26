@@ -65,22 +65,51 @@ feature(
     ],
 )
 
+feature(
+    name = "all_warnings",
+    enabled = True,
+    flag_sets = [
+        flag_set(
+            actions = CPP_ALL_COMPILE_ACTIONS + C_ALL_COMPILE_ACTIONS,
+            flag_groups = [
+                flag_group(
+                    flags = [
+                        "-Wall",
+                    ],
+                ),
+            ],
+        ),
+    ],
+)
+
+feature(
+    name = "all_warnings_as_errors",
+    enabled = False,
+    flag_sets = [
+        flag_set(
+            actions = CPP_ALL_COMPILE_ACTIONS + C_ALL_COMPILE_ACTIONS,
+            flag_groups = [
+                flag_group(
+                    flags = ["-Werror"],
+                ),
+            ],
+        ),
+    ],
+)
+
 feature_set(
     name = "rv32im",
     feature = [
         ":architecture",
         ":sys_spec",
+        ":all_warnings",
+        ":all_warnings_as_errors",
+        "@crt//features/common:includes",
+        "@crt//features/common:reproducible",
+        "@crt//features/common:symbol_garbage_collection",
         "@crt//features/embedded:cc_constructor_destructor",
         "@crt//features/embedded:exceptions",
         "@crt//features/embedded:runtime_type_information",
-        "@crt//platforms/riscv32/features:all_warnings_as_errors",
         "@crt//platforms/riscv32/features:fastbuild",
-        "@crt//features/common:includes",
-        "@crt//features/common:all_warnings",
-        "@crt//features/common:all_warnings_as_errors",
-        "@crt//features/common:reproducible",
-        # TODO(atv): It would be nice to have the feature, but for now enabling
-        # this creates the wrong program.
-        # "@crt//features/common:symbol_garbage_collection",
     ],
 )

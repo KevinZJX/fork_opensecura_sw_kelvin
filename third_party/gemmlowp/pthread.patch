@@ -1,0 +1,13 @@
+diff --git a/flags.bzl b/flags.bzl
+index e35fe9e..e26a448 100644
+--- a/flags.bzl
++++ b/flags.bzl
+@@ -4,7 +4,7 @@ LIB_COPTS = []
+ LIB_LINKOPTS = select({
+     ":android": [],
+     ":windows": [],
+-    "//conditions:default": ["-lpthread"],
++    "//conditions:default": [],
+ })
+ 
+ BIN_LINKOPTS = LIB_LINKOPTS
