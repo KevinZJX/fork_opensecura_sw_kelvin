@@ -90,3 +90,10 @@ def tflm_repos():
         urls = ["https://github.com/pybind/pybind11_bazel/archive/faf56fb3df11287f26dbc66fdedf60a2fc2c6631.zip"],
         sha256 = "a185aa68c93b9f62c80fcb3aadc3c83c763854750dc3f38be1dadcb7be223837",
     )
+
+def model_repos():
+    native.new_local_repository(
+        name = "ml-models",
+        path = "../../ml/ml-models",
+        build_file = "third_party/ml-models/BUILD",
+    )
