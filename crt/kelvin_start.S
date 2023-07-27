@@ -17,8 +17,6 @@ _start:
         ###############################################
         la   sp, __stack_end__
         la   gp, _global_pointer
-        la   s0, __heap_start__
-        sw   s0, _heap_ptr, s1
         mv   tp, zero
         mv   t1, zero
         mv   t2, zero
@@ -46,12 +44,14 @@ _start:
         mv   t5, zero
         mv   t6, zero
 
-        # (TODO:lundong) uncomment the following
-        # when runtime error in iree targets is resolved
         # Zero out the bss section
-        # la   a0, __bss_start__
-        # la   a1, __bss_end__
-        # call crt_section_clear
+        la   a0, __bss_start__
+        la   a1, __bss_end__
+        call crt_section_clear
+
+        # Initialize the heap ptr after clearing BSS
+        la   s0, __heap_start__
+        sw   s0, _heap_ptr, s1
 
         # Initialize arrays
         la   s0, __init_array_start__
