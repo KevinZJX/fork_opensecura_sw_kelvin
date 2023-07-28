@@ -189,3 +189,37 @@ def kelvin_binary(
         srcs = [name],
         output_group = "elf_file",
     )
+
+def kelvin_test(
+        name,
+        size = "small",
+        **kwargs):
+    """A sh_test wrapper for kelvin binaries
+
+    A wrapper to build kelvin_binary and test it against build_tools/test_runner.sh
+
+    Args:
+      name: The name of this rule.
+      size: Test size. Default to small.
+      **kwargs: Agruments that will be forwarded to kelvin_binary
+    """
+
+    kelvin_elf = "{}_elf".format(name)
+    kelvin_binary(
+        name = kelvin_elf,
+        **kwargs
+    )
+
+    native.sh_test(
+        name = name,
+        size = size,
+        srcs = [
+            "//build_tools:test_runner.sh",
+        ],
+        args = [
+            "$(location %s.elf)" % kelvin_elf,
+        ],
+        data = [
+            "{}.elf".format(kelvin_elf),
+        ],
+    )

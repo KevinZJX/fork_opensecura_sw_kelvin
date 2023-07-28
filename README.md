@@ -37,6 +37,12 @@ The project uses Bazel 5.1.1, to align with
 bazel build //...
 ```
 
+To run the unit tests (with the kelvin_sim ISS)
+
+```bash
+bazel test --test_env=ROOTDIR=${ROOTDIR} //...
+```
+
 ### CMake
 
 ```note
@@ -45,8 +51,12 @@ TODO: Add CMake flow
 
 ## Run the executable
 
+The binaries can be simulated with the kelvin simulator, located at
+`<dir>/sim/kelvin`.
+
 ```note
-TODO: Add kelvin simulator
+sim_kelvin <elf location>
 ```
 
-Load the generated `.bin` binaries to matcha FPGA emulator.
+Load the generated `.bin` binaries to the FPGA emulator/Renode simulator.
+

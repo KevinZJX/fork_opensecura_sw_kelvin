@@ -1,6 +1,6 @@
 # Build riscv-tests based on Kelvin linker script and termination condition.
 
-load("//build_tools/bazel:kelvin.bzl", "kelvin_binary")
+load("//build_tools/bazel:kelvin.bzl", "kelvin_test")
 
 cc_library(
     name = "riscv_tests_base",
@@ -58,7 +58,7 @@ RV32UI_TESTS = [
     "xor",
 ]
 
-[kelvin_binary(
+[kelvin_test(
     name = "rv32ui_{}".format(test),
     srcs = [
         # riscv-tests use the rv64 code to set up rv32 tests.
@@ -91,7 +91,7 @@ RV32UM_TESTS = [
     "remu",
 ]
 
-[kelvin_binary(
+[kelvin_test(
     name = "rv32um_{}".format(test),
     srcs = [
         "@riscv-tests//:isa/rv32um/{}.S".format(test),
@@ -107,7 +107,7 @@ RV32UM_TESTS = [
     ],
 ) for test in RV32UM_TESTS]
 
-kelvin_binary(
+kelvin_test(
     name = "branch_modulo_test",
     srcs = [
         "branch_modulo_test.cc",
@@ -117,7 +117,7 @@ kelvin_binary(
     ],
 )
 
-kelvin_binary(
+kelvin_test(
     name = "branch_div_test",
     srcs = [
         "branch_div_test.cc",

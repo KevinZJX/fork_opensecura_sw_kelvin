@@ -1,0 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "test_runner.sh",
+])
