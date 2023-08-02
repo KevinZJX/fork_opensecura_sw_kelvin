@@ -35,13 +35,13 @@ uint32_t rand_uint32_input() {
   uint32_t a = static_cast<uint32_t>(
       ((rand() & 0xffff) << 16) |  // NOLINT(runtime/threadsafe_fn)
       (rand() & 0xffff));          // NOLINT(runtime/threadsafe_fn)
-  return (a > 0) ? a : 1;
+  return std::max<uint32_t>(a, 1);
 }
 
 int32_t rand_int32_input() {
   int32_t a = ((rand() & 0x7fff) << 16) |  // NOLINT(runtime/threadsafe_fn)
               (rand() & 0xffff);           // NOLINT(runtime/threadsafe_fn)
-  return (a > 0) ? a : 1;
+  return std::max<int32_t>(a, 1);
 }
 
 int main() {
