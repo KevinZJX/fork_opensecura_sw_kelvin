@@ -25,10 +25,10 @@ def kelvin_repos():
     )
 
     # risc-v isa test
-    new_git_repository(
+    http_archive(
         name = "riscv-tests",
-        commit = "d649367a1386609da3d10e9e6d388f98781dd35f",
         build_file = "//third_party/riscv:BUILD.riscv-tests",
-        shallow_since = "1636745372 -0800",
-        remote = "https://spacebeaker.googlesource.com/shodan/3p/riscv/riscv-tests",
+        sha256 = "1c7eb58edd7399b3ad2f9624a2003862cd87a6904237a737f39cd3978bab46a8",
+        urls = ["https://github.com/riscv-software-src/riscv-tests/archive/d4eaa5bd6674b51d3b9b24913713c4638e99cdd9.tar.gz"],
+        strip_prefix = "riscv-tests-d4eaa5bd6674b51d3b9b24913713c4638e99cdd9",
     )
