@@ -32,17 +32,17 @@ quadrupling the available encoding space within the 32-bit format.
 31..26 | 25..20 | 19..14 | 13..12 | 11..6 | 5   | 4..2  | 1..0 | form
 :----: | :----: | :----: | :----: | :---: | :-: | :---: | :--: | :--:
 func2  | vs2    | vs1    | sz     | vd    | m   | func1 | 00   | .vv
-func2  | xs2    | vs1    | sz     | vd    | m   | func1 | 10   | .vx
+func2  | [0]xs2 | vs1    | sz     | vd    | m   | func1 | 10   | .vx
 func2  | 000000 | vs1    | sz     | vd    | m   | func1 | 10   | .v
-func2  | xs2    | xs1    | sz     | vd    | m   | 111   | 11   | .xx
-func2  | 000000 | xs1    | sz     | vd    | m   | 111   | 11   | .x
+func2  | [0]xs2 | xs1[0] | sz     | vd    | m   | 111   | 11   | .xx
+func2  | 000000 | xs1[0] | sz     | vd    | m   | 111   | 11   | .x
 
 <br>
 
 31..26 | 25..20 | 19..14 | 13..12 | 11..6 | 5   | 4..3  | 2..0 | form
 :----: | :----: | :----: | :----: | :---: | :-: | :---: | :--: | :--:
 vs3    | vs2    | vs1    | func3  | vd    | m   | func3 | 001  | .vvv
-vs3    | z,xs2  | vs1    | func3  | vd    | m   | func3 | 101  | .vxv
+vs3    | [0]xs2 | vs1    | func3  | vd    | m   | func3 | 101  | .vxv
 
 ### Types ".b" ".h" ".w"
 
@@ -96,7 +96,7 @@ op[5] | m
 0     | ""
 1     | ".m"
 
-### 2-arg .xx
+### 2-arg .xx (Load / Store)
 
 Instruction | func2     | Notes
 :---------: | :-------: | :--------:
@@ -126,10 +126,20 @@ vld.p.x or vst.p.x which have different base update behavior. If the
 post-increment were programmatic behavior then a register where xs2!=x0 would be
 used.
 
-### 1-arg .x
+**NOTE**: Scalar register `xs1` uses the same encoding bitfield as the vector
+register `vs1`, but **HAS ONE BIT PADDED AT LSB**. That is `xs1` has the same
+encoding as the regular RISC-V instructions (bit[19:15]). On the other head,
+`xs2` shares the same encoding bitfield `vs2`, but **HAS ONE BIT PADDED AT MSB**,
+so it is consistent with the regular RISC-V instructions (bit[24:20]).
+
+### 1-arg .x (Load / Store)
 
 Instructions of the format "op.xx vd, xs1, x0" (xs2=x0, the scalar zero
 register) are reduced to the shortened form "op.x vd, xs1".
+
+**NOTE**: Scalar register `xs1` uses the same encoding bitfield as the vector
+register `vs1`, but **HAS ONE BIT PADDED AT LSB**. That is `xs1` has the same
+encoding as the regular RISC-V instructions (bit[19:15]).
 
 ### 0-arg
 
