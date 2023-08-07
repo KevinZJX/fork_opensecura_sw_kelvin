@@ -21,10 +21,12 @@ This project needs to be at `<dir>/sw/kelvin`.
 * build_tools: Build tool/rules for both Bazel and CMake
 * crt: Kelvin BSP
 * examples: Source code to build Kelvin SW artifacts.
+* host_tools: host tool to generate the intrinsic header and toolchain op files
 * platforms: Crosscompile platform setup for Bazel.
+* tests: Tests to exercise features of the Kelvin core.
+* tflm: Support code and optimized routines for TFLM.
 * third_party: Third party repositories for Bazel.
 * toolchains: Crosscomple toolchain setup for Bazel.
-* host_tools: host tool to generate the intrinsic header and toolchain op files
 
 ## Build the project
 
