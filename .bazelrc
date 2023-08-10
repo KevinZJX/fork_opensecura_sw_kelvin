@@ -7,6 +7,9 @@ build --incompatible_enable_cc_toolchain_resolution
 
 build:kelvin --platforms=//platforms/riscv32:kelvin
 
+# Test environment variable for kelvin_sim test_runner.sh
+test --test_env=ROOTDIR
+
 # Set preprocessor defines for tflite-micro.
 build --copt=-DTF_LITE_USE_GLOBAL_CMATH_FUNCTIONS
 build --copt=-DTF_LITE_USE_GLOBAL_MIN

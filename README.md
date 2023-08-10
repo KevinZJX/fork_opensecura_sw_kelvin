@@ -40,9 +40,11 @@ bazel build //...
 ```
 
 To run the unit tests (with the kelvin_sim ISS)
+Make sure the Environment variable `$ROOTDIR` is set to the root directory
+of the local repo (or run `source build/setup.sh`)
 
 ```bash
-bazel test --test_env=ROOTDIR=${ROOTDIR} //...
+bazel test //...
 ```
 
 ### CMake
