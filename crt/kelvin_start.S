@@ -64,6 +64,13 @@ init_array_loop:
         bltu s0, s1, init_array_loop
 init_array_loop_end:
 
+        # Set up sentinel value in _ret
+        # If we see this after an ebreak,
+        # the break source is unlikely to
+        # be a clean return from main.
+        la   t0, _ret
+        li   a0, 0x0badd00d
+        sw   a0, 0(t0)
 
         #############
         # Call main #
@@ -75,6 +82,11 @@ init_array_loop_end:
         # Store the application's return value at _ret
         la   t0, _ret
         sw   a0, 0(t0)
+        beqz a0, success
+failure:
+        ebreak
+        j    loop
+success:
         mpause      # Kelvin end of program op
-1:
-        j    1b
+loop:
+        j    loop
