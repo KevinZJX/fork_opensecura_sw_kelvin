@@ -42,41 +42,6 @@ def tflm_repos():
 
     maybe(
         http_archive,
-        name = "gemmlowp",
-        sha256 = "43146e6f56cb5218a8caaab6b5d1601a083f1f31c06ff474a4378a7d35be9cfb",  # SHARED_GEMMLOWP_SHA
-        strip_prefix = "gemmlowp-fda83bdc38b118cc6b56753bd540caa49e570745",
-        urls = [
-            "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/gemmlowp/archive/fda83bdc38b118cc6b56753bd540caa49e570745.zip",
-            "https://github.com/google/gemmlowp/archive/fda83bdc38b118cc6b56753bd540caa49e570745.zip",
-        ],
-        patches = [
-            "@kelvin_sw//third_party/gemmlowp:pthread.patch",
-        ],
-        patch_args = [
-            "-p1",
-        ],
-    )
-
-    maybe(
-        http_archive,
-        name = "ruy",
-        sha256 = "da5ec0cc07472bdb21589b0b51c8f3d7f75d2ed6230b794912adf213838d289a",
-        strip_prefix = "ruy-54774a7a2cf85963777289193629d4bd42de4a59",
-        urls = [
-            "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/ruy/archive/54774a7a2cf85963777289193629d4bd42de4a59.zip",
-            "https://github.com/google/ruy/archive/54774a7a2cf85963777289193629d4bd42de4a59.zip",
-        ],
-        build_file = "@tflite-micro//third_party/ruy:BUILD",
-        patches = [
-            "@kelvin_sw//third_party/ruy:pthread.patch",
-        ],
-        patch_args = [
-            "-p1",
-        ],
-    )
-
-    maybe(
-        http_archive,
         name = "rules_python",
         sha256 = "497ca47374f48c8b067d786b512ac10a276211810f4a580178ee9b9ad139323a",
         strip_prefix = "rules_python-0.16.1",
