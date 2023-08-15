@@ -875,7 +875,7 @@ for L in Op.typelen
   vd[L] = vs1[L] & MSB ? CLZ(~vs1[L]) : CLZ(vs1[L])
 ```
 
-Note: (clb - 1) is equivalent to __builtin_clrsb.
+Note: (clb - 1) is equivalent to `__builtin_clrsb`.
 
 **clb examples**
 
