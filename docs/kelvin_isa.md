@@ -293,14 +293,14 @@ though there is no difference in access permissions between the modes.
 
 ### Exit Cause
 
-*   enum_IDLE = 0
-*   enum_EBREAK = 1
-*   enum_ECALL = 2
-*   enum_EEXIT = 3
-*   enum_EYIELD = 4
-*   enum_ECTXSW = 5
-*   enum_UNDEF_INST = (1u<<31) | 2
-*   enum_USAGE_FAULT = (1u<<31) | 16
+*   `enum_IDLE = 0`
+*   `enum_EBREAK = 1`
+*   `enum_ECALL = 2`
+*   `enum_EEXIT = 3`
+*   `enum_EYIELD = 4`
+*   `enum_ECTXSW = 5`
+*   `enum_UNDEF_INST = (1u<<31) | 2`
+*   `enum_USAGE_FAULT = (1u<<31) | 16`
 
 ## Instruction Definitions
 
