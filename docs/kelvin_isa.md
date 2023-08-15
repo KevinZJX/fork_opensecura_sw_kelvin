@@ -303,14 +303,14 @@ though there is no difference in access permissions between the modes.
 
 ### Exit Cause
 
-*   enum_IDLE = 0
-*   enum_EBREAK = 1
-*   enum_ECALL = 2
-*   enum_EEXIT = 3
-*   enum_EYIELD = 4
-*   enum_ECTXSW = 5
-*   enum_UNDEF_INST = (1u<<31) | 2
-*   enum_USAGE_FAULT = (1u<<31) | 16
+*   `enum_IDLE = 0`
+*   `enum_EBREAK = 1`
+*   `enum_ECALL = 2`
+*   `enum_EEXIT = 3`
+*   `enum_EYIELD = 4`
+*   `enum_ECTXSW = 5`
+*   `enum_UNDEF_INST = (1u<<31) | 2`
+*   `enum_USAGE_FAULT = (1u<<31) | 16`
 
 ## Instruction Definitions
 
@@ -885,7 +885,7 @@ for L in Op.typelen
   vd[L] = vs1[L] & MSB ? CLZ(~vs1[L]) : CLZ(vs1[L])
 ```
 
-Note: (clb - 1) is equivalent to __builtin_clrsb.
+Note: (clb - 1) is equivalent to `__builtin_clrsb`.
 
 **clb examples**
 
@@ -1972,7 +1972,7 @@ Subtract two operands with widening.
 vsubw.[h,w].{u}.vv.{m} vd, vs1, vs2 \
 vsubw.[h,w].{u}.vx.{m} vd, vs1, xs2
 
-**Operation**`
+**Operation**
 
 ```
 for L in Op.typelen
