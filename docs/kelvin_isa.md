@@ -1962,7 +1962,7 @@ Subtract two operands with widening.
 vsubw.[h,w].{u}.vv.{m} vd, vs1, vs2 \
 vsubw.[h,w].{u}.vx.{m} vd, vs1, xs2
 
-**Operation**`
+**Operation**
 
 ```
 for L in Op.typelen
