@@ -1156,18 +1156,18 @@ where:
 
 #### VGE
 
-Integer greater-than comparison.
+Integer greater-than-or-equal comparison.
 
 **Encodings**
 
-vgt.[b,h,w].{u}.vv.{m} vd, vs1, vs2 \
-vgt.[b,h,w].{u}.vx.{m} vd, vs1, xs2
+vge.[b,h,w].{u}.vv.{m} vd, vs1, vs2 \
+vge.[b,h,w].{u}.vx.{m} vd, vs1, xs2
 
 **Operation**
 
 ```
 for L in Op.typelen
-  vd[L] = vs1[L] > vs2[L] ? 1 : 0
+  vd[L] = vs1[L] >= vs2[L] ? 1 : 0
 ```
 
 --------------------------------------------------------------------------------
