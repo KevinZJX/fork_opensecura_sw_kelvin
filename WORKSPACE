@@ -1,8 +1,7 @@
 workspace(name = "kelvin_sw")
 
-load("//build_tools/bazel:repos.bzl", "kelvin_repos", "model_repos", "tflm_repos")
-
-kelvin_repos()
+load("//build_tools/bazel:repos.bzl", "kelvin_sw_repos", "model_repos", "tflm_repos")
+kelvin_sw_repos()
 
 # Register Kelvin toolchain
 load("//platforms:registration.bzl", "kelvin_register_toolchain")
