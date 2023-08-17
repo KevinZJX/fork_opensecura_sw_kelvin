@@ -15,8 +15,8 @@ kelvin_test(
     srcs = [
         "getvl_test.cc",
     ],
-    copts = [
-        "-Wno-address",
+    hdrs = [
+        "kelvin_test.h",
     ],
     deps = [
         ":kelvin_test",

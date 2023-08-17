@@ -6,14 +6,14 @@
 #include "tests/kelvin_isa/kelvin_test.h"
 
 // clang-format off
-#define TEST_GETVL_X(op, in)                                              \
+#define TEST_GETVL_X(T, op, in)                                           \
   {                                                                       \
     int ref, dut;                                                         \
-    if (op == "getvl.b.x" || op == "getvl.b.x.m") {                       \
+    if (sizeof(T) == 1) {                                                 \
       ref = std::min(vlb, in);                                            \
-    } else if (op == "getvl.h.x" || op == "getvl.h.x.m") {                \
+    } else if (sizeof(T) == 2) {                                          \
       ref = std::min(vlh, in);                                            \
-    } else if (op == "getvl.w.x" || op == "getvl.w.x.m") {                \
+    } else if (sizeof(T) == 4) {                                          \
       ref = std::min(vlw, in);                                            \
     } else {                                                              \
       printf("**error(%d)[unknown getvl]\n", __LINE__);                   \
@@ -27,14 +27,14 @@
       exit(-1);                                                           \
     }                                                                     \
   }
-#define TEST_GETVL_XX(op, in0, in1)                                          \
+#define TEST_GETVL_XX(T, op, in0, in1)                                       \
   {                                                                          \
     int ref, dut;                                                            \
-    if (op == "getvl.b.xx" || op == "getvl.b.xx.m") {                        \
+    if (sizeof(T) == 1) {                                                    \
       ref = std::min(vlb, std::min(in0, in1));                               \
-    } else if (op == "getvl.h.xx" || op == "getvl.h.xx.m") {                 \
+    } else if (sizeof(T) == 2) {                                             \
       ref = std::min(vlh, std::min(in0, in1));                               \
-    } else if (op == "getvl.w.xx" || op == "getvl.w.xx.m") {                 \
+    } else if (sizeof(T) == 4) {                                             \
       ref = std::min(vlw, std::min(in0, in1));                               \
     } else {                                                                 \
       printf("**error(%d)[unknown getvl]\n", __LINE__);                      \
@@ -72,27 +72,27 @@ int main() {
     exit(-1);
   }
   for (int i = 0; i < vlb + pad; ++i) {
-    TEST_GETVL_X("getvl.b.x", i);
+    TEST_GETVL_X(uint8_t, "getvl.b.x", i);
   }
   for (int i = 0; i < vlh + pad; ++i) {
-    TEST_GETVL_X("getvl.h.x", i);
+    TEST_GETVL_X(uint16_t, "getvl.h.x", i);
   }
   for (int i = 0; i < vlw + pad; ++i) {
-    TEST_GETVL_X("getvl.w.x", i);
+    TEST_GETVL_X(uint32_t, "getvl.w.x", i);
   }
   for (int i = 0; i < vlb + pad; ++i) {
     for (int j = 0; j < vlb + pad; ++j) {
-      TEST_GETVL_XX("getvl.b.xx", i, j);
+      TEST_GETVL_XX(uint8_t, "getvl.b.xx", i, j);
     }
   }
   for (int i = 0; i < vlh + pad; ++i) {
     for (int j = 0; j < vlh + pad; ++j) {
-      TEST_GETVL_XX("getvl.h.xx", i, j);
+      TEST_GETVL_XX(uint16_t, "getvl.h.xx", i, j);
     }
   }
   for (int i = 0; i < vlw + pad; ++i) {
     for (int j = 0; j < vlw + pad; ++j) {
-      TEST_GETVL_XX("getvl.w.xx", i, j);
+      TEST_GETVL_XX(uint32_t, "getvl.w.xx", i, j);
     }
   }
   // ---------------------------------------------------------------------------
@@ -114,27 +114,27 @@ int main() {
     exit(-1);
   }
   for (int i = 0; i < vlb + pad; ++i) {
-    TEST_GETVL_X("getvl.b.x.m", i);
+    TEST_GETVL_X(uint8_t, "getvl.b.x.m", i);
   }
   for (int i = 0; i < vlh + pad; ++i) {
-    TEST_GETVL_X("getvl.h.x.m", i);
+    TEST_GETVL_X(uint16_t, "getvl.h.x.m", i);
   }
   for (int i = 0; i < vlw + pad; ++i) {
-    TEST_GETVL_X("getvl.w.x.m", i);
+    TEST_GETVL_X(uint32_t, "getvl.w.x.m", i);
   }
   for (int i = 0; i < vlb + pad; ++i) {
     for (int j = 0; j < vlb + pad; ++j) {
-      TEST_GETVL_XX("getvl.b.xx.m", i, j);
+      TEST_GETVL_XX(uint8_t, "getvl.b.xx.m", i, j);
     }
   }
   for (int i = 0; i < vlh + pad; ++i) {
     for (int j = 0; j < vlh + pad; ++j) {
-      TEST_GETVL_XX("getvl.h.xx.m", i, j);
+      TEST_GETVL_XX(uint16_t, "getvl.h.xx.m", i, j);
     }
   }
   for (int i = 0; i < vlw + pad; ++i) {
     for (int j = 0; j < vlw + pad; ++j) {
-      TEST_GETVL_XX("getvl.w.xx.m", i, j);
+      TEST_GETVL_XX(uint32_t, "getvl.w.xx.m", i, j);
     }
   }
   return 0;
