@@ -32,3 +32,13 @@ kelvin_test(
         ":kelvin_test",
     ],
 )
+
+kelvin_test(
+    name = "vpadd",
+    srcs = [
+        "vpadd.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
