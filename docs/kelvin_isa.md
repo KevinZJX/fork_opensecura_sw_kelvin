@@ -1609,6 +1609,8 @@ for L in Op.typelen
 
 Generalized reverse using bit ladder.
 
+The size of the flip is based on the `log_2(data type)`
+
 **Encodings**
 
 vrev.[b,h,w].vv.{m} vd, vs1, vs2 \
@@ -1624,7 +1626,9 @@ for L in Op.typelen
   if (shamt & 1)  r = ((r & 0x55..) << 1)  | ((r & 0xAA..) >> 1)
   if (shamt & 2)  r = ((r & 0x33..) << 2)  | ((r & 0xCC..) >> 2)
   if (shamt & 4)  r = ((r & 0x0F..) << 4)  | ((r & 0xF0..) >> 4)
+  if (sz == 0) vd[L] = r; continue;
   if (shamt & 8)  r = ((r & 0x00..) << 8)  | ((r & 0xFF..) >> 8)
+  if (sz == 1) vd[L] = r; continue;
   if (shamt & 16) r = ((r & 0x00..) << 16) | ((r & 0xFF..) >> 16)
   vd[L] = r
 ```
