@@ -1866,8 +1866,8 @@ Arithmetic right shift with rounding and signed/unsigned saturation.
 
 **Encodings**
 
-vsrans{u}.[b,h,w].{r}.vv.{m} vd, vs1, vs2 \
-vsrans{u}.[b,h,w].{r}.vx.{m} vd, vs1, xs2
+vsrans{u}.[b,h].{r}.vv.{m} vd, vs1, vs2 \
+vsrans{u}.[b,h].{r}.vx.{m} vd, vs1, xs2
 
 **Operation**
 
@@ -1893,8 +1893,8 @@ saturation.
 
 **Encodings**
 
-vsraqs{u}.[b,h].{r}.vv.{m} vd, vs1, vs2 \
-vsraqs{u}.[b,h].{r}.vx.{m} vd, vs1, xs2
+vsraqs{u}.b.{r}.vv.{m} vd, vs1, vs2 \
+vsraqs{u}.b.{r}.vx.{m} vd, vs1, xs2
 
 **Operation**
 
@@ -1910,7 +1910,7 @@ for L in i32.typelen
 ```
 
 Note: The register interleaving is [0,2,1,3] and not [0,1,2,3] as this matches
-vconv/vdwconv requirements, and one vsrxqs is the same as two chained vsrxns.
+vconv/vdwconv requirements, and one vsraqs is the same as two chained vsrans.
 
 --------------------------------------------------------------------------------
 
