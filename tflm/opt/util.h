@@ -12,12 +12,11 @@
 #define RIGHT_SHIFT(_shift) -std::min(_shift, 0L)
 
 #define rescale_internal(Vd, Vs, mult, shift, offset, m) \
-  do { \
-    int32_t _shift = RIGHT_SHIFT(shift); \
-    vmulh_w_r_vx##m(Vd, Vs, mult); \
-    vmul_w_vx##m(Vd, Vd, 2); \
-    vsha_w_vx##m(Vd, Vd, _shift); \
-    vadd_w_vx##m(Vd, Vd, offset); \
+  do {                                                   \
+    int32_t _shift = RIGHT_SHIFT(shift);                 \
+    vdmulh_w_r_vx##m(Vd, Vs, mult);                      \
+    vsha_w_r_vx##m(Vd, Vd, _shift);                      \
+    vadd_w_vx##m(Vd, Vd, offset);                        \
   } while (0);
 
 #define rescale(Vd, Vs, mult, shift, offset) rescale_internal(Vd, Vs, mult, shift, offset, );
