@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 
+#include "examples/tflm/soundstream/best_of_times_s16_decoded.h"
+#include "examples/tflm/soundstream/best_of_times_s16_encoded.h"
 #include "examples/tflm/soundstream/best_of_times_s16_wav.h"
 #include "examples/tflm/soundstream/decoder_non_stream_q16x8_b64_io_int16_tflite.h"
 #include "examples/tflm/soundstream/encoder_non_stream_q16x8_b64_io_int16_tflite.h"
@@ -73,9 +75,12 @@ int main(int argc, char **argv) {
 
   TfLiteTensor *encoder_input = encoder_interpreter->input(0);
   TfLiteTensor *encoder_output = encoder_interpreter->output(0);
+  TfLiteTensor *decoder_input = decoder_interpreter->input(0);
+  TfLiteTensor *decoder_output = decoder_interpreter->output(0);
 
   int invocation_count =
-      g_best_of_times_s16_audio_data_size / encoder_input->bytes;
+      (g_best_of_times_s16_audio_data_size * sizeof(int16_t)) /
+      encoder_input->bytes;
   for (int i = 0; i < invocation_count; ++i) {
     MicroPrintf("Invocation %d of %d", i, invocation_count);
     memcpy(encoder_input->data.uint8,
@@ -87,13 +92,24 @@ int main(int argc, char **argv) {
       MicroPrintf("Failed to invoke encoder");
       return -1;
     }
+    if (memcmp(encoder_output->data.uint8,
+               g_best_of_times_s16_encoded + (i * encoder_output->bytes),
+               encoder_output->bytes)) {
+      MicroPrintf("Encoder output mismatches reference");
+      return -1;
+    }
 
-    TfLiteTensor *decoder_input = decoder_interpreter->input(0);
     memcpy(decoder_input->data.uint8, encoder_output->data.uint8,
            decoder_input->bytes);
     invoke_status = decoder_interpreter->Invoke();
     if (invoke_status != kTfLiteOk) {
       MicroPrintf("Failed to invoke decoder");
+      return -1;
+    }
+    if (memcmp(decoder_output->data.uint8,
+               g_best_of_times_s16_decoded + (i * decoder_output->bytes),
+               decoder_output->bytes)) {
+      MicroPrintf("Decoder output mismatches reference");
       return -1;
     }
   }
