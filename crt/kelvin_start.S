@@ -82,6 +82,7 @@ init_array_loop_end:
         # Store the application's return value at _ret
         la   t0, _ret
         sw   a0, 0(t0)
+        flushall
         beqz a0, success
 failure:
         ebreak
