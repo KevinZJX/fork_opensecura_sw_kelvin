@@ -947,7 +947,7 @@ if IsDenseFormat
   a2 = {vs1+2}.asByteType
 if IsSparseFormat1  # [n-1,n,n+1]
   a0 = vslide_p({vs1+1}, {vs1+0}, 1).asByteType
-  a1 = {vs1+0}.asByteType
+  a1 = {vs1+1}.asByteType
   a2 = vslide_n({vs1+1}, {vs1+2}, 1).asByteType
 if IsSparseFormat2  # [n,n+1,n+2]
   a0 = {vs1+0}.asByteType
