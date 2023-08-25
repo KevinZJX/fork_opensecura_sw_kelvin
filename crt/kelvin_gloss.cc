@@ -136,8 +136,8 @@ extern "C" void* _sbrk(int bytes) {
   return reinterpret_cast<void*>(prev_heap_end);
 }
 
+void* operator new(size_t n) { return malloc(n); }
+
 void operator delete(void* p) noexcept { free(p); }
 
-extern "C" void operator delete(void* p, uint32_t c) noexcept {
-  operator delete(p);
-}
+void operator delete(void* p, size_t c) noexcept { operator delete(p); }

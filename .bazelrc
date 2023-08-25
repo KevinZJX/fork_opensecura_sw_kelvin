@@ -1,6 +1,6 @@
-build --action_env=BAZEL_CXXOPTS="-std=gnu++14"
-build --cxxopt='-std=gnu++14'
-build --conlyopt='-std=gnu11'
+build --action_env=BAZEL_CXXOPTS="-std=c++17"
+build --cxxopt='-std=c++17'
+build --conlyopt='-std=c11'
 
 # Enable toolchain resolution with cc
 build --incompatible_enable_cc_toolchain_resolution
@@ -15,5 +15,4 @@ build --copt=-DTF_LITE_USE_GLOBAL_CMATH_FUNCTIONS
 build --copt=-DTF_LITE_USE_GLOBAL_MIN
 build --copt=-DTF_LITE_USE_GLOBAL_MAX
 build --copt=-DTF_LITE_MCU_DEBUG_LOG
-build --copt=-DTF_LITE_STATIC_MEMORY
 build:opt --copt=-DTF_LITE_STRIP_ERROR_STRINGS

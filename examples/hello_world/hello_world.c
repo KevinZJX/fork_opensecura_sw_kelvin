@@ -46,7 +46,5 @@ int main(int argc, char *argv[]) {
   output = data[kDataSize - 1];
   output_header.output_ptr = (uint32_t)&output;
 
-  // invalidate all cache.
-  asm volatile("flushall");
   return 0;
 }
