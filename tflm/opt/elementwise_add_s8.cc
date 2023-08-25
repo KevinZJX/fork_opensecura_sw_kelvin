@@ -59,14 +59,14 @@ void elementwise_add_s8(const int8_t* input1, const int8_t* input2,
     vmul_w_vx_m(vm6, vm6, input2_shift_mul);
     vmul_w_vx_m(vm7, vm7, input2_shift_mul);
 
-    rescale_m(vm0, vm0, input1_mult, input1_shift, input1_offset);
-    rescale_m(vm1, vm1, input1_mult, input1_shift, input1_offset);
-    rescale_m(vm2, vm2, input1_mult, input1_shift, input1_offset);
-    rescale_m(vm3, vm3, input1_mult, input1_shift, input1_offset);
-    rescale_m(vm4, vm4, input2_mult, input2_shift, input2_offset);
-    rescale_m(vm5, vm5, input2_mult, input2_shift, input2_offset);
-    rescale_m(vm6, vm6, input2_mult, input2_shift, input2_offset);
-    rescale_m(vm7, vm7, input2_mult, input2_shift, input2_offset);
+    rescale_m(vm0, vm0, vm15, input1_mult, input1_shift, input1_offset);
+    rescale_m(vm1, vm1, vm15, input1_mult, input1_shift, input1_offset);
+    rescale_m(vm2, vm2, vm15, input1_mult, input1_shift, input1_offset);
+    rescale_m(vm3, vm3, vm15, input1_mult, input1_shift, input1_offset);
+    rescale_m(vm4, vm4, vm15, input2_mult, input2_shift, input2_offset);
+    rescale_m(vm5, vm5, vm15, input2_mult, input2_shift, input2_offset);
+    rescale_m(vm6, vm6, vm15, input2_mult, input2_shift, input2_offset);
+    rescale_m(vm7, vm7, vm15, input2_mult, input2_shift, input2_offset);
 
     // Sum the rescaled inputs.
     vadd_w_vv_m(vm0, vm0, vm4);
@@ -75,10 +75,10 @@ void elementwise_add_s8(const int8_t* input1, const int8_t* input2,
     vadd_w_vv_m(vm3, vm3, vm7);
 
     // Rescale the summed output.
-    rescale_m(vm0, vm0, output_mult, output_shift, output_offset);
-    rescale_m(vm1, vm1, output_mult, output_shift, output_offset);
-    rescale_m(vm2, vm2, output_mult, output_shift, output_offset);
-    rescale_m(vm3, vm3, output_mult, output_shift, output_offset);
+    rescale_m(vm0, vm0, vm15, output_mult, output_shift, output_offset);
+    rescale_m(vm1, vm1, vm15, output_mult, output_shift, output_offset);
+    rescale_m(vm2, vm2, vm15, output_mult, output_shift, output_offset);
+    rescale_m(vm3, vm3, vm15, output_mult, output_shift, output_offset);
 
     // Clamp to the provided range.
     vmin_w_vx_m(vm0, vm0, output_activation_max);

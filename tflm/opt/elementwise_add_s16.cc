@@ -45,18 +45,18 @@ void elementwise_add_s16(const int16_t* input1, const int16_t* input2,
     vmul_w_vx_m(vm2, vm2, input2_shift_mul);
     vmul_w_vx_m(vm3, vm3, input2_shift_mul);
 
-    rescale_m(vm0, vm0, input1_mult, input1_shift, input1_offset);
-    rescale_m(vm1, vm1, input1_mult, input1_shift, input1_offset);
-    rescale_m(vm2, vm2, input2_mult, input2_shift, input2_offset);
-    rescale_m(vm3, vm3, input2_mult, input2_shift, input2_offset);
+    rescale_m(vm0, vm0, vm15, input1_mult, input1_shift, input1_offset);
+    rescale_m(vm1, vm1, vm15, input1_mult, input1_shift, input1_offset);
+    rescale_m(vm2, vm2, vm15, input2_mult, input2_shift, input2_offset);
+    rescale_m(vm3, vm3, vm15, input2_mult, input2_shift, input2_offset);
 
     // Sum the rescaled inputs.
     vadd_w_vv_m(vm0, vm0, vm2);
     vadd_w_vv_m(vm1, vm1, vm3);
 
     // Rescale the summed output.
-    rescale_m(vm0, vm0, output_mult, output_shift, output_offset);
-    rescale_m(vm1, vm1, output_mult, output_shift, output_offset);
+    rescale_m(vm0, vm0, vm15, output_mult, output_shift, output_offset);
+    rescale_m(vm1, vm1, vm15, output_mult, output_shift, output_offset);
 
     // Clamp to the provided range.
     vmin_w_vx_m(vm0, vm0, output_activation_max);
