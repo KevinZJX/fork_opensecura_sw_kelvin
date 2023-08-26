@@ -747,8 +747,8 @@ void Encode100(std::string name, const int index) {
             if (v && !has_v_only) continue;
             bool is_v_only = !v && has_v_only;
             for (auto is_vx : {false, true}) {
-              // Skip this to sort .v before .vv and .vx
-              if (!v && !is_vx && has_v_only) continue;
+              // .v only code with !v && is_vx
+              if (!(!v && is_vx) && has_v_only) continue;
 
               std::string op = name;
               uint32_t vmatch = vmatch_base;
