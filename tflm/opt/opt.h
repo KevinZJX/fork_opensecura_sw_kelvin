@@ -5,6 +5,12 @@
 #ifndef TFLM_OPT_OPT_H_
 #define TFLM_OPT_OPT_H_
 
+/* clang-format off */
+#include <cstring>
+#include "tensorflow/lite/kernels/internal/runtime_shape.h"
+#include "tensorflow/lite/kernels/internal/types.h"
+/* clang-format on */
+
 namespace kelvin::opt {
 void *memcpy(void *dst, const void *src, size_t n);
 void elementwise_add_s8(const int8_t* input1, const int8_t* input2,
@@ -45,6 +51,27 @@ void leaky_relu_s16(const int16_t* input, int16_t* output,
                     const int32_t output_shift_alpha,
                     const int32_t output_multiplier_identity,
                     const int32_t output_shift_identity);
+void conv_per_channel_b32(
+    const tflite::ConvParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int32_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int16_t* output_data);
+void conv_per_channel_b64(
+    const tflite::ConvParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int64_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int16_t* output_data);
+void conv_per_channel_b8(
+    const tflite::ConvParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int8_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int32_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int8_t* output_data);
 }  // namespace kelvin::opt
 
 #endif  // TFLM_OPT_OPT_H_

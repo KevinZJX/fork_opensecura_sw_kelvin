@@ -7,6 +7,7 @@
 #ifndef CRT_KELVIN_H_
 #define CRT_KELVIN_H_
 
+#include <assert.h>
 #include <math.h>
 #include <stdint.h>
 #include <string.h>
@@ -38,5 +39,16 @@
 #define vm13 v52
 #define vm14 v56
 #define vm15 v60
+
+struct vconv_u8_t {
+  uint32_t mode : 2;    // 1:0
+  uint32_t start : 5;   // 6:2
+  uint32_t stop : 5;    // 11:7
+  int32_t sbias1 : 9;   // 20:12
+  uint32_t sdata1 : 1;  // 21
+  int32_t sbias2 : 9;   // 30:22
+  uint32_t sdata2 : 1;  // 31
+};
+static_assert(sizeof(struct vconv_u8_t) == 4);
 
 #endif  // CRT_KELVIN_H_
