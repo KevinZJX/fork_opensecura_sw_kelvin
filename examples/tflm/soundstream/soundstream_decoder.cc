@@ -16,23 +16,34 @@ __attribute__((section(".model_output_header"))) OutputHeader output_header = {
 };
 
 namespace {
-uint8_t
-    decoder_tensor_arena[kelvin::soundstream::decoder::kTensorArenaSizeBytes]
-    __attribute__((aligned(64)));
+#if defined(STREAMING)
+constexpr size_t tensor_arena_size =
+    kelvin::soundstream::decoder::kTensorArenaStreamingSizeBytes;
+#else
+constexpr size_t tensor_arena_size =
+    kelvin::soundstream::decoder::kTensorArenaSizeBytes;
+#endif
+uint8_t decoder_tensor_arena[tensor_arena_size] __attribute__((aligned(64)));
 }  // namespace
 
 int main(int argc, char **argv) {
-  auto decoder = kelvin::soundstream::decoder::Setup(decoder_tensor_arena);
+#if defined(STREAMING)
+  auto decoder = kelvin::soundstream::decoder::SetupStreaming(
+      decoder_tensor_arena, tensor_arena_size);
+#else
+  auto decoder = kelvin::soundstream::decoder::Setup(decoder_tensor_arena,
+                                                     tensor_arena_size);
+#endif
   if (!decoder) {
     MicroPrintf("Unable to construct decoder");
     return -1;
   }
 
-  TfLiteTensor *decoder_input = decoder->interpreter->input(0);
-  TfLiteTensor *decoder_output = decoder->interpreter->output(0);
+  TfLiteTensor *decoder_input = decoder->interpreter()->input(0);
+  TfLiteTensor *decoder_output = decoder->interpreter()->output(0);
 
   memset(decoder_input->data.uint8, 0, decoder_input->bytes);
-  TfLiteStatus invoke_status = decoder->interpreter->Invoke();
+  TfLiteStatus invoke_status = decoder->interpreter()->Invoke();
   if (invoke_status != kTfLiteOk) {
     MicroPrintf("Failed to invoke decoder");
     return -1;
