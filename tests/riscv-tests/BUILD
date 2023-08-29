@@ -74,6 +74,7 @@ RV32UI_TESTS = [
     defines = [
         "RVTEST_RV64U=RVTEST_RV32U",
     ],
+    hw_test_size = "small",
     is_riscv_test = True,
     deps = [
         ":riscv_tests_base",
@@ -101,6 +102,7 @@ RV32UM_TESTS = [
         "-Iexternal/riscv-tests/isa/macros/scalar",
         "-Wno-variadic-macros",
     ],
+    hw_test_size = "small",
     is_riscv_test = True,
     deps = [
         ":riscv_tests_base",
@@ -112,6 +114,7 @@ kelvin_test(
     srcs = [
         "branch_modulo_test.cc",
     ],
+    hw_test_size = "small",
     deps = [
         "//crt:crt_header",
     ],
@@ -122,6 +125,7 @@ kelvin_test(
     srcs = [
         "branch_div_test.cc",
     ],
+    hw_test_size = "small",
     deps = [
         "//crt:crt_header",
     ],

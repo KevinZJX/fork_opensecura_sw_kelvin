@@ -7,6 +7,8 @@ kelvin_test(
     srcs = [
         "@tflite-micro//tensorflow/lite/micro/kernels:add_test.cc",
     ],
+    # TODO(b/295921340): Re-enable HW test.
+    hw_test_tags = ["broken"],
     deps = [
         "//crt:crt_header",
         "@tflite-micro//tensorflow/lite/c:common",
@@ -39,6 +41,7 @@ kelvin_test(
     srcs = [
         "@tflite-micro//tensorflow/lite/micro/kernels:reshape_test.cc",
     ],
+    hw_test_size = "large",
     deps = [
         "//crt:crt_header",
         "@tflite-micro//tensorflow/lite/c:common",

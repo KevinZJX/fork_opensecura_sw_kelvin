@@ -38,6 +38,7 @@ kelvin_test(
     srcs = [
         "vpadd.cc",
     ],
+    hw_test_size = "small",
     deps = [
         ":kelvin_test",
     ],

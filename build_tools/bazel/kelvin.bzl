@@ -192,15 +192,20 @@ def kelvin_binary(
 
 def kelvin_test(
         name,
-        size = "small",
+        hw_test_size = "medium",
+        hw_test_tags = [],
+        iss_test_size = "small",
         **kwargs):
     """A sh_test wrapper for kelvin binaries
 
-    A wrapper to build kelvin_binary and test it against build_tools/test_runner.sh
+    A wrapper to build kelvin_binary and test it against build_tools/*test_runner.sh
+    on both ISS and HW SystemC simulations.
 
     Args:
       name: The name of this rule.
-      size: Test size. Default to small.
+      iss_test_size: ISS test size. Default to small.
+      hw_test_size: Tests size for SystemC test, default to medium.
+      hw_test_tags: Test tags passed to System test.
       **kwargs: Agruments that will be forwarded to kelvin_binary
     """
 
@@ -210,9 +215,10 @@ def kelvin_test(
         **kwargs
     )
 
+    iss_test = "{}_iss".format(name)
     native.sh_test(
-        name = name,
-        size = size,
+        name = iss_test,
+        size = iss_test_size,
         srcs = [
             "//build_tools:test_runner.sh",
         ],
@@ -221,6 +227,28 @@ def kelvin_test(
         ],
         data = [
             "{}.elf".format(kelvin_elf),
+        ],
+    )
+
+    hw_test = "{}_hw".format(name)
+    native.sh_test(
+        name = hw_test,
+        size = hw_test_size,
+        srcs = ["//build_tools:core_sim_test_runner.sh"],
+        args = [
+            "$(location %s.bin)" % kelvin_elf,
+        ],
+        data = [
+            "{}.bin".format(kelvin_elf),
+        ],
+        tags = hw_test_tags,
+    )
+
+    native.test_suite(
+        name = name,
+        tests = [
+            iss_test,
+            hw_test,
         ],
     )
 
