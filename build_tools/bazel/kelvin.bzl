@@ -195,6 +195,7 @@ def kelvin_test(
         hw_test_size = "medium",
         hw_test_tags = [],
         iss_test_size = "small",
+        iss_test_tags = [],
         **kwargs):
     """A sh_test wrapper for kelvin binaries
 
@@ -203,9 +204,10 @@ def kelvin_test(
 
     Args:
       name: The name of this rule.
-      iss_test_size: ISS test size. Default to small.
       hw_test_size: Tests size for SystemC test, default to medium.
       hw_test_tags: Test tags passed to System test.
+      iss_test_size: ISS test size. Default to small.
+      iss_test_tags: Test tags passed to ISS test.
       **kwargs: Agruments that will be forwarded to kelvin_binary
     """
 
@@ -228,6 +230,7 @@ def kelvin_test(
         data = [
             "{}.elf".format(kelvin_elf),
         ],
+        tags = ["iss"] + iss_test_tags,
     )
 
     hw_test = "{}_hw".format(name)
@@ -241,7 +244,7 @@ def kelvin_test(
         data = [
             "{}.bin".format(kelvin_elf),
         ],
-        tags = hw_test_tags,
+        tags = ["systemc"] + hw_test_tags,
     )
 
     native.test_suite(
