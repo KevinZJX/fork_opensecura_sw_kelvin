@@ -146,6 +146,7 @@ def kelvin_binary(
         name,
         srcs,
         is_riscv_test = False,
+        tags = [],
         **kwargs):
     """A helper macro for generating binary artifacts for the kelvin core.
 
@@ -175,6 +176,7 @@ def kelvin_binary(
         name = name,
         srcs = srcs,
         linker_script = "//crt:kelvin.ld",
+        tags = tags,
         **kwargs
     )
 
@@ -183,11 +185,13 @@ def kelvin_binary(
         name = "{}.bin".format(name),
         srcs = [name],
         output_group = "bin_file",
+        tags = tags,
     )
     native.filegroup(
         name = "{}.elf".format(name),
         srcs = [name],
         output_group = "elf_file",
+        tags = tags,
     )
 
 def kelvin_test(
