@@ -137,7 +137,8 @@ extern "C" void* _sbrk(int bytes) {
 }
 
 void* operator new(size_t n) { return malloc(n); }
+void* operator new[](size_t n) { return malloc(n); }
 
 void operator delete(void* p) noexcept { free(p); }
-
 void operator delete(void* p, size_t c) noexcept { operator delete(p); }
+void operator delete[](void* p) noexcept { free(p); }
