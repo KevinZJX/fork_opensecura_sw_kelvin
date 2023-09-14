@@ -23,6 +23,24 @@ kelvin_test(
     ],
 )
 
+cc_library(
+    name = "vdwconv_data",
+    srcs = [
+        "vdwconv_data.h",
+    ],
+)
+
+kelvin_test(
+    name = "vdwconv",
+    srcs = [
+        "vdwconv.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+        ":vdwconv_data",
+    ],
+)
+
 kelvin_test(
     name = "vld",
     srcs = [
