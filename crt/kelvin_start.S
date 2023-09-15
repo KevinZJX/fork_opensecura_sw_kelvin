@@ -44,6 +44,28 @@ _start:
         mv   t5, zero
         mv   t6, zero
 
+        ###############################################
+        # Zero out all kelvin registers               #
+        ###############################################
+        vdup.w.x.m v0, zero
+        vdup.w.x.m v4, zero
+        vdup.w.x.m v8, zero
+        vdup.w.x.m v12, zero
+        vdup.w.x.m v16, zero
+        vdup.w.x.m v20, zero
+        vdup.w.x.m v24, zero
+        vdup.w.x.m v28, zero
+        vdup.w.x.m v32, zero
+        vdup.w.x.m v36, zero
+        vdup.w.x.m v40, zero
+        vdup.w.x.m v44, zero
+        vdup.w.x.m v48, zero
+        vdup.w.x.m v52, zero
+        vdup.w.x.m v56, zero
+        vdup.w.x.m v60, zero
+        acset.v v48, v0
+        adwinit.v v48, v0
+
         # Zero out the bss section
         la   a0, __bss_start__
         la   a1, __bss_end__
