@@ -35,7 +35,7 @@ kelvin_binary(
     tags = ["manual"],
     deps = [
         ":soundstream",
-        "//crt:crt_header",
+        "//crt:crt",
     ],
 )
 
@@ -48,7 +48,7 @@ kelvin_binary(
     tags = ["manual"],
     deps = [
         ":soundstream",
-        "//crt:crt_header",
+        "//crt:crt",
     ],
 )
 
@@ -60,7 +60,7 @@ kelvin_binary(
     tags = ["manual"],
     deps = [
         ":soundstream",
-        "//crt:crt_header",
+        "//crt:crt",
     ],
 )
 
@@ -73,7 +73,7 @@ kelvin_binary(
     tags = ["manual"],
     deps = [
         ":soundstream",
-        "//crt:crt_header",
+        "//crt:crt",
     ],
 )
 
@@ -93,7 +93,7 @@ kelvin_binary(
     tags = ["manual"],
     deps = [
         ":soundstream",
-        "//crt:crt_header",
+        "//crt:crt",
     ],
 )
 
@@ -114,7 +114,7 @@ kelvin_binary(
     tags = ["manual"],
     deps = [
         ":soundstream",
-        "//crt:crt_header",
+        "//crt:crt",
     ],
 )
 

@@ -13,7 +13,7 @@ kelvin_binary(
         "person_detect_tflite.h",
     ],
     deps = [
-        "//crt:crt_header",
+        "//crt:crt",
         "@tflite-micro//tensorflow/lite/micro:micro_framework",
         "@tflite-micro//tensorflow/lite/micro:system_setup",
     ],

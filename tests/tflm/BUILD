@@ -9,7 +9,7 @@ kelvin_test(
     ],
     hw_test_size = "large",
     deps = [
-        "//crt:crt_header",
+        "//crt",
         "@tflite-micro//tensorflow/lite/c:common",
         "@tflite-micro//tensorflow/lite/kernels/internal:tensor",
         "@tflite-micro//tensorflow/lite/micro:micro_utils",
@@ -25,7 +25,7 @@ kelvin_test(
         "@tflite-micro//tensorflow/lite/micro/kernels:leaky_relu_test.cc",
     ],
     deps = [
-        "//crt:crt_header",
+        "//crt",
         "@tflite-micro//tensorflow/lite/c:common",
         "@tflite-micro//tensorflow/lite/kernels/internal:tensor",
         "@tflite-micro//tensorflow/lite/micro:micro_utils",
@@ -42,7 +42,7 @@ kelvin_test(
     ],
     hw_test_size = "large",
     deps = [
-        "//crt:crt_header",
+        "//crt",
         "@tflite-micro//tensorflow/lite/c:common",
         "@tflite-micro//tensorflow/lite/kernels/internal:tensor",
         "@tflite-micro//tensorflow/lite/micro:micro_utils",

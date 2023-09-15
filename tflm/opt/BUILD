@@ -16,7 +16,7 @@ cc_library(
     ],
     target_compatible_with = ["@kelvin_sw//platforms/cpu:kelvin"],
     deps = [
-        "//crt:crt_header",
+        "//crt:crt",
     ],
     alwayslink = True,
 )

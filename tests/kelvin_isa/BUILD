@@ -6,7 +6,7 @@ cc_library(
         "kelvin_test.h",
     ],
     deps = [
-        "//crt:crt_header",
+        "//crt:crt",
     ],
 )
 

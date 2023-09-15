@@ -6,6 +6,6 @@ kelvin_binary(
         "hello_world.c",
     ],
     deps = [
-        "//crt:crt_header",
+        "//crt",
     ]
 )

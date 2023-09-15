@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "test_helper.h",
     ],
+    deps = [
+        "//crt",
+    ],
 )
 
 kelvin_test(
@@ -23,7 +26,6 @@ kelvin_test(
     ],
     deps = [
         ":test_helper",
-        "//crt:crt_header",
     ],
 )
 
@@ -39,7 +41,6 @@ kelvin_test(
     hw_test_size = "small",
     deps = [
         ":test_helper",
-        "//crt:crt_header",
     ],
 )
 
@@ -54,7 +55,6 @@ kelvin_test(
     ],
     deps = [
         ":test_helper",
-        "//crt:crt_header",
     ],
 )
 
@@ -69,7 +69,6 @@ kelvin_test(
     ],
     deps = [
         ":test_helper",
-        "//crt:crt_header",
     ],
 )
 
@@ -84,7 +83,6 @@ kelvin_test(
     ],
     deps = [
         ":test_helper",
-        "//crt:crt_header",
     ],
 )
 
@@ -100,6 +98,5 @@ kelvin_test(
     hw_test_size = "small",
     deps = [
         ":test_helper",
-        "//crt:crt_header",
     ],
 )

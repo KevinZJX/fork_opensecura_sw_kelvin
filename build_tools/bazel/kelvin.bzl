@@ -145,7 +145,6 @@ kelvin_binary_impl = kelvin_rule(
 def kelvin_binary(
         name,
         srcs,
-        is_riscv_test = False,
         tags = [],
         **kwargs):
     """A helper macro for generating binary artifacts for the kelvin core.
@@ -156,8 +155,7 @@ def kelvin_binary(
     Args:
       name: The name of this rule.
       srcs: The c source files.
-      is_riscv_test: A bool flag to decide if a custom _start asm is included.
-        It is used by riscv-tests.
+      tags: build tags.
       **kwargs: Additional arguments forward to cc_binary.
     Emits rules:
       filegroup              named: <name>.bin
@@ -165,17 +163,11 @@ def kelvin_binary(
       filegroup              named: <name>.elf
         Containing all elf output for the target.
     """
-    srcs.append("//crt:kelvin_gloss.cc")
-    if not is_riscv_test:
-        srcs += [
-            "//crt:crt.S",
-            "//crt:kelvin_start.S",
-        ]
 
     kelvin_binary_impl(
         name = name,
         srcs = srcs,
-        linker_script = "//crt:kelvin.ld",
+        linker_script = "@kelvin_sw//crt:kelvin_linker",
         tags = tags,
         **kwargs
     )

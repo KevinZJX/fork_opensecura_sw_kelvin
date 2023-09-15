@@ -11,8 +11,10 @@ cc_library(
         "riscv_test.h",
         "@riscv-tests//:isa/macros/scalar/test_macros.h",
     ],
+    target_compatible_with = ["@kelvin_sw//platforms/cpu:kelvin"],
     deps = [
-        "//crt:crt_header",
+        # only include the header since riscv tests have their own start.S.
+        "//crt:crt_gloss_only",
     ],
 )
 
@@ -75,7 +77,6 @@ RV32UI_TESTS = [
         "RVTEST_RV64U=RVTEST_RV32U",
     ],
     hw_test_size = "small",
-    is_riscv_test = True,
     deps = [
         ":riscv_tests_base",
     ],
@@ -103,7 +104,6 @@ RV32UM_TESTS = [
         "-Wno-variadic-macros",
     ],
     hw_test_size = "small",
-    is_riscv_test = True,
     deps = [
         ":riscv_tests_base",
     ],
@@ -116,7 +116,7 @@ kelvin_test(
     ],
     hw_test_size = "small",
     deps = [
-        "//crt:crt_header",
+        "//crt",
     ],
 )
 
@@ -127,6 +127,6 @@ kelvin_test(
     ],
     hw_test_size = "small",
     deps = [
-        "//crt:crt_header",
+        "//crt",
     ],
 )
