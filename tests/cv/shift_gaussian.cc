@@ -5,6 +5,7 @@
 #include "tests/cv/shift_gaussian.h"
 
 #include <cstdint>
+#include <cstdio>
 
 #include "crt/kelvin.h"
 

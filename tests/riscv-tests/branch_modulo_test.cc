@@ -5,8 +5,9 @@
 // Use greatest common denominator routine to stress test branch/modulo op
 // combinations.
 
-#include <stdint.h>
-#include <stdlib.h>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
 #include "crt/kelvin.h"
 
@@ -40,26 +41,26 @@ int main() {
   int32_t int32_a = rand_int32_input();
   int32_t int32_b = rand_int32_input();
 
-  printf("unsigned numbers: a:%u, b:%u\n", uint32_a, uint32_b);
+  printf("unsigned numbers: a:%lu, b:%lu\n", uint32_a, uint32_b);
   auto uint32_gcd = (uint32_a > uint32_b)
                         ? get_gcd<uint32_t>(uint32_a, uint32_b)
                         : get_gcd<uint32_t>(uint32_b, uint32_a);
-  printf("gcd: %u\n", uint32_gcd);
+  printf("gcd: %lu\n", uint32_gcd);
 
   if (!(uint32_a % uint32_gcd == 0 && uint32_b % uint32_gcd == 0)) {
-    printf("Invalid common denominator %u for %u and %u\n", uint32_gcd,
+    printf("Invalid common denominator %lu for %lu and %lu\n", uint32_gcd,
            uint32_a, uint32_b);
     exit(-1);
   }
 
-  printf("signed numbers: a:%d, b:%d\n", int32_a, int32_b);
+  printf("signed numbers: a:%ld, b:%ld\n", int32_a, int32_b);
   auto int32_gcd = (int32_a > int32_b) ? get_gcd<int32_t>(int32_a, int32_b)
                                        : get_gcd<int32_t>(int32_b, int32_a);
-  printf("gcd: %d\n", int32_gcd);
+  printf("gcd: %ld\n", int32_gcd);
 
   if (!(int32_a % int32_gcd == 0 && int32_b % int32_gcd == 0)) {
-    printf("Invalid common denominator %d for %d and %d\n", int32_gcd, int32_a,
-           int32_b);
+    printf("Invalid common denominator %ld for %ld and %ld\n", int32_gcd,
+           int32_a, int32_b);
     exit(-1);
   }
 

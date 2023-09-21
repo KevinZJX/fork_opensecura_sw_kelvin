@@ -1,3 +1,10 @@
+// Copyright 2023 Google LLC
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+
+#include <cstdio>
+
+#include "crt/printf_traits.h"
 #include "tests/kelvin_isa/kelvin_test.h"
 
 inline uint8_t* vldp_data(uint8_t* data) {
@@ -206,8 +213,8 @@ void test_ldst_x() {
   void* target = reinterpret_cast<void*>(read_data + offset);
   if (reinterpret_cast<void*>(dut) != target) {
     printf("Failed test_ldst_x for type %s:\n", TypeString<T>::type_str());
-    printf("  expected dut=0x%x to be 0x%x\n",
-           reinterpret_cast<void*>(dut), target);
+    printf("  expected dut=%p to be %p\n", reinterpret_cast<void*>(dut),
+           target);
     exit(1);
   }
 
@@ -222,7 +229,9 @@ void test_ldst_x() {
   for (int i = 0; i < size; i++) {
     if (result[i] != static_cast<T>(i)) {
       printf("Failed test_ldst_x for type %s:\n", TypeString<T>::type_str());
-      printf("  expected %d at position %d/%d got %d\n", i, i, size, result[i]);
+      printf("  expected %d at position %d/%d got ", i, i, size);
+      printf(PrintfTraits<T>::kFmt, result[i]);
+      printf("\n");
       exit(1);
     }
   }
@@ -247,8 +256,8 @@ void test_ldst_p_xx(int length) {
   void* target = reinterpret_cast<void*>(read_data + (length * sizeof(T)));
   if (reinterpret_cast<void*>(dut) != target) {
     printf("Failed test_ldst_p_xx for type %s:\n", TypeString<T>::type_str());
-    printf("  expected dut=%x to be %x\n",
-           reinterpret_cast<void*>(dut), target);
+    printf("  expected dut=%p to be %p\n", reinterpret_cast<void*>(dut),
+           target);
     exit(1);
   }
 
@@ -263,7 +272,9 @@ void test_ldst_p_xx(int length) {
   for (int i = 0; i < size; i++) {
     if (result[i] != static_cast<T>(i)) {
       printf("Failed test_ldst_p_xx for type %s:\n", TypeString<T>::type_str());
-      printf("  expected %d at position %d got %d\n", i, i, result[i]);
+      printf("  expected %d at position %d got ", i, i);
+      printf(PrintfTraits<T>::kFmt, result[i]);
+      printf("\n");
       exit(1);
     }
   }
@@ -299,8 +310,8 @@ void test_ldst_l_xx(int length) {
         (post_increment ? length * sizeof(T) : 0));
   if (reinterpret_cast<void*>(dut) != target) {
     printf("Failed test_ldst_l_xx for type %s:\n", TypeString<T>::type_str());
-    printf("  expected dut=%x to be %x\n",
-           reinterpret_cast<void*>(dut), target);
+    printf("  expected dut=%p to be %p\n", reinterpret_cast<void*>(dut),
+           target);
     exit(1);
   }
 
@@ -316,14 +327,18 @@ void test_ldst_l_xx(int length) {
   for (; i < length; i++) {
     if (result[i] != static_cast<T>(i)) {
       printf("Failed test_ldst_l_xx for type %s:\n", TypeString<T>::type_str());
-      printf("  expected %d at position %d/%d got %d\n", i, i, size, result[i]);
+      printf("  expected %d at position %d/%d got ", i, i, size);
+      printf(PrintfTraits<T>::kFmt, result[i]);
+      printf("\n");
       exit(1);
     }
   }
   for (; i < size; i++) {
     if (result[i] != 0) {
       printf("Failed test_ldst_l_xx for type %s:\n", TypeString<T>::type_str());
-      printf("  expected 0 at position %d/%d got %d\n", i, size, result[i]);
+      printf("  expected 0 at position %d/%d got ", i, size);
+      printf(PrintfTraits<T>::kFmt, result[i]);
+      printf("\n");
       exit(1);
     }
   }
@@ -359,8 +374,8 @@ void test_ldst_s_xx(int stride) {
   void* target = reinterpret_cast<void*>(read_data + offset);
   if (reinterpret_cast<void*>(dut) != target) {
     printf("Failed test_ldst_s_xx for type %s:\n", TypeString<T>::type_str());
-    printf("  expected dut=%x to be %x\n",
-           reinterpret_cast<void*>(dut), target);
+    printf("  expected dut=%p to be %p\n", reinterpret_cast<void*>(dut),
+           target);
     exit(1);
   }
 
@@ -381,8 +396,11 @@ void test_ldst_s_xx(int stride) {
       if (result_vector[i] != start_value + i) {
         printf("Failed test_ldst_s_xx for type %s:\n",
                TypeString<T>::type_str());
-        printf("  expected %d at position %d got %d\n",
-               expected_value, i, result_vector[i]);
+        printf("  expected ");
+        printf(PrintfTraits<T>::kFmt, expected_value);
+        printf(" at position %ld got ", i);
+        printf(PrintfTraits<T>::kFmt, result_vector[i]);
+        printf("\n");
         exit(1);
       }
     }
@@ -408,8 +426,8 @@ void test_ldst_tp_xx(int stride) {
   void* target = reinterpret_cast<void*>(read_data + VLENB);
   if (reinterpret_cast<void*>(dut) != target) {
     printf("Failed test_ldst_tp_xx for type %s:\n", TypeString<T>::type_str());
-    printf("  expected dut=%x to be %x\n",
-           reinterpret_cast<void*>(dut), target);
+    printf("  expected dut=%p to be %p\n", reinterpret_cast<void*>(dut),
+           target);
     exit(1);
   }
 
@@ -430,8 +448,11 @@ void test_ldst_tp_xx(int stride) {
     if (result[i] != expected_value) {
       printf("Failed test_ldst_tp_xx for type %s:\n",
              TypeString<T>::type_str());
-      printf("  expected %d at position %d got %d\n",
-             expected_value, i, result[i]);
+      printf("  expected ");
+      printf(PrintfTraits<T>::kFmt, expected_value);
+      printf(" at position %d got ", i);
+      printf(PrintfTraits<T>::kFmt, result[i]);
+      printf("\n");
       exit(1);
     }
   }
@@ -440,7 +461,9 @@ void test_ldst_tp_xx(int stride) {
     if (result[i] != 0) {
       printf("Failed test_ldst_tp_xx for type %s:\n",
              TypeString<T>::type_str());
-      printf("  expected 0 at position %d got %d\n", i, result[i]);
+      printf("  expected 0 at position %d got ", i);
+      printf(PrintfTraits<T>::kFmt, result[i]);
+      printf("\n");
       exit(1);
     }
   }
@@ -474,7 +497,11 @@ void test_vld_l() {
     for (int j = 0; j < vlen; ++j) {
       T ref = j < i ? j + 1 : 0;
       if (ref != dut[j]) {
-        printf("**error vld_l[%d,%d] %x %x\n", i, j, ref, dut[j]);
+        printf("**error vld_l[%d,%d] ", i, j);
+        printf(PrintfTraits<T>::kFmtHex, ref);
+        printf(" ");
+        printf(PrintfTraits<T>::kFmtHex, dut[j]);
+        printf("\n");
         exit(-1);
       }
     }

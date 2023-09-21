@@ -4,6 +4,8 @@
 
 #include "tests/cv/gaussian.h"
 
+#include <cstdio>
+
 #include "crt/kelvin.h"
 
 // Note: separable kernel is vertical then horizontal. H then V with the

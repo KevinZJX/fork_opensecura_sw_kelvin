@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
+#include <cstdio>
+
 #include "tests/kelvin_isa/kelvin_test.h"
 
 // clang-format off

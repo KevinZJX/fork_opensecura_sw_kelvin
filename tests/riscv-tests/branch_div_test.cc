@@ -5,8 +5,9 @@
 // Use the routine of finding the integer part of log_3 to stress test
 // branch/div op combinations.
 
-#include <stdint.h>
-#include <stdlib.h>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
 #include "crt/kelvin.h"
 
@@ -50,18 +51,18 @@ int main() {
   uint32_t uint32_input = rand_uint32_input();
   int32_t int32_input = rand_int32_input();
   auto uint32_log3 = get_int_log3<uint32_t>(uint32_input);
-  printf("Unsigned input: %u, integer log3: %u\n", uint32_input, uint32_log3);
+  printf("Unsigned input: %lu, integer log3: %lu\n", uint32_input, uint32_log3);
   auto test = int_pow3<uint32_t>(uint32_log3);
   // Make the check like this to prevent overflow
   if (!(test <= uint32_input && test >= uint32_input / 3)) {
-    printf("Invalid log_3 %u for %u\n", uint32_log3, uint32_input);
+    printf("Invalid log_3 %lu for %lu\n", uint32_log3, uint32_input);
     exit(-1);
   }
   auto int32_log3 = get_int_log3<int32_t>(int32_input);
-  printf("Signed intput:%d, integer log3: %d\n", int32_input, int32_log3);
+  printf("Signed intput:%ld, integer log3: %ld\n", int32_input, int32_log3);
   auto test1 = int_pow3<int32_t>(int32_log3);
   if (!(test1 <= int32_input && test1 >= int32_input / 3)) {
-    printf("Invalid log_3 %d for %d\n", int32_log3, int32_input);
+    printf("Invalid log_3 %ld for %ld\n", int32_log3, int32_input);
     exit(-1);
   }
   return 0;

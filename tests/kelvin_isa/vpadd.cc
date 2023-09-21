@@ -1,5 +1,8 @@
 // Copyright 2023 Google LLC
 
+#include <cstdio>
+
+#include "crt/printf_traits.h"
 #include "tests/kelvin_isa/kelvin_test.h"
 
 #define vpadd_v(T, Vd, Vs)          \
@@ -58,8 +61,16 @@ static void test_vpadd_v() {
 
   for (int i = 0; i < lanes; ++i) {
     if (ref[i] != dut[i]) {
-      printf("**error vpadd_v[%d] %d %d\n", i, ref[i], dut[i]);
-      printf("  inputs: %d, %d\n", inp[2 * i + 0], inp[2 * i + 1]);
+      printf("**error vpadd_v[%d] ", i);
+      printf(PrintfTraits<T2>::kFmt, ref[i]);
+      printf(" ");
+      printf(PrintfTraits<T2>::kFmt, dut[i]);
+      printf("\n");
+      printf("  inputs: ");
+      printf(PrintfTraits<T1>::kFmt, inp[2 * i + 0]);
+      printf(", ");
+      printf(PrintfTraits<T1>::kFmt, inp[2 * i + 1]);
+      printf("\n");
       exit(-1);
     }
   }
@@ -89,7 +100,11 @@ static void test_vpadd_v_m() {
 
   for (int i = 0; i < lanes; ++i) {
     if (ref[i] != dut[i]) {
-      printf("**error vpadd_v_m[%d] %x %x\n", i, ref[i], dut[i]);
+      printf("**error vpadd_v_m[%d] ", i);
+      printf(PrintfTraits<T2>::kFmtHex, ref[i]);
+      printf(" ");
+      printf(PrintfTraits<T2>::kFmtHex, dut[i]);
+      printf("\n");
       exit(-1);
     }
   }

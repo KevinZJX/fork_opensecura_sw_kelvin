@@ -2,11 +2,11 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 
-#include "tests/kelvin_isa/vdwconv_data.h"
-
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #include "tests/kelvin_isa/kelvin_test.h"
+#include "tests/kelvin_isa/vdwconv_data.h"
 
 struct vdwconv_u8_t {
   uint32_t mode:2;      // 1:0
@@ -35,7 +35,7 @@ static int32_t dwconv(const vdwconv_u8_t& cmd, uint8_t ina[3], uint8_t inb[3]) {
 #endif  // TEST_GEN
 
 void dwconv(const vdwconv_u8_t& cmd, const uint8_t ina[3][kZlen],
-            const uint8_t inb[3][kZlen], uint32_t ref[4][kZlen / 4],
+            const uint8_t inb[3][kZlen], const uint32_t ref[4][kZlen / 4],
             uint32_t dut[4][kZlen / 4]) {
   uint32_t cmdw;
   memcpy(&cmdw, &cmd, 4);
@@ -208,7 +208,7 @@ void dwconv(const vdwconv_u8_t& cmd, const uint8_t ina[3][kZlen],
   printf("{ ");
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < kZlen / 4; ++j) {
-      printf("0x%08x, ", ref[i][j]);
+      printf("0x%lx, ", ref[i][j]);
     }
   }
   printf("} },\n");
@@ -222,7 +222,7 @@ void dwconv(const vdwconv_u8_t& cmd, const uint8_t ina[3][kZlen],
         printf("**error::test_dwconv(%d,%d)(%d,%d,%d,%d)[%d,%d] ", cmd.sparsity,
                cmd.regbase, cmd.sdata1, cmd.sdata2, cmd.sbias1, cmd.sbias2, i,
                j);
-        printf("%08x %08x\n", r, d);
+        printf("0x%lx 0x%lx\n", r, d);
         exit(-1);
       }
     }
@@ -285,14 +285,14 @@ void test_vdwconv() {
 
   for (int i = 0; i < 4; ++i) {
     if (ref[i] != dut[i]) {
-      printf("**error::test_dwconv<%d,%d>[%d] %08x %08x\n", step, use_accum, i,
-             ref[i], dut[i]);
+      printf("**error::test_dwconv<%d,%d>[%d] 0x%lx 0x%lx\n", step, use_accum,
+             i, ref[i], dut[i]);
       exit(-1);
     }
   }
 }
 
-void test_vdwconv(int sparsity, int regbase, test_dwconv_t& test) {
+void test_vdwconv(int sparsity, int regbase, const test_dwconv_t& test) {
   uint32_t dut[4][kZlen / 4];
   vdwconv_u8_t cmd;
 
@@ -309,10 +309,10 @@ void test_vdwconv(int sparsity, int regbase, test_dwconv_t& test) {
 
 int main() {
 #ifdef TEST_GEN
-  uint32_t* pw_ina = (uint32_t*)ina_;
-  uint32_t* pw_inb = (uint32_t*)inb_;
-  uint8_t* pb_ina = (uint8_t*)ina_;
-  uint8_t* pb_inb = (uint8_t*)inb_;
+  uint32_t* pw_ina = reinterpret_cast<uint32_t*>(ina_);
+  uint32_t* pw_inb = reinterpret_cast<uint32_t*>(inb_);
+  uint8_t* pb_ina = reinterpret_cast<uint8_t*>(ina_);
+  uint8_t* pb_inb = reinterpret_cast<uint8_t*>(inb_);
   for (int i = 0; i < 3 * kZlen / 4; ++i) {
     pw_ina[i] = krand();
     pw_inb[i] = krand();

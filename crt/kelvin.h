@@ -41,42 +41,4 @@
 #define vm14 v56
 #define vm15 v60
 
-// Stop printing the string when \0 is found in the word.
-static inline bool WordHasZero(uint32_t data) {
-  return (((data >> 24) & 0xff) == 0) || (((data >> 16) & 0xff) == 0) ||
-         (((data >> 8) & 0xff) == 0) || ((data & 0xff) == 0);
-}
-
-template <typename T>
-static inline void PrintArg(const T arg) {
-  if (std::is_same<T, const uint8_t *>::value ||
-      std::is_same<T, const char *>::value) {
-    klog(arg);
-  } else if (std::is_same<T, uint8_t *>::value ||
-             std::is_same<T, char *>::value) {
-    const uint32_t *p_str = reinterpret_cast<const uint32_t *>(arg);
-    uint32_t data = 0;
-    do {
-      data = *p_str;
-      p_str++;
-      clog(data);
-    } while (!WordHasZero(data));
-  } else {  // scalar argument.
-    slog(arg);
-  }
-}
-
-// General printf helper function. The c++11 pack expansion + braced-init-list
-// is used to support arbitrary variadic template.
-// The unused list is initialized by expanding the arguments in order, and then
-// processed by `PrintArg`.
-template <typename... Types>
-static inline void printf(const char *format, Types... args) {
-  constexpr auto size = sizeof...(args);
-  if (size > 0) {
-    __attribute__((unused)) int x[] = {0, ((void)PrintArg(args), 0)...};
-  }
-  flog(format);
-}
-
 #endif  // CRT_KELVIN_H_

@@ -35,5 +35,6 @@ cc_library(
     hdrs = [
         "kelvin.h",
         "kelvin_intrinsics.h",
+        "printf_traits.h",
     ],
 )

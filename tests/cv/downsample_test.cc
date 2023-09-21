@@ -6,6 +6,7 @@
 #include "tests/cv/downsample.h"
 
 #include <cstdint>
+#include <cstdio>
 
 #include "crt/kelvin.h"
 #include "tests/cv/test_helper.h"

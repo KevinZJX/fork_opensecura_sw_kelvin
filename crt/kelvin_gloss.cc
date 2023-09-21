@@ -13,11 +13,13 @@
 // limitations under the License.
 //
 // Syscall stubs for newlib on Kelvin
-#include <errno.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include <cerrno>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
 #include "crt/kelvin.h"
 
@@ -93,7 +95,7 @@ extern "C" int _write(int file, char* buf, int nbytes) {
       _write_line_buffer[len] = '\0';
     }
     if ((_write_line_buffer[len] == '\0')) {
-      printf("%s", _write_line_buffer);
+      flog(_write_line_buffer);
       len = 0;
     }
     _write_line_buffer_len = len;
