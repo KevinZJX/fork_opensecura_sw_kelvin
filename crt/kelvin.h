@@ -11,8 +11,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <algorithm>
-
 #define __volatile_always__ volatile
 
 // Helper macros for Intrinsics definitions.

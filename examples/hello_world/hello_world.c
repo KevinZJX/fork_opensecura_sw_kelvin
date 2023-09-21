@@ -16,6 +16,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// This header is included to ensure that it can
+// be referenced from a C file.
+#include "crt/kelvin.h"
+
 typedef struct {
   uint32_t return_code;  // Populated in kelvin_start.S.
   uint32_t output_ptr;
