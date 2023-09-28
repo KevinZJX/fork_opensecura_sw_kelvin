@@ -9,7 +9,7 @@ def kelvin_sw_repos():
     # Kelvin toolchain
     native.new_local_repository(
         name = "kelvin-gcc",
-        build_file = "third_party/kelvin-gcc/BUILD",
+        build_file = "@kelvin_sw//third_party/kelvin-gcc:BUILD.kelvin-gcc",
         path = "../../cache/toolchain_kelvin",
     )
 
@@ -26,7 +26,7 @@ def kelvin_sw_repos():
     # risc-v isa test
     http_archive(
         name = "riscv-tests",
-        build_file = "//third_party/riscv:BUILD.riscv-tests",
+        build_file = "@kelvin_sw//third_party/riscv:BUILD.riscv-tests",
         sha256 = "1c7eb58edd7399b3ad2f9624a2003862cd87a6904237a737f39cd3978bab46a8",
         urls = ["https://github.com/riscv-software-src/riscv-tests/archive/d4eaa5bd6674b51d3b9b24913713c4638e99cdd9.tar.gz"],
         strip_prefix = "riscv-tests-d4eaa5bd6674b51d3b9b24913713c4638e99cdd9",
@@ -54,11 +54,4 @@ def tflm_repos():
         strip_prefix = "pybind11_bazel-faf56fb3df11287f26dbc66fdedf60a2fc2c6631",
         urls = ["https://github.com/pybind/pybind11_bazel/archive/faf56fb3df11287f26dbc66fdedf60a2fc2c6631.zip"],
         sha256 = "a185aa68c93b9f62c80fcb3aadc3c83c763854750dc3f38be1dadcb7be223837",
-    )
-
-def model_repos():
-    native.new_local_repository(
-        name = "ml-models",
-        path = "../../ml/ml-models",
-        build_file = "third_party/ml-models/BUILD",
     )

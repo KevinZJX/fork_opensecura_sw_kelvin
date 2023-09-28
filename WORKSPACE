@@ -1,6 +1,6 @@
 workspace(name = "kelvin_sw")
 
-load("//build_tools/bazel:repos.bzl", "kelvin_sw_repos", "model_repos", "tflm_repos")
+load("//build_tools/bazel:repos.bzl", "kelvin_sw_repos", "tflm_repos")
 kelvin_sw_repos()
 
 # Register Kelvin toolchain
@@ -21,5 +21,3 @@ pip_parse(
 
 load("@tflm_pip_deps//:requirements.bzl", "install_deps")
 install_deps()
-
-model_repos()
