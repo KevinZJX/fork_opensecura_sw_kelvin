@@ -4,6 +4,7 @@ cc_library(
     name = "opt",
     srcs = [
         "conv.cc",
+        "depthwise_conv_s16.cc",
         "elementwise_add_s16.cc",
         "elementwise_add_s32.cc",
         "elementwise_add_s8.cc",

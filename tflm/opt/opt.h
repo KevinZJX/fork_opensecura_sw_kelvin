@@ -72,6 +72,11 @@ void conv_per_channel_b8(
     const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
     const int32_t* bias_data, const tflite::RuntimeShape& output_shape,
     int8_t* output_data);
+void DepthwiseConv2DKelvinS16K3x1(
+    const int16_t* activations, const int8_t* weights, const int64_t* biases,
+    int channels, int frames, const int32_t* output_mult,
+    const int32_t* output_shift, int32_t output_activation_min,
+    int32_t output_activation_max, int16_t* output);
 }  // namespace kelvin::opt
 
 #endif  // TFLM_OPT_OPT_H_
