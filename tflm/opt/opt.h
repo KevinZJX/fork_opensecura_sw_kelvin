@@ -74,7 +74,7 @@ void conv_per_channel_b8(
     int8_t* output_data);
 void DepthwiseConv2DKelvinS16K3x1(
     const int16_t* activations, const int8_t* weights, const int64_t* biases,
-    int channels, int frames, const int32_t* output_mult,
+    int channels, int frames, int dilation, const int32_t* output_mult,
     const int32_t* output_shift, int32_t output_activation_min,
     int32_t output_activation_max, int16_t* output);
 }  // namespace kelvin::opt
