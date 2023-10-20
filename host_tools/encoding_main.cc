@@ -91,14 +91,25 @@ void Comment(std::string s) {
 
 void Header() {
   // OSS header.
+  const std::string oss_header = R"(// Copyright 2023 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// clang-format off
+
+)";
   for (auto fp : {fc_, fh_, fi_}) {
-    fprintf(fp,
-            "// Copyright 2023 Google LLC\n"
-            "// Licensed under the Apache License, Version 2.0, see LICENSE "
-            "for details.\n"
-            "// SPDX-License-Identifier: Apache-2.0\n"
-            "//\n"
-            "// clang-format off\n\n");
+    fprintf(fp, oss_header.c_str());
   }
   fprintf(fh_,
           "#ifndef PATCHES_KELVIN_KELVIN_OPC_H_\n"
