@@ -25,6 +25,28 @@ cc_library(
 )
 
 kelvin_test(
+    name = "acset",
+    srcs = [
+        "acset.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "actr",
+    srcs = [
+        "actr.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
     name = "getvl_test",
     srcs = [
         "getvl_test.cc",

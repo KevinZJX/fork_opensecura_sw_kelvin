@@ -29,6 +29,18 @@ constexpr int VLENB = VLEN / 8;
 constexpr int VLENH = VLEN / 16;
 constexpr int VLENW = VLEN / 32;
 
+uint32_t krand(void) {
+  static uint32_t x = 123456789;
+  static uint32_t y = 362436069;
+  static uint32_t z = 521288629;
+  static uint32_t w = 88675123;
+  uint32_t t = x ^ (x << 11);
+  x = y;
+  y = z;
+  z = w;
+  return w = w ^ (w >> 19) ^ (t ^ (t >> 8));
+}
+
 #define getmaxvl(T, d)                 \
   {                                    \
     if (sizeof(T) == 1) getmaxvl_b(d); \
