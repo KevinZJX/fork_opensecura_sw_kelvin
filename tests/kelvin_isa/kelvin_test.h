@@ -234,7 +234,106 @@ uint32_t krand(void) {
     }                                                                       \
   }
 
+#define test_aluw_h_vv(op, in0, in1, ref)                                  \
+  {                                                                        \
+    uint16_t dut[VLENH] __attribute__((aligned(64))) = {0xcccc};           \
+    vdup_b_x(v0, in0);                                                     \
+    vdup_b_x(v1, in1);                                                     \
+    __asm__ __volatile__(ARGS_F_A_A_A(op, v2, v0, v1));                    \
+    vst_h_x(v2, dut);                                                      \
+    if (ref != dut[0]) {                                                   \
+      printf("**error(%d)[%s] %02x %02x : %04x %04x\n", __LINE__, op, in0, \
+             in1, ref, dut[0]);                                            \
+      exit(-1);                                                            \
+    }                                                                      \
+  }
+
+#define test_aluw_w_vv(op, in0, in1, ref)                                   \
+  {                                                                         \
+    uint32_t dut[VLENW] __attribute__((aligned(64))) = {0xcccccccc};        \
+    vdup_h_x(v0, in0);                                                      \
+    vdup_h_x(v1, in1);                                                      \
+    __asm__ __volatile__(ARGS_F_A_A_A(op, v2, v0, v1));                     \
+    vst_w_x(v2, dut);                                                       \
+    if (ref != dut[0]) {                                                    \
+      printf("**error(%d)[%s] %04x %04x : %08x %08lx\n", __LINE__, op, in0, \
+             in1, ref, dut[0]);                                             \
+      exit(-1);                                                             \
+    }                                                                       \
+  }
+
+#define test_alu_b_vv3(op, in0, in1, in2, ref)                             \
+  {                                                                        \
+    uint8_t dut[VLENW] __attribute__((aligned(64))) = {0xcc};              \
+    vdup_b_x(v0, in0);                                                     \
+    vdup_b_x(v1, in1);                                                     \
+    vdup_b_x(v2, in2);                                                     \
+    __asm__ __volatile__(ARGS_F_A_A_A(op, v2, v0, v1));                    \
+    vst_b_x(v2, dut);                                                      \
+    if (ref != dut[0]) {                                                   \
+      printf("**error(%d)[%s] %02x %02x %02x : %02x %02x\n", __LINE__, op, \
+             in0, in1, in2, ref, dut[0]);                                  \
+      exit(-1);                                                            \
+    }                                                                      \
+  }
+
+#define test_alu_h_vv3(op, in0, in1, in2, ref)                             \
+  {                                                                        \
+    uint16_t dut[VLENW] __attribute__((aligned(64))) = {0xcccc};           \
+    vdup_h_x(v0, in0);                                                     \
+    vdup_h_x(v1, in1);                                                     \
+    vdup_h_x(v2, in2);                                                     \
+    __asm__ __volatile__(ARGS_F_A_A_A(op, v2, v0, v1));                    \
+    vst_h_x(v2, dut);                                                      \
+    if (ref != dut[0]) {                                                   \
+      printf("**error(%d)[%s] %04x %04x %04x : %04x %04x\n", __LINE__, op, \
+             in0, in1, in2, ref, dut[0]);                                  \
+      exit(-1);                                                            \
+    }                                                                      \
+  }
+
+#define test_alu_w_vv3(op, in0, in1, in2, ref)                              \
+  {                                                                         \
+    uint32_t dut[VLENW] __attribute__((aligned(64))) = {0xcccccccc};        \
+    vdup_w_x(v0, in0);                                                      \
+    vdup_w_x(v1, in1);                                                      \
+    vdup_w_x(v2, in2);                                                      \
+    __asm__ __volatile__(ARGS_F_A_A_A(op, v2, v0, v1));                     \
+    vst_w_x(v2, dut);                                                       \
+    if (ref != dut[0]) {                                                    \
+      printf("**error(%d)[%s] %08x %08x %08x : %08x %08lx\n", __LINE__, op, \
+             in0, in1, in2, ref, dut[0]);                                   \
+      exit(-1);                                                             \
+    }                                                                       \
+  }
+
 // clang-format off
+#define test_alu_b_vx(op, in0, in1, ref)                                   \
+  {                                                                        \
+    uint8_t dut[VLENB] __attribute__((aligned(64))) = {0xcc};              \
+    vdup_b_x(v0, in0);                                                     \
+    __asm__ __volatile__(ARGS_F_A_A_A(op, v2, v0, %0) : : "r"(in1));       \
+    vst_b_x(v2, dut);                                                      \
+    if (ref != dut[0]) {                                                   \
+      printf("**error(%d)[%s] %02x %02x : %02x %02x\n", __LINE__, op, in0, \
+             in1, ref, dut[0]);                                            \
+      exit(-1);                                                            \
+    }                                                                      \
+  }
+
+#define test_alu_h_vx(op, in0, in1, ref)                                   \
+  {                                                                        \
+    uint16_t dut[VLENH] __attribute__((aligned(64))) = {0xcccc};           \
+    vdup_h_x(v0, in0);                                                     \
+    __asm__ __volatile__(ARGS_F_A_A_A(op, v2, v0, %0) : : "r"(in1));       \
+    vst_h_x(v2, dut);                                                      \
+    if (ref != dut[0]) {                                                   \
+      printf("**error(%d)[%s] %04x %04x : %04x %04x\n", __LINE__, op, in0, \
+             in1, ref, dut[0]);                                            \
+      exit(-1);                                                            \
+    }                                                                      \
+  }
+
 #define test_alu_w_vx(op, in0, in1, ref)                                     \
   {                                                                          \
     uint32_t dut[VLENW] __attribute__((aligned(64))) = {0xcccccccc};         \

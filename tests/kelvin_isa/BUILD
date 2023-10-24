@@ -70,6 +70,16 @@ kelvin_test(
 )
 
 kelvin_test(
+    name = "vadd",
+    srcs = [
+        "vadd.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
     name = "valu",
     srcs = [
         "valu.cc",
@@ -150,11 +160,63 @@ kelvin_test(
 )
 
 kelvin_test(
+    name = "vmul",
+    srcs = [
+        "vmul.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "vmv",
+    srcs = [
+        "vmv.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
     name = "vpadd",
     srcs = [
         "vpadd.cc",
     ],
     hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "vsel",
+    srcs = [
+        "vsel.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "vshift",
+    srcs = [
+        "vshift.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "vslide",
+    srcs = [
+        "vslide.cc",
+    ],
     deps = [
         ":kelvin_test",
     ],
