@@ -37,6 +37,54 @@ kelvin_test(
     ],
 )
 
+kelvin_test(
+    name = "vacc",
+    srcs = [
+        "vacc.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "valu",
+    srcs = [
+        "valu.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "vcmp",
+    srcs = [
+        "vcmp.cc",
+    ],
+    copts = [
+        # Templated error printout may have type mismatch.
+        "-Wno-format",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "vevn_vodd",
+    srcs = [
+        "vevn_vodd.cc",
+    ],
+    copts = [
+        # Templated error printout may have type mismatch.
+        "-Wno-format",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
 cc_library(
     name = "vdwconv_data",
     srcs = [
@@ -59,6 +107,20 @@ kelvin_test(
     name = "vld",
     srcs = [
         "vld.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "vmax_vmin",
+    srcs = [
+        "vmax_vmin.cc",
+    ],
+    copts = [
+        # Templated error printout may have type mismatch.
+        "-Wno-format",
     ],
     deps = [
         ":kelvin_test",

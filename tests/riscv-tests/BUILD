@@ -124,6 +124,17 @@ RV32UM_TESTS = [
 ) for test in RV32UM_TESTS]
 
 kelvin_test(
+    name = "alu",
+    srcs = [
+        "alu.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        "//crt",
+    ],
+)
+
+kelvin_test(
     name = "branch_modulo_test",
     srcs = [
         "branch_modulo_test.cc",
