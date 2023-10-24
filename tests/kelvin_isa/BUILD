@@ -221,3 +221,24 @@ kelvin_test(
         ":kelvin_test",
     ],
 )
+
+kelvin_test(
+    name = "vsrn",
+    srcs = [
+        "vsrn.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
+    name = "vzip",
+    srcs = [
+        "vzip.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+)
