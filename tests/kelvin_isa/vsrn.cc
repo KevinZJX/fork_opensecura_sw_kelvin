@@ -63,8 +63,8 @@ void test_vsraqs() {
                            0xffffff66, 0xfffffcba, 0x00000006, 0xffffff64,
                            0x0000019a, 0x000001b2, 0xffffff9e, 0x00000234,
                            0xffffff7c, 0x00000013, 0xffffff35, 0x000000a3};
-  const uint8_t ref[16] = {0x03, 0x0d, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x01,
-                           0x05, 0x00, 0x00, 0x00, 0x00, 0x12, 0x00, 0x05};
+  const uint8_t ref[16] = {0x03, 0x0d, 0xff, 0xff, 0xff, 0x0e, 0xff, 0x01,
+                           0x05, 0xff, 0x00, 0xff, 0xff, 0x12, 0xff, 0x05};
   uint8_t dut[16];
 
   vld_w_l_xx(v0, in + 0, 4);
@@ -85,7 +85,6 @@ void test_vsraqs() {
 }
 
 int main() {
-  // TODO(b/307590638): Re-Enable vsransu/vsraqsu tests.
   test_alun_b_vx("vsrans.b.vx", 0x00cd, 0x00, 0x7f);
   test_alun_b_vx("vsrans.b.vx", 0x00cd, 0x01, 0x66);
   test_alun_b_vx("vsrans.b.vx", 0x00cd, 0x02, 0x33);
@@ -424,6 +423,23 @@ int main() {
   test_alun_b_vx("vsransu.b.vx", 0x6789, 0x0e, 0x01);
   test_alun_b_vx("vsransu.b.vx", 0x6789, 0x0f, 0x00);
   test_alun_b_vx("vsransu.b.vx", 0x6789, 0xf0, 0xff);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x00, 0xff);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x01, 0xff);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x02, 0xff);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x03, 0xff);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x04, 0xff);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x05, 0xff);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x06, 0xff);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x07, 0xff);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x08, 0x98);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x09, 0x4c);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x0a, 0x26);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x0b, 0x13);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x0c, 0x09);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x0d, 0x04);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x0e, 0x02);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0x0f, 0x01);
+  test_alun_b_vx("vsransu.b.vx", 0x9876, 0xf0, 0xff);
 
   test_alun_h_vx("vsransu.h.vx", 0x0000cba9, 0x00, 0xcba9);
   test_alun_h_vx("vsransu.h.vx", 0x0000cba9, 0x01, 0x65d4);
@@ -491,6 +507,39 @@ int main() {
   test_alun_h_vx("vsransu.h.vx", 0x23456789, 0x1e, 0x0000);
   test_alun_h_vx("vsransu.h.vx", 0x23456789, 0x1f, 0x0000);
   test_alun_h_vx("vsransu.h.vx", 0x23456789, 0xe0, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x00, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x01, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x02, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x03, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x04, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x05, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x06, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x07, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x08, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x09, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x0a, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x0b, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x0c, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x0d, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x0e, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x0f, 0xffff);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x10, 0x9876);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x11, 0x4c3b);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x12, 0x261d);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x13, 0x130e);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x14, 0x0987);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x15, 0x04c3);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x16, 0x0261);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x17, 0x0130);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x18, 0x0098);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x19, 0x004c);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x1a, 0x0026);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x1b, 0x0013);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x1c, 0x0009);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x1d, 0x0004);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x1e, 0x0002);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0x1f, 0x0001);
+  test_alun_h_vx("vsransu.h.vx", 0x98765432, 0xe0, 0xffff);
 
   test_alun_b_vx("vsransu.b.r.vx", 0x00cd, 0x00, 0xcd);
   test_alun_b_vx("vsransu.b.r.vx", 0x00cd, 0x01, 0x67);
@@ -526,6 +575,23 @@ int main() {
   test_alun_b_vx("vsransu.b.r.vx", 0x6789, 0x0e, 0x02);
   test_alun_b_vx("vsransu.b.r.vx", 0x6789, 0x0f, 0x01);
   test_alun_b_vx("vsransu.b.r.vx", 0x6789, 0xf0, 0xff);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x00, 0xff);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x01, 0xff);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x02, 0xff);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x03, 0xff);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x04, 0xff);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x05, 0xff);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x06, 0xff);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x07, 0xff);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x08, 0x98);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x09, 0x4c);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x0a, 0x26);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x0b, 0x13);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x0c, 0x0a);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x0d, 0x05);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x0e, 0x02);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0x0f, 0x01);
+  test_alun_b_vx("vsransu.b.r.vx", 0x9876, 0xf0, 0xff);
 
   test_alun_h_vx("vsransu.h.r.vx", 0x0000cba9, 0x00, 0xcba9);
   test_alun_h_vx("vsransu.h.r.vx", 0x0000cba9, 0x01, 0x65d5);
@@ -593,6 +659,40 @@ int main() {
   test_alun_h_vx("vsransu.h.r.vx", 0x23456789, 0x1e, 0x0001);
   test_alun_h_vx("vsransu.h.r.vx", 0x23456789, 0x1f, 0x0000);
   test_alun_h_vx("vsransu.h.r.vx", 0x23456789, 0xe0, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x00, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x00, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x01, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x02, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x03, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x04, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x05, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x06, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x07, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x08, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x09, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x0a, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x0b, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x0c, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x0d, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x0e, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x0f, 0xffff);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x10, 0x9876);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x11, 0x4c3b);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x12, 0x261e);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x13, 0x130f);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x14, 0x0987);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x15, 0x04c4);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x16, 0x0262);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x17, 0x0131);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x18, 0x0098);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x19, 0x004c);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x1a, 0x0026);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x1b, 0x0013);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x1c, 0x000a);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x1d, 0x0005);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x1e, 0x0002);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0x1f, 0x0001);
+  test_alun_h_vx("vsransu.h.r.vx", 0x98765432, 0xe0, 0xffff);
 
   test_aluq_b_vx("vsraqs.b.vx", 0x00000012, 0x00, 0x12);
   test_aluq_b_vx("vsraqs.b.vx", 0x00000012, 0x01, 0x09);
@@ -1140,6 +1240,38 @@ int main() {
   test_aluq_b_vx("vsraqsu.b.vx", 0x6789abcd, 0x1d, 0x03);
   test_aluq_b_vx("vsraqsu.b.vx", 0x6789abcd, 0x1e, 0x01);
   test_aluq_b_vx("vsraqsu.b.vx", 0x6789abcd, 0x1f, 0x00);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x00, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x01, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x02, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x03, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x04, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x05, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x06, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x07, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x08, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x09, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x0a, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x0b, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x0c, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x0d, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x0e, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x0f, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x10, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x11, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x12, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x13, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x14, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x15, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x16, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x17, 0xff);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x18, 0xba);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x19, 0x5d);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x1a, 0x2e);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x1b, 0x17);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x1c, 0x0b);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x1d, 0x05);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x1e, 0x02);
+  test_aluq_b_vx("vsraqsu.b.vx", 0xba987654, 0x1f, 0x01);
 
   test_aluq_b_vx("vsraqsu.b.r.vx", 0x00000012, 0x00, 0x12);
   test_aluq_b_vx("vsraqsu.b.r.vx", 0x00000012, 0x01, 0x09);
@@ -1301,6 +1433,39 @@ int main() {
   test_aluq_b_vx("vsraqsu.b.r.vx", 0x6789abcd, 0x1d, 0x03);
   test_aluq_b_vx("vsraqsu.b.r.vx", 0x6789abcd, 0x1e, 0x02);
   test_aluq_b_vx("vsraqsu.b.r.vx", 0x6789abcd, 0x1f, 0x01);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x00, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x01, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x02, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x03, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x04, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x05, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x06, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x07, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x08, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x09, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x0a, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x0b, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x0c, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x0d, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x0e, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x0f, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x10, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x11, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x12, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x13, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x14, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x15, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x16, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x17, 0xff);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x18, 0xbb);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x19, 0x5d);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x1a, 0x2f);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x1b, 0x17);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x1c, 0x0c);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x1d, 0x06);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x1e, 0x03);
+  test_aluq_b_vx("vsraqsu.b.r.vx", 0xba987654, 0x1f, 0x01);
 
+  test_vsraqs();
   return 0;
 }
