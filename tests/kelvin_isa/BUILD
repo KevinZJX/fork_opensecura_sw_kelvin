@@ -233,6 +233,16 @@ kelvin_test(
 )
 
 kelvin_test(
+    name = "vstq",
+    srcs = [
+        "vstq.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
     name = "vzip",
     srcs = [
         "vzip.cc",
