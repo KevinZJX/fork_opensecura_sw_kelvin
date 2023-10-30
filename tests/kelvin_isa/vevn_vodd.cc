@@ -16,6 +16,7 @@
 
 #include <cstdio>
 
+#include "crt/printf_traits.h"
 #include "tests/kelvin_isa/kelvin_test.h"
 
 #define vevn_vv(T, Vd, Vs, Vt) \
@@ -126,7 +127,11 @@ static void test_vevnodd() {
   for (int j = 0; j < 2; ++j) {
     for (int i = 0; i < lanes; ++i) {
       if (ref[j][i] != dut[j][i]) {
-        printf("**error vevnodd_vv[%d,%d] %x %x\n", j, i, ref[j][i], dut[j][i]);
+        printf("**error vevnodd_vv[%d,%d] ", j, i);
+        printf(PrintfTraits<T>::kFmtHex, ref[j][i]);
+        printf(" ");
+        printf(PrintfTraits<T>::kFmtHex, dut[j][i]);
+        printf("\n");
         exit(-1);
       }
     }
@@ -163,8 +168,11 @@ static void test_vevnodd_m() {
   for (int j = 0; j < 2; ++j) {
     for (int i = 0; i < lanes; ++i) {
       if (ref[j][i] != dut[j][i]) {
-        printf("**error vevnodd_vv_m[%d,%d] %x %x\n", j, i, ref[j][i],
-               dut[j][i]);
+        printf("**error vevnodd_vv_m[%d,%d] ", j, i);
+        printf(PrintfTraits<T>::kFmtHex, ref[j][i]);
+        printf(" ");
+        printf(PrintfTraits<T>::kFmtHex, dut[j][i]);
+        printf("\n");
         exit(-1);
       }
     }
@@ -198,7 +206,11 @@ static void test_vevn() {
 
   for (int i = 0; i < lanes; ++i) {
     if (ref[i] != dut[i]) {
-      printf("**error vevn_vv[%d] %x %x\n", i, ref[i], dut[i]);
+      printf("**error vevn_vv[%d] ", i);
+      printf(PrintfTraits<T>::kFmtHex, ref[i]);
+      printf(" ");
+      printf(PrintfTraits<T>::kFmtHex, dut[i]);
+      printf("\n");
       exit(-1);
     }
   }
@@ -231,7 +243,11 @@ static void test_vevn_m() {
 
   for (int i = 0; i < lanes; ++i) {
     if (ref[i] != dut[i]) {
-      printf("**error vevn_vv_m[%d] %x %x\n", i, ref[i], dut[i]);
+      printf("**error vevn_vv_m[%d] ", i);
+      printf(PrintfTraits<T>::kFmtHex, ref[i]);
+      printf(" ");
+      printf(PrintfTraits<T>::kFmtHex, dut[i]);
+      printf("\n");
       exit(-1);
     }
   }
@@ -264,7 +280,11 @@ static void test_vodd() {
 
   for (int i = 0; i < lanes; ++i) {
     if (ref[i] != dut[i]) {
-      printf("**error vodd_vv[%d] %x %x\n", i, ref[i], dut[i]);
+      printf("**error vodd_vv[%d] ", i);
+      printf(PrintfTraits<T>::kFmtHex, ref[i]);
+      printf(" ");
+      printf(PrintfTraits<T>::kFmtHex, dut[i]);
+      printf("\n");
       exit(-1);
     }
   }
@@ -298,7 +318,11 @@ static void test_vodd_m() {
 
   for (int i = 0; i < lanes; ++i) {
     if (ref[i] != dut[i]) {
-      printf("**error vodd_vv_m[%d] %x %x\n", i, ref[i], dut[i]);
+      printf("**error vodd_vv_m[%d] ", i);
+      printf(PrintfTraits<T>::kFmtHex, ref[i]);
+      printf(" ");
+      printf(PrintfTraits<T>::kFmtHex, dut[i]);
+      printf("\n");
       exit(-1);
     }
   }

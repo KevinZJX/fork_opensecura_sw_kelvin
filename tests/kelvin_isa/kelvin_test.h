@@ -220,18 +220,19 @@ uint32_t krand(void) {
     }                                                                      \
   }
 
-#define test_alu_w_vv(op, in0, in1, ref)                                    \
-  {                                                                         \
-    uint32_t dut[VLENW] __attribute__((aligned(64))) = {0xcccccccc};        \
-    vdup_w_x(v0, in0);                                                      \
-    vdup_w_x(v1, in1);                                                      \
-    __asm__ __volatile_always__(ARGS_F_A_A_A(op, v2, v0, v1));              \
-    vst_w_x(v2, dut);                                                       \
-    if (ref != dut[0]) {                                                    \
-      printf("**error(%d)[%s] %08x %08x : %08x %08lx\n", __LINE__, op, in0, \
-             in1, ref, dut[0]);                                             \
-      exit(-1);                                                             \
-    }                                                                       \
+#define test_alu_w_vv(op, in0, in1, ref)                                  \
+  {                                                                       \
+    uint32_t dut[VLENW] __attribute__((aligned(64))) = {0xcccccccc};      \
+    vdup_w_x(v0, in0);                                                    \
+    vdup_w_x(v1, in1);                                                    \
+    __asm__ __volatile_always__(ARGS_F_A_A_A(op, v2, v0, v1));            \
+    vst_w_x(v2, dut);                                                     \
+    if (ref != dut[0]) {                                                  \
+      printf("**error(%d)[%s] %08lx %08lx : %08lx %08lx\n", __LINE__, op, \
+             static_cast<uint32_t>(in0), static_cast<uint32_t>(in1),      \
+             static_cast<uint32_t>(ref), dut[0]);                         \
+      exit(-1);                                                           \
+    }                                                                     \
   }
 
 #define test_aluw_h_vv(op, in0, in1, ref)                                  \

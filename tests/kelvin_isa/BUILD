@@ -94,10 +94,6 @@ kelvin_test(
     srcs = [
         "vcmp.cc",
     ],
-    copts = [
-        # Templated error printout may have type mismatch.
-        "-Wno-format",
-    ],
     deps = [
         ":kelvin_test",
     ],
@@ -107,10 +103,6 @@ kelvin_test(
     name = "vevn_vodd",
     srcs = [
         "vevn_vodd.cc",
-    ],
-    copts = [
-        # Templated error printout may have type mismatch.
-        "-Wno-format",
     ],
     deps = [
         ":kelvin_test",
@@ -149,10 +141,6 @@ kelvin_test(
     name = "vmax_vmin",
     srcs = [
         "vmax_vmin.cc",
-    ],
-    copts = [
-        # Templated error printout may have type mismatch.
-        "-Wno-format",
     ],
     deps = [
         ":kelvin_test",
