@@ -221,6 +221,16 @@ kelvin_test(
 )
 
 kelvin_test(
+    name = "vst",
+    srcs = [
+        "vst.cc",
+    ],
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
     name = "vstq",
     srcs = [
         "vstq.cc",
