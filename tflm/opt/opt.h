@@ -70,6 +70,31 @@ void conv_per_channel_b32(
     const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
     const int32_t* bias_data, const tflite::RuntimeShape& output_shape,
     int16_t* output_data);
+
+void conv_per_channel_b64_1x1(
+    const tflite::ConvParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int64_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int16_t* output_data);
+
+void conv_per_channel_b64_filter1xn_non_group(
+    const tflite::ConvParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int64_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int16_t* output_data);
+
+void conv_per_channel_b64_filter1xn_group(
+    const tflite::ConvParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int64_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int16_t* output_data);
+
 void conv_per_channel_b64(
     const tflite::ConvParams& params, const int32_t* output_multiplier,
     const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
