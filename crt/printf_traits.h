@@ -29,13 +29,13 @@ struct PrintfTraits {
 template <>
 struct PrintfTraits<int8_t> {
   static constexpr const char* kFmt = "%d";
-  static constexpr const char* kFmtHex = "0x%hhx";
+  static constexpr const char* kFmtHex = "0x%02x";
 };
 
 template <>
 struct PrintfTraits<int16_t> {
-  static constexpr const char* kFmt = "%hd";
-  static constexpr const char* kFmtHex = "0x%hx";
+  static constexpr const char* kFmt = "%d";
+  static constexpr const char* kFmtHex = "0x%04x";
 };
 
 template <>
@@ -47,13 +47,13 @@ struct PrintfTraits<int32_t> {
 template <>
 struct PrintfTraits<uint8_t> {
   static constexpr const char* kFmt = "%u";
-  static constexpr const char* kFmtHex = "0x%hhx";
+  static constexpr const char* kFmtHex = "0x%02x";
 };
 
 template <>
 struct PrintfTraits<uint16_t> {
-  static constexpr const char* kFmt = "%hu";
-  static constexpr const char* kFmtHex = "0x%hx";
+  static constexpr const char* kFmt = "%u";
+  static constexpr const char* kFmtHex = "0x%04x";
 };
 
 template <>
