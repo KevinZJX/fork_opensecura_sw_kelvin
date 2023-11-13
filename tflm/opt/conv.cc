@@ -34,6 +34,12 @@ constexpr const int swizzle[16] = {
     3, 7, 11, 15,
 };
 /* clang-format on */
+
+constexpr int kFilterHeightIndex = 1;
+constexpr int kFilterWidthIndex = 2;
+constexpr int kFilterInputChannelIndex = 3;
+constexpr int kInputChannelIndex = 3;
+constexpr int kOutputChannelIndex = 3;
 }  // namespace
 
 void conv_per_channel_b32(
@@ -430,7 +436,7 @@ void conv_per_channel_b64_filter1xn_non_group(
   }
 }
 
-void conv_per_channel_b64(
+void conv_per_channel_b64_generic(
     const tflite::ConvParams& params, const int32_t* output_multiplier,
     const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
     const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
@@ -530,6 +536,52 @@ void conv_per_channel_b64(
       }
     }
   }
+}
+
+void conv_per_channel_b64(
+    const tflite::ConvParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int64_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int16_t* output_data) {
+  if (filter_shape.Dims(kFilterHeightIndex) == 1 &&
+      output_shape.Dims(kOutputChannelIndex) % 2 == 0) {
+    if (filter_shape.Dims(kFilterWidthIndex) == 1 &&
+        filter_shape.Dims(kFilterInputChannelIndex) % 32 == 0) {
+      kelvin::opt::conv_per_channel_b64_1x1(
+          params, output_multiplier, output_shift, input_shape, input_data,
+          filter_shape, filter_data, bias_shape, bias_data, output_shape,
+          output_data);
+      return;
+    }
+
+    // TODO(derekjchow): Check for valid padding
+    bool group_conv = !(input_shape.Dims(kInputChannelIndex) ==
+        filter_shape.Dims(kFilterInputChannelIndex));
+    int32_t fan_in = filter_shape.Dims(kFilterWidthIndex) *
+        filter_shape.Dims(kFilterInputChannelIndex);
+    if (!group_conv && fan_in % 32 == 0) {
+      kelvin::opt::conv_per_channel_b64_filter1xn_non_group(
+          params, output_multiplier, output_shift, input_shape, input_data,
+          filter_shape, filter_data, bias_shape, bias_data, output_shape,
+          output_data);
+      return;
+    }
+
+    if (fan_in % 32 == 0) {
+      kelvin::opt::conv_per_channel_b64_filter1xn_group(
+          params, output_multiplier, output_shift, input_shape, input_data,
+          filter_shape, filter_data, bias_shape, bias_data, output_shape,
+          output_data);
+      return;
+    }
+  }
+
+  kelvin::opt::conv_per_channel_b64_generic(
+      params, output_multiplier, output_shift, input_shape, input_data,
+      filter_shape, filter_data, bias_shape, bias_data, output_shape,
+      output_data);
 }
 
 #define INA0 v0
