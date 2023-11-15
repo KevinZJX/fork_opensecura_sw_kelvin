@@ -37,22 +37,37 @@
  *                             |  (All unclamied     |
  *                             |       memory)       |
  *                             |                     |
- *  (TCM_END - stack    --->   +---------------------+
+ *  (TCM_END - 4096     --->   +---------------------+
  *     - model_output          |       .stack        |
- *     - output_header)        +---------------------+
+ *     - stack)                +---------------------+
  *                             |   .model_output     |
- *  output_header (64B) --->   +---------------------+
- *                             |   .output_header    |
+ *  TCM_END - 4096      --->   +=====================+
+ *                             |   .model_input      |
+ +                             | (remainder of page) |
+ *                             +---------------------+
+ *  output_header (64B) --->   |.model_output_header |
  *  TCM_END             --->   +=====================+
  **/
 
-MEMORY {
-  TCM(rwx): ORIGIN = 0x00000000, LENGTH = 0x400000
-}
-
+TCM_SIZE = 0x400000;
 STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : DEFINED(__stack_size__) ? __stack_size__ : 0x4000;
 OUTPUT_SIZE = DEFINED(OUTPUT_SIZE) ? OUTPUT_SIZE : DEFINED(__output_size__) ? __output_size__ : 0x40;
 __output_header_size__ = 0x40;
+
+/*
+ * This defines all of memory as 2x segments with the last page used for an
+ * output header at a fixed location and the remainder of the page used for
+ * input parameters. ML runtimes either copy input data from this region
+ * (e.g. TfLite) or reference the data in the region directly (IREE).
+ *
+ * The "TCM segment" is sized as the physical memory size (TCM_SIZE) - 1x
+ * page so that offsets from the end of "TCM" can be expressed as:
+ *    ORIGIN(TCM) + LENGTH(TCM) - <offset>
+ */
+MEMORY {
+  TCM(rwx): ORIGIN = 0, LENGTH = TCM_SIZE - 4096
+  MODEL_HEADER(rw): ORIGIN = LENGTH(TCM), LENGTH = 4096
+}
 
 ENTRY(_start)
 
@@ -114,33 +129,48 @@ SECTIONS {
   .heap (NOLOAD) : {
     . = ALIGN(64);
     __heap_start__ = .;
-    . = ORIGIN(TCM) + LENGTH(TCM) - STACK_SIZE - OUTPUT_SIZE - __output_header_size__ - 63;
+    . = ORIGIN(TCM) + LENGTH(TCM) - OUTPUT_SIZE - STACK_SIZE - 63;
     . = ALIGN(64);
     __heap_end__ = .;
   } > TCM
 
-  .stack ORIGIN(TCM) + LENGTH(TCM) - STACK_SIZE - OUTPUT_SIZE - __output_header_size__ (NOLOAD) : {
+  .stack ORIGIN(TCM) + LENGTH(TCM) - OUTPUT_SIZE - STACK_SIZE (NOLOAD) : {
     __stack_start__ = .;
     . += STACK_SIZE;
     . = ALIGN(64);
     __stack_end__ = .;
   } > TCM
 
-  .model_output ORIGIN(TCM) + LENGTH(TCM) - OUTPUT_SIZE - __output_header_size__ (NOLOAD) : {
+  .model_output ORIGIN(TCM) + LENGTH(TCM) - OUTPUT_SIZE (NOLOAD) : {
     . = ALIGN(64);
     __model_output_start__ = .;
     *(.model_output)
     __model_output_end__ = .;
   } > TCM
+}
 
-  .output_header ORIGIN(TCM) + LENGTH(TCM) - __output_header_size__ (NOLOAD) : {
-    /*
-     * Model output information (return code and output location/length) is
-     * always at the end of TCM.
-     */
+SECTIONS {
+  . = ORIGIN(MODEL_HEADER);
+  /*
+   * Model input data region uses the rest of the page not occupied by the
+   * output header. The host writes input data here and the model is
+   * responsible for copying (TfLite) it or informing the model where it is
+   * if the model can take input from any location (IREE).
+   */
+  .model_input : {
+    __model_input_start__ = .;
+    *(.model_input)
+    __model_input_end__ = .;
+  } > MODEL_HEADER
+
+  /*
+   * Model output information (return code and output location/length) is
+   * always at the end of TCM.
+   */
+  .output_header ORIGIN(MODEL_HEADER) + (4096 - __output_header_size__) : ALIGN(4) {
     __output_header_start__ = .;
-    _ret = .;
+    _ret = .; /* NB: memory location for model return value (aka ModelHeader::return_code) */
     *(.model_output_header*)
     __output_header_end__ = .;
-  } > TCM
+  } > MODEL_HEADER
 }
