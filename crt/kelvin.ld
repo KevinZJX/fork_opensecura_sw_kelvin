@@ -157,7 +157,7 @@ SECTIONS {
    * responsible for copying (TfLite) it or informing the model where it is
    * if the model can take input from any location (IREE).
    */
-  .model_input : {
+  .model_input (NOLOAD) : {
     __model_input_start__ = .;
     *(.model_input)
     __model_input_end__ = .;
@@ -167,7 +167,7 @@ SECTIONS {
    * Model output information (return code and output location/length) is
    * always at the end of TCM.
    */
-  .output_header ORIGIN(MODEL_HEADER) + (4096 - __output_header_size__) : ALIGN(4) {
+  .output_header ORIGIN(MODEL_HEADER) + (4096 - __output_header_size__) (NOLOAD) : ALIGN(4) {
     __output_header_start__ = .;
     _ret = .; /* NB: memory location for model return value (aka ModelHeader::return_code) */
     *(.model_output_header*)
