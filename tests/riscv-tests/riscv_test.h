@@ -21,6 +21,9 @@
 #define RVTEST_RV32U \
   .macro init;       \
   .endm
+#define RVTEST_RV32M \
+  .macro init;       \
+  .endm
 #define RVTEST_CODE_BEGIN \
   .globl _start;          \
   _start:
@@ -44,4 +47,10 @@
   .align 4;              \
   .global end_signature; \
   end_signature:
+
+#define MSTATUS_FS (0x00006000)
+#define MSTATUS_MPP (0x00001800)
+#define CAUSE_USER_ECALL (0x8)
+#define CAUSE_ILLEGAL_INSTRUCTION (0x2)
+
 #endif  // TESTS_RISCV_TESTS_RISCV_TEST_H_

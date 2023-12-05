@@ -124,6 +124,45 @@ RV32UM_TESTS = [
 ) for test in RV32UM_TESTS]
 
 kelvin_test(
+    name = "rv32mi_mcsr",
+    srcs = [
+        "@riscv-tests//:isa/rv64mi/mcsr.S",
+    ],
+    copts = [
+        "-Itests/riscv-tests",
+        "-Iexternal/riscv-tests/isa/macros/scalar",
+        "-Wno-variadic-macros",
+    ],
+    defines = [
+        "RVTEST_RV64M=RVTEST_RV32M",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":riscv_tests_base",
+    ],
+)
+
+kelvin_test(
+    name = "rv32mi_csr",
+    srcs = [
+        "@riscv-tests//:isa/rv64si/csr.S",
+    ],
+    copts = [
+        "-Itests/riscv-tests",
+        "-Iexternal/riscv-tests/isa/macros/scalar",
+        "-Wno-variadic-macros",
+    ],
+    defines = [
+        "RVTEST_RV64S=RVTEST_RV32M",
+        "__MACHINE_MODE",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":riscv_tests_base",
+    ],
+)
+
+kelvin_test(
     name = "alu",
     srcs = [
         "alu.cc",

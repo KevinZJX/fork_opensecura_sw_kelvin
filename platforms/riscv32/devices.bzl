@@ -24,7 +24,7 @@ DEVICES = [
             "@platforms//os:none",
         ],
         substitutions = {
-            "ARCHITECTURE": "rv32i2p1m_zifencei_zbb",
+            "ARCHITECTURE": "rv32i2p1m_zicsr_zifencei_zbb",
             "ABI": "ilp32",
             "CMODEL": "medany",
             "[STACK_PROTECTOR]": "-fstack-protector-strong",
