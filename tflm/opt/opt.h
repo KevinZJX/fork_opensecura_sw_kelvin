@@ -120,6 +120,10 @@ void DepthwiseConv2DKelvinS16K3x1(
     int channels, int frames, int dilation, const int32_t* output_mult,
     const int32_t* output_shift, int32_t output_activation_min,
     int32_t output_activation_max, int16_t* output);
+void MaxPoolGeneric(const tflite::PoolParams& params, const tflite::RuntimeShape& input_shape,
+                    const int8_t* input_data, const tflite::RuntimeShape& output_shape,
+                    int8_t* output_data);
+
 }  // namespace kelvin::opt
 
 #endif  // TFLM_OPT_OPT_H_

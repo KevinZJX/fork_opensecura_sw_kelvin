@@ -25,6 +25,7 @@ cc_library(
         "leaky_relu_s16.cc",
         "leaky_relu_s8.cc",
         "memcpy.cc",
+        "max_pool_s8.cc"
     ],
     hdrs = [
         "opt.h",
