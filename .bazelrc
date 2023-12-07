@@ -16,3 +16,5 @@ build --copt=-DTF_LITE_USE_GLOBAL_MIN
 build --copt=-DTF_LITE_USE_GLOBAL_MAX
 build --copt=-DTF_LITE_MCU_DEBUG_LOG
 build:opt --copt=-DTF_LITE_STRIP_ERROR_STRINGS
+
+build --use_top_level_targets_for_symlinks=false

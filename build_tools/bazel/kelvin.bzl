@@ -71,7 +71,7 @@ def _kelvin_binary_impl(ctx):
         OutputGroupsInfo to allow definition of filegroups
         containing the output ELF and BIN.
     """
-    cc_toolchain = find_cc_toolchain(ctx).cc
+    cc_toolchain = find_cc_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,
