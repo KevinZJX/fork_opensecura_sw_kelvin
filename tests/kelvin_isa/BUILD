@@ -25,6 +25,17 @@ cc_library(
 )
 
 kelvin_test(
+    name = "perf_counters",
+    srcs = [
+        "perf_counters.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
     name = "acset",
     srcs = [
         "acset.cc",
