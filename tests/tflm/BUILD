@@ -90,6 +90,7 @@ kelvin_test(
     srcs = [
         "@tflite-micro//tensorflow/lite/micro/kernels:pooling_test.cc",
     ],
+    hw_test_size = "large",
     deps = [
         "//crt",
         "@tflite-micro//tensorflow/lite/c:common",
