@@ -72,6 +72,8 @@ def _kelvin_binary_impl(ctx):
         containing the output ELF and BIN.
     """
     cc_toolchain = find_cc_toolchain(ctx)
+    if type(cc_toolchain) != 'CcToolchainInfo':
+        cc_toolchain = cc_toolchain.cc
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,
