@@ -234,7 +234,7 @@ def kelvin_test(
         name = iss_test,
         size = iss_test_size,
         srcs = [
-            "//build_tools:test_runner.sh",
+            "@kelvin_sw//build_tools:test_runner.sh",
         ],
         args = [
             "$(location %s.elf)" % kelvin_elf,
@@ -249,7 +249,7 @@ def kelvin_test(
     native.sh_test(
         name = hw_test,
         size = hw_test_size,
-        srcs = ["//build_tools:core_sim_test_runner.sh"],
+        srcs = ["@kelvin_sw//build_tools:core_sim_test_runner.sh"],
         args = [
             "$(location %s.bin)" % kelvin_elf,
         ],
