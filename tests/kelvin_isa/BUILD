@@ -36,6 +36,17 @@ kelvin_test(
 )
 
 kelvin_test(
+    name = "ecall",
+    srcs = [
+        "ecall.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+)
+
+kelvin_test(
     name = "acset",
     srcs = [
         "acset.cc",
