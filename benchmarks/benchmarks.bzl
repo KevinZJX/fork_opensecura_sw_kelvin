@@ -56,6 +56,64 @@ def kelvin_benchmark_fpga(
         model,
         iterations,
         **kwargs):
+        _kelvin_benchmark_device(
+            name = name,
+            model = model,
+            device_type = "fpga_nexus",
+            iterations = iterations,
+            **kwargs,
+        )
+
+def kelvin_benchmark_asic(
+        name,
+        model,
+        iterations,
+        **kwargs):
+
+        _kelvin_benchmark_device(
+            name = name,
+            model = model,
+            device_type = "asic",
+            iterations = iterations,
+            **kwargs,
+        )
+
+def kelvin_benchmark_devices(
+        name,
+        model,
+        iterations,
+        **kwargs):
+
+        kelvin_benchmark_asic(
+            name = "{}_asic".format(name),
+            model = model,
+            iterations = iterations,
+            **kwargs,
+        )
+
+        kelvin_benchmark_fpga(
+            name = "{}_fpga".format(name),
+            model = model,
+            iterations = iterations,
+            **kwargs,
+        )
+
+        # Create a filegroup to allow building all devices
+        native.filegroup(
+            name = "{}".format(name),
+            srcs = [
+                ":{}_asic".format(name),
+                ":{}_fpga".format(name),
+            ],
+            output_group = "device_files",
+        )
+
+def _kelvin_benchmark_device(
+        name,
+        model,
+        device_type,
+        iterations,
+        **kwargs):
 
         bin_to_c_file(
             name = "{}_model".format(name),
@@ -72,7 +130,7 @@ def kelvin_benchmark_fpga(
             ],
             copts = ["-DBENCHMARK_NAME={}".format(name)],
             per_device_deps = {
-                "fpga_nexus": [NEXUS_CORE_TARGETS.get("smc")],
+                device_type: [NEXUS_CORE_TARGETS.get("smc")],
             },
             deps = [
                 "@matcha//sw/device/lib/dif:ml_top",
@@ -86,7 +144,7 @@ def kelvin_benchmark_fpga(
 
         bin_to_c_file(
             name = "{}-smc_bin".format(name),
-            srcs = ["{}_smc_fpga_nexus_bin".format(name)],
+            srcs = ["{}_smc_{}_bin".format(name, device_type)],
             var_name = "smc_bin",
         )
 
@@ -99,7 +157,7 @@ def kelvin_benchmark_fpga(
             ],
             copts = ["-DBENCHMARK_NAME={}".format(name)],
             per_device_deps = {
-                "fpga_nexus": [NEXUS_CORE_TARGETS.get("secure_core")],
+                device_type: [NEXUS_CORE_TARGETS.get("secure_core")],
             },
             deps = [
                 "@matcha//sw/device/lib:spi_flash",
@@ -131,10 +189,10 @@ def kelvin_benchmark_fpga(
         matcha_extflash_tar(
             name = "{}_extflash".format(name),
             kelvin_binary = ":{}_kelvin.bin".format(name),
-            sc_binary = ":{}_sec_fpga_nexus_bin".format(name),
+            sc_binary = ":{}_sec_{}_bin".format(name, device_type),
         )
 
-        # Create a filegroup with all FPGA targets.
+        # Create a filegroup with all device targets.
         native.filegroup(
             name = "{}".format(name),
             srcs = [
@@ -143,5 +201,5 @@ def kelvin_benchmark_fpga(
                 ":{}_kelvin".format(name),
                 ":{}_extflash".format(name),
             ],
-            output_group = "fpga_files",
+            output_group = "{}_files".format(device_type),
         )
