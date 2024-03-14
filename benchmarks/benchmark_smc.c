@@ -45,7 +45,7 @@ volatile bool ml_top_finish_done = false;
 void _print64(const char* header, uint64_t number) {
   uint32_t number_low = number & 0xFFFFFFFF;
   uint32_t number_hi = number >> 32;
-  LOG_INFO("%s: 0x%08lx%08lx", header, number_hi, number_low);
+  LOG_INFO("%s: 0x%08x%08x", header, number_hi, number_low);
 }
 
 void ottf_external_isr(void) {
@@ -119,7 +119,7 @@ void _ottf_main(void) {
   uint32_t iterations = output_header_ptr->iterations;
   uint64_t cycles = output_header_ptr->cycles;
   uint64_t average_cycles = udiv64_slow(cycles, iterations, NULL);
-  LOG_INFO("Iterations: %ld", iterations);
+  LOG_INFO("Iterations: %d", iterations);
   _print64("Total Cycles", cycles);
   _print64("Average Cycles per Iteration", average_cycles);
   LOG_INFO("========== End Benchmark ==========");
