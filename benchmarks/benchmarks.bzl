@@ -15,7 +15,7 @@
 """Rules to run Kelvin benchmarks"""
 
 load("@kelvin_sw//build_tools/bazel:kelvin.bzl","kelvin_binary", "kelvin_test", "generate_cc_arrays")
-load("@matcha//rules:matcha.bzl", "bin_to_c_file", "matcha_extflash_tar", "sec_flash_binary", "smc_flash_binary", "NEXUS_CORE_TARGETS")
+load("@matcha//rules:matcha.bzl", "bin_to_c_file", "matcha_extflash_tar", "sec_flash_binary", "smc_flash_binary", "device_deps")
 
 def kelvin_benchmark_simulator(
         name,
@@ -130,7 +130,7 @@ def _kelvin_benchmark_device(
             ],
             copts = ["-DBENCHMARK_NAME={}".format(name)],
             per_device_deps = {
-                device_type: [NEXUS_CORE_TARGETS.get("smc")],
+                device_type: device_deps("smc").get(device_type),
             },
             deps = [
                 "@matcha//sw/device/lib/dif:ml_top",
@@ -157,7 +157,7 @@ def _kelvin_benchmark_device(
             ],
             copts = ["-DBENCHMARK_NAME={}".format(name)],
             per_device_deps = {
-                device_type: [NEXUS_CORE_TARGETS.get("secure_core")],
+                device_type: device_deps("secure_core").get(device_type),
             },
             deps = [
                 "@matcha//sw/device/lib:spi_flash",

@@ -62,7 +62,7 @@ void _ottf_main(void) {
       "kelvin.bin", (void*)TOP_MATCHA_ML_TOP_DMEM_BASE_ADDR,
       (TOP_MATCHA_ML_TOP_DMEM_BASE_ADDR + TOP_MATCHA_RAM_ML_DMEM_SIZE_BYTES)));
 
-  if (kDeviceType == kDeviceFpgaNexus) {
+  if (kDeviceType == kDeviceFpgaNexus || kDeviceType == kDeviceAsic) {
     LOG_INFO("Loading SMC binary");
     memcpy((void*)TOP_MATCHA_RAM_SMC_BASE_ADDR, smc_bin, smc_bin_len);
   }
