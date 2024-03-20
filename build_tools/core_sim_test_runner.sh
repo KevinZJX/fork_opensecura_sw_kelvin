@@ -42,7 +42,7 @@ fi
 
 BIN_FILE=$(realpath $1)
 shift 1
-SIM_OUT=$(${CORE_SIM} "${BIN_FILE}" $@)
+SIM_OUT=$(${CORE_SIM} "${BIN_FILE}" $@ "${EXTRA_FLAGS}")
 RESULT=$?
 echo "${SIM_OUT}"
 
