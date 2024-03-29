@@ -35,14 +35,14 @@ if [[ ! -f ${CORE_SIM} ]]; then
   exit 1
 fi
 
-if (( $# != 1 )); then
+if (( $# < 1 )); then
   print_usage
   exit 1
 fi
 
 BIN_FILE=$(realpath $1)
 shift 1
-SIM_OUT=$(${CORE_SIM} "${BIN_FILE}" $@ "${EXTRA_FLAGS}")
+SIM_OUT=$(${CORE_SIM} "${BIN_FILE}" $@)
 RESULT=$?
 echo "${SIM_OUT}"
 
