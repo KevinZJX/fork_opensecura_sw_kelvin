@@ -19,10 +19,15 @@
 #include "crt/kelvin.h"
 #include "crt/log.h"
 #include "benchmarks/benchmark.h"
+#include "benchmarks/cycle_count.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
+
+#if (PROFILE == 1)
+#include "tensorflow/lite/micro/micro_profiler.h"
+#endif
 
 #define STRINGIZE(x) #x
 #define STR(x) STRINGIZE(x)
@@ -43,21 +48,6 @@ __attribute__((section(".model_output_header"))) BenchmarkOutputHeader output_he
     .iterations = 0,
     .cycles = 0,
 };
-
-inline uint64_t mcycle_read(void) {
-  uint32_t cycle_low = 0;
-  uint32_t cycle_high = 0;
-  uint32_t cycle_high_2 = 0;
-  asm volatile(
-      "1:"
-      "  csrr %0, mcycleh;"  // Read `mcycleh`.
-      "  csrr %1, mcycle;"   // Read `mcycle`.
-      "  csrr %2, mcycleh;"  // Read `mcycleh` again.
-      "  bne  %0, %2, 1b;"
-      : "=r"(cycle_high), "=r"(cycle_low), "=r"(cycle_high_2)
-      :);
-  return static_cast<uint64_t>(cycle_high) << 32 | cycle_low;
-}
 
 // This includes all ops currently used in the Kelvin model suite. More can be added.
 constexpr int kAllOpsNum = 22;
@@ -110,8 +100,17 @@ int main(int argc, char **argv) {
       tflite::MicroAllocator::Create(variable_arena, 1024);
   tflite::MicroResourceVariables *resource_variables =
       tflite::MicroResourceVariables::Create(variable_allocator, 20);
+#if (PROFILE == 1)
+  tflite::MicroProfiler profiler;
+  std::unique_ptr<tflite::MicroInterpreter> interpreter = std::make_unique<tflite::MicroInterpreter>(
+      model, *resolver.get(), g_tensor_arena, kTensorArenaSize, resource_variables, &profiler);
+  // For a profiled model, just run a single iteration
+  const int iterations = 1;
+#else
   std::unique_ptr<tflite::MicroInterpreter> interpreter = std::make_unique<tflite::MicroInterpreter>(
       model, *resolver.get(), g_tensor_arena, kTensorArenaSize, resource_variables);
+  const int iterations = ITERATIONS;
+#endif
 
   // Run inference outside of benchmark to intialize model.
   if (interpreter->AllocateTensors() != kTfLiteOk) {
@@ -130,17 +129,22 @@ int main(int argc, char **argv) {
   uint64_t begin = mcycle_read();
 
   // TODO(michaelbrooks): Possibly set/verify test data?
-  for (int i = 0; i < ITERATIONS; ++i) {
+  for (int i = 0; i < iterations; ++i) {
     interpreter->Invoke();
   }
   uint64_t end = mcycle_read();
   uint64_t num_cycles = end - begin;
+
+#if (PROFILE == 1)
+  profiler.LogCsv();
+#endif
+
   // Stores benchmark information in output header for other cores to access.
-  output_header.iterations = ITERATIONS;
+  output_header.iterations = iterations;
   output_header.cycles = num_cycles;
 
   // If running on a simulator, print cycle information.
-  uint64_t average_cycles = num_cycles / ITERATIONS;
+  uint64_t average_cycles = num_cycles / iterations;
   LOG_INFO("Iterations: %ld", output_header.iterations);
   _print64("Total Cycles: ", output_header.cycles);
   _print64("Average Cycles per Iteration: ", average_cycles);
