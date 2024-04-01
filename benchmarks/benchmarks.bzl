@@ -21,6 +21,7 @@ def kelvin_benchmark_simulator(
         name,
         model,
         iterations,
+        profile = False,
         hw_test_size = "medium",
         hw_test_tags = [],
         iss_test_size = "small",
@@ -38,10 +39,15 @@ def kelvin_benchmark_simulator(
             name = "{}".format(name),
             srcs = ["@kelvin_sw//benchmarks:benchmark_kelvin.cc"],
             hdrs = ["@kelvin_sw//benchmarks:benchmark.h", "{}_model.h".format(name)],
-            copts = ["-DITERATIONS={}".format(iterations), "-DBENCHMARK_NAME={}".format(name)],
+            copts = [
+                "-DITERATIONS={}".format(iterations),
+                "-DBENCHMARK_NAME={}".format(name),
+                "-DPROFILE={}".format(1 if profile else 0),
+            ],
             deps = [
                 "@kelvin_sw//crt",
                 "@kelvin_sw//benchmarks:benchmark_header",
+                "@kelvin_sw//benchmarks:cycle_count",
                 "@tflite-micro//tensorflow/lite/micro:micro_framework",
                 "@tflite-micro//tensorflow/lite/micro:system_setup",
             ],
@@ -55,12 +61,14 @@ def kelvin_benchmark_fpga(
         name,
         model,
         iterations,
+        profile = False,
         **kwargs):
         _kelvin_benchmark_device(
             name = name,
             model = model,
             device_type = "fpga_nexus",
             iterations = iterations,
+            profile = profile,
             **kwargs,
         )
 
@@ -68,6 +76,7 @@ def kelvin_benchmark_asic(
         name,
         model,
         iterations,
+        profile = False,
         **kwargs):
 
         _kelvin_benchmark_device(
@@ -75,6 +84,7 @@ def kelvin_benchmark_asic(
             model = model,
             device_type = "asic",
             iterations = iterations,
+            profile = profile,
             **kwargs,
         )
 
@@ -82,12 +92,14 @@ def kelvin_benchmark_devices(
         name,
         model,
         iterations,
+        profile = False,
         **kwargs):
 
         kelvin_benchmark_asic(
             name = "{}_asic".format(name),
             model = model,
             iterations = iterations,
+            profile = profile,
             **kwargs,
         )
 
@@ -95,6 +107,7 @@ def kelvin_benchmark_devices(
             name = "{}_fpga".format(name),
             model = model,
             iterations = iterations,
+            profile = profile,
             **kwargs,
         )
 
@@ -113,6 +126,7 @@ def _kelvin_benchmark_device(
         model,
         device_type,
         iterations,
+        profile = False,
         **kwargs):
 
         bin_to_c_file(
@@ -138,6 +152,7 @@ def _kelvin_benchmark_device(
                 "@matcha//sw/device/lib/dif:i2s",
                 "@matcha//sw/device/lib/dif:tlul_mailbox",
                 "@kelvin_sw//benchmarks:benchmark_header",
+                "@kelvin_sw//benchmarks:cycle_count",
                 "@lowrisc_opentitan//sw/device/lib/dif:rv_plic",
             ],
         )
@@ -165,6 +180,7 @@ def _kelvin_benchmark_device(
                 "@matcha//sw/device/lib/dif:smc_ctrl",
                 "@matcha//sw/device/lib/dif:tlul_mailbox",
                 "@kelvin_sw//benchmarks:benchmark_header",
+                "@kelvin_sw//benchmarks:cycle_count",
                 "@lowrisc_opentitan//sw/device/lib/dif:rv_plic",
             ],
         )
@@ -174,13 +190,18 @@ def _kelvin_benchmark_device(
             srcs = [
                 "@kelvin_sw//benchmarks:benchmark_kelvin.cc",
             ],
-            copts = ["-DITERATIONS={}".format(iterations), "-DBENCHMARK_NAME={}".format(name)],
+            copts = [
+                "-DITERATIONS={}".format(iterations),
+                "-DBENCHMARK_NAME={}".format(name),
+                "-DPROFILE={}".format(1 if profile else 0),
+            ],
             hdrs = [
                 "@kelvin_sw//benchmarks:benchmark.h",
                 "{}_model.h".format(name),
             ],
             deps = [
                 "@kelvin_sw//benchmarks:benchmark_header",
+                "@kelvin_sw//benchmarks:cycle_count",
                 "@tflite-micro//tensorflow/lite/micro:micro_framework",
                 "@tflite-micro//tensorflow/lite/micro:system_setup",
             ],

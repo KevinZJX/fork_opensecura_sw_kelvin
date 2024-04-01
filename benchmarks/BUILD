@@ -20,6 +20,12 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "cycle_count",
+    hdrs = ["cycle_count.h"],
+    visibility = ["//visibility:public"],
+)
+
 exports_files(
     srcs = glob(["*.c", "*.cc", "*.h"]),
 )
