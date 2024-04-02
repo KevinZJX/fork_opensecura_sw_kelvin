@@ -21,6 +21,7 @@ def kelvin_benchmark_simulator(
         name,
         model,
         iterations,
+        test_data = None,
         profile = False,
         hw_test_size = "medium",
         hw_test_tags = [],
@@ -28,20 +29,33 @@ def kelvin_benchmark_simulator(
         iss_test_tags = [],
         **kwargs):
 
+        kelvin_headers = ["@kelvin_sw//benchmarks:benchmark.h"]
+        model_header_name = "{}_model".format(name)
         bin_to_c_file(
-            name = "{}_model".format(name),
+            name = model_header_name,
             srcs = [model],
             var_name = "g_benchmark_model_data",
         )
+        kelvin_headers.append(model_header_name)
+
+        if test_data:
+            test_data_header_name = "{}_test_data".format(name)
+            bin_to_c_file(
+                name = test_data_header_name,
+                srcs = [test_data],
+                var_name = "g_benchmark_test_data",
+            )
+            kelvin_headers.append(test_data_header_name)
 
         # Test to run in simulator and MPACT.
         kelvin_test(
             name = "{}".format(name),
             srcs = ["@kelvin_sw//benchmarks:benchmark_kelvin.cc"],
-            hdrs = ["@kelvin_sw//benchmarks:benchmark.h", "{}_model.h".format(name)],
+            hdrs = kelvin_headers,
             copts = [
                 "-DITERATIONS={}".format(iterations),
                 "-DBENCHMARK_NAME={}".format(name),
+                "-DTEST_DATA={}".format(1 if test_data else 0),
                 "-DPROFILE={}".format(1 if profile else 0),
             ],
             deps = [
@@ -61,6 +75,7 @@ def kelvin_benchmark_fpga(
         name,
         model,
         iterations,
+        test_data = None,
         profile = False,
         **kwargs):
         _kelvin_benchmark_device(
@@ -68,6 +83,7 @@ def kelvin_benchmark_fpga(
             model = model,
             device_type = "fpga_nexus",
             iterations = iterations,
+            test_data = test_data,
             profile = profile,
             **kwargs,
         )
@@ -76,6 +92,7 @@ def kelvin_benchmark_asic(
         name,
         model,
         iterations,
+        test_data = None,
         profile = False,
         **kwargs):
 
@@ -84,6 +101,7 @@ def kelvin_benchmark_asic(
             model = model,
             device_type = "asic",
             iterations = iterations,
+            test_data = test_data,
             profile = profile,
             **kwargs,
         )
@@ -92,6 +110,7 @@ def kelvin_benchmark_devices(
         name,
         model,
         iterations,
+        test_data = None,
         profile = False,
         **kwargs):
 
@@ -99,6 +118,7 @@ def kelvin_benchmark_devices(
             name = "{}_asic".format(name),
             model = model,
             iterations = iterations,
+            test_data = test_data,
             profile = profile,
             **kwargs,
         )
@@ -107,6 +127,7 @@ def kelvin_benchmark_devices(
             name = "{}_fpga".format(name),
             model = model,
             iterations = iterations,
+            test_data = test_data,
             profile = profile,
             **kwargs,
         )
@@ -126,14 +147,9 @@ def _kelvin_benchmark_device(
         model,
         device_type,
         iterations,
+        test_data = None,
         profile = False,
         **kwargs):
-
-        bin_to_c_file(
-            name = "{}_model".format(name),
-            srcs = [model],
-            var_name = "g_benchmark_model_data",
-        )
 
         # Creation of binaries for running on FPGA
         smc_flash_binary(
@@ -185,6 +201,24 @@ def _kelvin_benchmark_device(
             ],
         )
 
+        kelvin_headers = ["@kelvin_sw//benchmarks:benchmark.h"]
+        model_header_name = "{}_model".format(name)
+        bin_to_c_file(
+            name = "{}_model".format(name),
+            srcs = [model],
+            var_name = "g_benchmark_model_data",
+        )
+        kelvin_headers.append(model_header_name)
+
+        if test_data:
+            test_data_header_name = "{}_test_data".format(name)
+            bin_to_c_file(
+                name = test_data_header_name,
+                srcs = [test_data],
+                var_name = "g_benchmark_test_data",
+            )
+            kelvin_headers.append(test_data_header_name)
+
         kelvin_binary(
             name = "{}_kelvin".format(name),
             srcs = [
@@ -193,12 +227,10 @@ def _kelvin_benchmark_device(
             copts = [
                 "-DITERATIONS={}".format(iterations),
                 "-DBENCHMARK_NAME={}".format(name),
+                "-DTEST_DATA={}".format(1 if test_data else 0),
                 "-DPROFILE={}".format(1 if profile else 0),
             ],
-            hdrs = [
-                "@kelvin_sw//benchmarks:benchmark.h",
-                "{}_model.h".format(name),
-            ],
+            hdrs = kelvin_headers,
             deps = [
                 "@kelvin_sw//benchmarks:benchmark_header",
                 "@kelvin_sw//benchmarks:cycle_count",

@@ -39,6 +39,12 @@
 #define MODEL_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME MODEL_HEADER_TYPE)
 #include MODEL_HEADER
 
+#if (TEST_DATA == 1)
+#define TEST_DATA_HEADER_TYPE _test_data.h
+#define TEST_DATA_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME TEST_DATA_HEADER_TYPE)
+#include TEST_DATA_HEADER
+#endif
+
 namespace {
 constexpr int kTensorArenaSize = 1024 * 1024;
 uint8_t g_tensor_arena[kTensorArenaSize] __attribute__((aligned(64)));
@@ -118,9 +124,12 @@ int main(int argc, char **argv) {
   }
   TfLiteTensor* input = interpreter->input(0);
 
-  // Set input tensor to zero for first inference, subsequent runs
-  // will run on output tensor data (since the memory is shared).
+#if (TEST_DATA == 1)
+  memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_test_data, input->bytes);
+#else
   memset(tflite::GetTensorData<uint8_t>(input), 0, input->bytes);
+#endif
+
   if (interpreter->Invoke() != kTfLiteOk) {
     return kInvokeFailed;
   }
@@ -130,6 +139,11 @@ int main(int argc, char **argv) {
 
   // TODO(michaelbrooks): Possibly set/verify test data?
   for (int i = 0; i < iterations; ++i) {
+#if (TEST_DATA == 1)
+  memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_test_data, input->bytes);
+#else
+  memset(tflite::GetTensorData<uint8_t>(input), 0, input->bytes);
+#endif
     interpreter->Invoke();
   }
   uint64_t end = mcycle_read();
