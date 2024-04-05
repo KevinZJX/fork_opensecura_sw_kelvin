@@ -170,6 +170,7 @@ def _kelvin_benchmark_device(
                 "@kelvin_sw//benchmarks:benchmark_header",
                 "@kelvin_sw//benchmarks:cycle_count",
                 "@lowrisc_opentitan//sw/device/lib/dif:rv_plic",
+                "@lowrisc_opentitan//sw/device/lib/dif:rv_timer",
             ],
         )
 

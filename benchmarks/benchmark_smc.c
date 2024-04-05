@@ -22,6 +22,7 @@
 #include "sw/device/lib/base/math.h"
 #include "sw/device/lib/dif/dif_ml_top.h"
 #include "sw/device/lib/dif/dif_rv_plic.h"
+#include "sw/device/lib/dif/dif_rv_timer.h"
 #include "sw/device/lib/runtime/hart.h"
 #include "sw/device/lib/runtime/irq.h"
 #include "sw/device/lib/runtime/log.h"
@@ -37,6 +38,7 @@
 OTTF_DEFINE_TEST_CONFIG();
 
 static dif_rv_plic_t plic_smc;
+static dif_rv_timer_t rv_timer;
 static dif_uart_t smc_uart;
 static dif_ml_top_t ml_top;
 
@@ -87,6 +89,9 @@ void _ottf_main(void) {
       mmio_region_from_addr(TOP_MATCHA_RV_PLIC_SMC_BASE_ADDR), &plic_smc));
   CHECK_DIF_OK(dif_ml_top_init(
       mmio_region_from_addr(TOP_MATCHA_ML_TOP_CORE_BASE_ADDR), &ml_top));
+  CHECK_DIF_OK(dif_rv_timer_init(
+      mmio_region_from_addr(TOP_MATCHA_RV_TIMER_SMC_BASE_ADDR), &rv_timer));
+
   CHECK_DIF_OK(dif_ml_top_irq_set_enabled(&ml_top, kDifMlTopIrqFinish,
                                           kDifToggleEnabled));
   CHECK_DIF_OK(dif_rv_plic_irq_set_priority(
@@ -94,6 +99,16 @@ void _ottf_main(void) {
   CHECK_DIF_OK(dif_rv_plic_irq_set_enabled(
       &plic_smc, kTopMatchaPlicIrqIdMlTopFinish, kTopMatchaPlicTargetIbex0Smc,
       kDifToggleEnabled));
+
+  dif_rv_timer_tick_params_t tick_params;
+  CHECK_DIF_OK(dif_rv_timer_approximate_tick_params(kClockFreqPeripheralHz,
+                                                    1000000, &tick_params));
+  CHECK_DIF_OK(dif_rv_timer_init(
+      mmio_region_from_addr(TOP_MATCHA_RV_TIMER_SMC_BASE_ADDR), &rv_timer));
+  CHECK_DIF_OK(dif_rv_timer_set_tick_params(&rv_timer, 0, tick_params));
+  CHECK_DIF_OK(
+      dif_rv_timer_counter_set_enabled(&rv_timer, 0, kDifToggleEnabled));
+
   irq_global_ctrl(true);
   irq_external_ctrl(true);
 
@@ -101,12 +116,16 @@ void _ottf_main(void) {
 
   // start kelvin
   ml_top_finish_done = false;
+  uint64_t timer_start;
+  CHECK_DIF_OK(dif_rv_timer_counter_read(&rv_timer, 0, &timer_start));
   CHECK_DIF_OK(dif_ml_top_release_ctrl_en(&ml_top));
 
   // wfi
   while (!ml_top_finish_done) {
     wait_for_interrupt();
   }
+  uint64_t timer_finish;
+  CHECK_DIF_OK(dif_rv_timer_counter_read(&rv_timer, 0, &timer_finish));
 
   BenchmarkOutputHeader* output_header_ptr =
       (BenchmarkOutputHeader*)((TOP_MATCHA_ML_TOP_DMEM_BASE_ADDR +
@@ -119,9 +138,13 @@ void _ottf_main(void) {
   uint32_t iterations = output_header_ptr->iterations;
   uint64_t cycles = output_header_ptr->cycles;
   uint64_t average_cycles = udiv64_slow(cycles, iterations, NULL);
+  uint64_t wall_time_us = timer_finish - timer_start;
+  uint64_t average_wall_time_us = udiv64_slow(wall_time_us, iterations, NULL);
   LOG_INFO("Iterations: %d", iterations);
   _print64("Total Cycles", cycles);
   _print64("Average Cycles per Iteration", average_cycles);
+  _print64("Wall time (us)", wall_time_us);
+  _print64("Wall time per Iteration (us)", average_wall_time_us);
   LOG_INFO("========== End Benchmark ==========");
   while (true) {
     wait_for_interrupt();
