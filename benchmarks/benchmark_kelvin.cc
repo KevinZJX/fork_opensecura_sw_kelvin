@@ -46,7 +46,7 @@
 #endif
 
 namespace {
-constexpr int kTensorArenaSize = 1024 * 1024;
+constexpr int kTensorArenaSize = 1232 * 1024;
 uint8_t g_tensor_arena[kTensorArenaSize] __attribute__((aligned(64)));
 
 __attribute__((section(".model_output_header"))) BenchmarkOutputHeader output_header = {
@@ -56,7 +56,7 @@ __attribute__((section(".model_output_header"))) BenchmarkOutputHeader output_he
 };
 
 // This includes all ops currently used in the Kelvin model suite. More can be added.
-constexpr int kAllOpsNum = 22;
+constexpr int kAllOpsNum = 25;
 std::unique_ptr<tflite::MicroMutableOpResolver<kAllOpsNum>> GetAllOpsResolver() {
   tflite::MicroMutableOpResolver<kAllOpsNum> resolver;
   resolver.AddAveragePool2D();
@@ -81,6 +81,9 @@ std::unique_ptr<tflite::MicroMutableOpResolver<kAllOpsNum>> GetAllOpsResolver() 
   resolver.AddTransposeConv();
   resolver.AddAdd();
   resolver.AddSub();
+  resolver.AddMean();
+  resolver.AddPack();
+  resolver.AddShape();
   return std::make_unique<tflite::MicroMutableOpResolver<kAllOpsNum>>(resolver);
 }
 
