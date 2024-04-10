@@ -46,7 +46,7 @@
 #endif
 
 namespace {
-constexpr int kTensorArenaSize = 1232 * 1024;
+constexpr int kTensorArenaSize = 1536 * 1024;
 uint8_t g_tensor_arena[kTensorArenaSize] __attribute__((aligned(64)));
 
 __attribute__((section(".model_output_header"))) BenchmarkOutputHeader output_header = {
