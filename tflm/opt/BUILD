@@ -19,6 +19,7 @@ cc_library(
     srcs = [
         "conv.cc",
         "depthwise_conv_s16.cc",
+        "depthwise_conv_s8.cc",
         "elementwise_add_s16.cc",
         "elementwise_add_s32.cc",
         "elementwise_add_s8.cc",
@@ -35,6 +36,7 @@ cc_library(
     deps = [
         "//crt",
         "@tflite-micro//tensorflow/lite/kernels/internal:common",
+        "@tflite-micro//tensorflow/lite/kernels/internal:reference_base",
     ],
     alwayslink = True,
 )
