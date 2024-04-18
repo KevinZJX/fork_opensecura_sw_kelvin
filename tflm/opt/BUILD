@@ -18,6 +18,7 @@ cc_library(
     name = "opt",
     srcs = [
         "conv.cc",
+        "conv_s8.cc",
         "depthwise_conv_s16.cc",
         "depthwise_conv_s8.cc",
         "elementwise_add_s16.cc",
