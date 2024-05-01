@@ -21,6 +21,7 @@ typedef struct {
   uint32_t return_code;
   uint32_t iterations;
   uint64_t cycles;
+  uint32_t mismatch_count;
 } BenchmarkOutputHeader;
 
 #endif // #ifndef BENCHMARKS_BENCHMARK_H_

@@ -21,7 +21,8 @@ def kelvin_benchmark_simulator(
         name,
         model,
         iterations,
-        test_data = None,
+        test_data_input = None,
+        test_data_output = None,
         profile = False,
         kelvin_binary_info = None,
         benchmark_path = "benchmarks",
@@ -51,14 +52,22 @@ def kelvin_benchmark_simulator(
             )
             kelvin_headers.append(model_header_name)
 
-            if test_data:
-                test_data_header_name = "{}_test_data".format(name)
+            if test_data_input:
+                input_header_name = "{}_input".format(name)
                 bin_to_c_file(
-                    name = test_data_header_name,
-                    srcs = [test_data],
-                    var_name = "g_benchmark_test_data",
+                    name = input_header_name,
+                    srcs = [test_data_input],
+                    var_name = "g_benchmark_input",
                 )
-                kelvin_headers.append(test_data_header_name)
+                kelvin_headers.append(input_header_name)
+            if test_data_output:
+                output_header_name = "{}_output".format(name)
+                bin_to_c_file(
+                    name = output_header_name,
+                    srcs = [test_data_output],
+                    var_name = "g_benchmark_output",
+                )
+                kelvin_headers.append(output_header_name)
 
             # Test to run in simulator and MPACT.
             kelvin_test(
@@ -68,7 +77,8 @@ def kelvin_benchmark_simulator(
                 copts = [
                     "-DITERATIONS={}".format(iterations),
                     "-DBENCHMARK_NAME={}".format(name),
-                    "-DTEST_DATA={}".format(1 if test_data else 0),
+                    "-DTEST_DATA_INPUT={}".format(1 if test_data_input else 0),
+                    "-DTEST_DATA_OUTPUT={}".format(1 if test_data_output else 0),
                     "-DPROFILE={}".format(1 if profile else 0),
                     "-DBENCHMARK_PATH={}".format(benchmark_path),
                 ],
@@ -175,7 +185,8 @@ def _kelvin_benchmark_device(
         model,
         device_type,
         iterations,
-        test_data = None,
+        test_data_input = None,
+        test_data_output = None,
         profile = False,
         kelvin_binary_info = None,
         benchmark_path = "benchmarks",
@@ -254,14 +265,22 @@ def _kelvin_benchmark_device(
             )
             kelvin_headers.append(model_header_name)
 
-            if test_data:
-                test_data_header_name = "{}_test_data".format(name)
+            if test_data_input:
+                input_header_name = "{}_input".format(name)
                 bin_to_c_file(
-                    name = test_data_header_name,
-                    srcs = [test_data],
-                    var_name = "g_benchmark_test_data",
+                    name = input_header_name,
+                    srcs = [test_data_input],
+                    var_name = "g_benchmark_input",
                 )
-                kelvin_headers.append(test_data_header_name)
+                kelvin_headers.append(input_header_name)
+            if test_data_output:
+                output_header_name = "{}_output".format(name)
+                bin_to_c_file(
+                    name = output_header_name,
+                    srcs = [test_data_output],
+                    var_name = "g_benchmark_output",
+                )
+                kelvin_headers.append(output_header_name)
 
             kelvin_binary(
                 name = "{}_kelvin".format(name),
@@ -271,7 +290,8 @@ def _kelvin_benchmark_device(
                 copts = [
                     "-DITERATIONS={}".format(iterations),
                     "-DBENCHMARK_NAME={}".format(name),
-                    "-DTEST_DATA={}".format(1 if test_data else 0),
+                    "-DTEST_DATA_INPUT={}".format(1 if test_data_input else 0),
+                    "-DTEST_DATA_OUTPUT={}".format(1 if test_data_output else 0),
                     "-DPROFILE={}".format(1 if profile else 0),
                     "-DBENCHMARK_PATH={}".format(benchmark_path),
                 ],

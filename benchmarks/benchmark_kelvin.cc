@@ -39,10 +39,16 @@
 #define MODEL_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME MODEL_HEADER_TYPE)
 #include MODEL_HEADER
 
-#if (TEST_DATA == 1)
-#define TEST_DATA_HEADER_TYPE _test_data.h
-#define TEST_DATA_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME TEST_DATA_HEADER_TYPE)
-#include TEST_DATA_HEADER
+#if (TEST_DATA_INPUT == 1)
+#define TEST_DATA_INPUT_HEADER_TYPE _input.h
+#define TEST_DATA_INPUT_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME TEST_DATA_INPUT_HEADER_TYPE)
+#include TEST_DATA_INPUT_HEADER
+#endif
+
+#if (TEST_DATA_OUTPUT == 1)
+#define TEST_DATA_OUTPUT_HEADER_TYPE _output.h
+#define TEST_DATA_OUTPUT_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME TEST_DATA_OUTPUT_HEADER_TYPE)
+#include TEST_DATA_OUTPUT_HEADER
 #endif
 
 namespace {
@@ -53,6 +59,7 @@ __attribute__((section(".model_output_header"))) BenchmarkOutputHeader output_he
     .return_code = 0, // Set by kelvin_start based on return value in main.
     .iterations = 0,
     .cycles = 0,
+    .mismatch_count = 0,
 };
 
 // This includes all ops currently used in the Kelvin model suite. More can be added.
@@ -127,8 +134,8 @@ int main(int argc, char **argv) {
   }
   TfLiteTensor* input = interpreter->input(0);
 
-#if (TEST_DATA == 1)
-  memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_test_data, input->bytes);
+#if (TEST_DATA_INPUT == 1)
+  memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_input, input->bytes);
 #else
   memset(tflite::GetTensorData<uint8_t>(input), 0, input->bytes);
 #endif
@@ -142,8 +149,8 @@ int main(int argc, char **argv) {
 
   // TODO(michaelbrooks): Possibly set/verify test data?
   for (int i = 0; i < iterations; ++i) {
-#if (TEST_DATA == 1)
-  memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_test_data, input->bytes);
+#if (TEST_DATA_INPUT == 1)
+  memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_input, input->bytes);
 #else
   memset(tflite::GetTensorData<uint8_t>(input), 0, input->bytes);
 #endif
@@ -151,6 +158,20 @@ int main(int argc, char **argv) {
   }
   uint64_t end = mcycle_read();
   uint64_t num_cycles = end - begin;
+
+#if (TEST_DATA_OUTPUT == 1)
+  TfLiteTensor* output = interpreter->output(0);
+  int mismatch_count = 0;
+  for (size_t i = 0; i < output->bytes; ++i) {
+    int8_t vx = (int8_t)(*(tflite::GetTensorData<int8_t>(output) + i) & 0xFF);
+    int8_t vy = (int8_t)(*(g_benchmark_output + i) & 0xFF);
+    auto delta = ((vx) > (vy)) ? ((vx) - (vy)) : ((vy) - (vx));
+    if (delta) {
+      mismatch_count += 1;
+    }
+  }
+  output_header.mismatch_count = mismatch_count;
+#endif
 
 #if (PROFILE == 1)
   profiler.LogCsv();
@@ -165,6 +186,9 @@ int main(int argc, char **argv) {
   LOG_INFO("Iterations: %ld", output_header.iterations);
   _print64("Total Cycles: ", output_header.cycles);
   _print64("Average Cycles per Iteration: ", average_cycles);
+#if (TEST_DATA_OUTPUT == 1)
+  LOG_INFO("Mismatch_count: %d", mismatch_count);
+#endif
   LOG_INFO("========== End Benchmark ==========");
   return kSuccess;
 }
