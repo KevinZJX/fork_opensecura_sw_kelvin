@@ -34,7 +34,7 @@
 
 // In order to include the model data generate from Bazel, include the header
 // using the name passed as a macro.
-#define MODEL_HEADER_DIRECTORY benchmarks/
+#define MODEL_HEADER_DIRECTORY BENCHMARK_PATH/
 #define MODEL_HEADER_TYPE _model.h
 #define MODEL_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME MODEL_HEADER_TYPE)
 #include MODEL_HEADER
