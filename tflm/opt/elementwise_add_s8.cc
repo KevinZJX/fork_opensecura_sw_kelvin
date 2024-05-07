@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@
 
 namespace kelvin::opt {
 
-void elementwise_add_s8(const int8_t* input1, const int8_t* input2,
-                        const int32_t input1_offset, const int32_t input1_mult,
-                        const int32_t input1_shift, const int32_t input2_offset,
-                        const int32_t input2_mult, const int32_t input2_shift,
-                        const int32_t left_shift, int8_t* output,
-                        const int32_t output_offset, const int32_t output_mult,
-                        const int32_t output_shift,
-                        const int32_t output_activation_min,
-                        const int32_t output_activation_max,
-                        const int32_t block_size) {
+void ElementwiseAddS8(const int8_t* input1, const int8_t* input2,
+                      const int32_t input1_offset, const int32_t input1_mult,
+                      const int32_t input1_shift, const int32_t input2_offset,
+                      const int32_t input2_mult, const int32_t input2_shift,
+                      const int32_t left_shift, int8_t* output,
+                      const int32_t output_offset, const int32_t output_mult,
+                      const int32_t output_shift,
+                      const int32_t output_activation_min,
+                      const int32_t output_activation_max,
+                      const int32_t block_size) {
   int blocks = block_size;
   int vl;
   getmaxvl_b(vl);

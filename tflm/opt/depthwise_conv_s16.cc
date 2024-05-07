@@ -14,23 +14,32 @@
  * limitations under the License.
  */
 
-#include <algorithm>
+// Depthwise convolution based on Kelvin ops
+// Data types: input: s16, filter: s8, bias s64
 
-#include "crt/kelvin.h"
-#include "tflm/opt/opt.h"
-#include "tensorflow/lite/kernels/internal/common.h"
+#include "tensorflow/lite/kernels/internal/reference/integer_ops/depthwise_conv.h"
+#include "tflm/opt/conv_util.h"
 
 namespace kelvin::opt {
+namespace {
+void DepthwiseConvS16K3x1(
+    const tflite::DepthwiseParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int64_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int16_t* output_data) {
+  const int16_t* activations = input_data;
+  const int8_t* weights = filter_data;
+  const int64_t* biases = bias_data;
+  int channels = filter_shape.Dims(3);
+  int frames = input_shape.Dims(2);
+  int dilation = params.dilation_width_factor;
+  const int32_t* output_mult = output_multiplier;
+  int32_t output_activation_min = params.quantized_activation_min;
+  int32_t output_activation_max = params.quantized_activation_max;
+  int16_t* output = output_data;
 
-void DepthwiseConv2DKelvinS16K3x1(const int16_t* activations,
-                                  const int8_t* weights,
-                                  const int64_t* biases,
-                                  int channels, int frames, int dilation,
-                                  const int32_t* output_mult,
-                                  const int32_t* output_shift,
-                                  int32_t output_activation_min,
-                                  int32_t output_activation_max,
-                                  int16_t* output) {
   for (int c = 0; c + 32 <= channels; c += 32) {
     // Load weights and interleave into correct order [v58-v63].
     // Because there are more activations than weights, interleave weights.
@@ -78,8 +87,8 @@ void DepthwiseConv2DKelvinS16K3x1(const int16_t* activations,
       for (; frames_idx < frames; frames_idx += dilation) {
         vld_h_p_xx(v4, local_activations0, step);
         vld_h_p_xx(v5, local_activations1, step);
-        vmulw_w_vv(v48, v58, v0);  // Clobber accumulator
-        vmulw_w_vv(v50, v59, v1);  // Clobber accumulator
+        vmulw_w_vv(v48, v58, v0);    // Clobber accumulator
+        vmulw_w_vv(v50, v59, v1);    // Clobber accumulator
         vadd_w_vv_m(v48, v48, v52);  // Add bias.
         vmulw_w_vv(v40, v60, v2);
         vmulw_w_vv(v42, v61, v3);
@@ -116,6 +125,62 @@ void DepthwiseConv2DKelvinS16K3x1(const int16_t* activations,
   // Break it down into:
   //   - one loop looking for 16 byte stripes
   //   - one final loop handling remainder
+}
+
+// generic implementation based on Kelvin ops
+void DepthwiseConvS16Generic(
+    const tflite::DepthwiseParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int64_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int16_t* output_data) {
+  // TBD: Use Kelvin implementation to replace the below
+  tflite::reference_integer_ops::DepthwiseConvPerChannel(
+      params, output_multiplier, output_shift, input_shape, input_data,
+      filter_shape, filter_data, bias_shape, bias_data, output_shape,
+      output_data);
+  return;
+}
+}  // namespace
+
+void DepthwiseConvS16(
+    const tflite::DepthwiseParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int16_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int64_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int16_t* output_data) {
+  // Get parameters.
+  const int stride_width = params.stride_width;
+  const int stride_height = params.stride_height;
+  const int dilation_width_factor = params.dilation_width_factor;
+  const int dilation_height_factor = params.dilation_height_factor;
+  const int filter_height = filter_shape.Dims(1);
+  const int filter_width = filter_shape.Dims(2);
+
+  if (params.padding_type == tflite::PaddingType::kValid && stride_width == 1 &&
+      stride_height == 1 && dilation_width_factor == 1 &&
+      dilation_height_factor == 1) {
+    // generic implementation by default
+    auto fn = DepthwiseConvS16Generic;
+
+    // special case of filter size 3x1
+    if (filter_height == 1 && filter_width == 3) {
+      fn = DepthwiseConvS16K3x1;
+    }
+
+    fn(params, output_multiplier, output_shift, input_shape, input_data,
+       filter_shape, filter_data, bias_shape, bias_data, output_shape,
+       output_data);
+    return;
+  }
+
+  // Use reference implementation
+  tflite::reference_integer_ops::DepthwiseConvPerChannel(
+      params, output_multiplier, output_shift, input_shape, input_data,
+      filter_shape, filter_data, bias_shape, bias_data, output_shape,
+      output_data);
 }
 
 }  // namespace kelvin::opt

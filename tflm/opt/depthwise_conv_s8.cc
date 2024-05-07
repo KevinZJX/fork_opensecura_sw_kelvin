@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,16 @@
  * limitations under the License.
  */
 
-#include <algorithm>
+// Depthwise convolution based on Kelvin ops
+// Data types: input: s8, filter: s8, bias s32
 
-#include "crt/kelvin.h"
-#include "tensorflow/lite/kernels/internal/common.h"
 #include "tensorflow/lite/kernels/internal/reference/integer_ops/depthwise_conv.h"
-#include "tensorflow/lite/kernels/internal/runtime_shape.h"
-#include "tensorflow/lite/kernels/internal/types.h"
-#include "tflm/opt/opt.h"
+#include "tflm/opt/conv_util.h"
 
 namespace kelvin::opt {
-
-void Swizzle(const int32_t* input, int32_t* output, int N) {
-  const int32_t(&in)[N] = *(int32_t(*)[N])input;
-  int32_t(&out)[N * 4] = *(int32_t(*)[N * 4]) output;
-  // Convert to accumulator swizzle pattern.
-  for (int i = 0; i < N / 8; ++i) {
-    int32_t* out0 = out + i * 32 + 0;
-    int32_t* out1 = out + i * 32 + 16;
-    int32_t* out2 = out + i * 32 + 8;
-    int32_t* out3 = out + i * 32 + 24;
-    for (int j = 0; j < 4; ++j) {
-      const int32_t* p_in = in + i * 8;
-      for (int k = 0; k < 2; ++k) {
-        *out0++ = *p_in++;
-        *out1++ = *p_in++;
-        *out2++ = *p_in++;
-        *out3++ = *p_in++;
-      }
-    }
-  }
-}
-
-void DWConv2DKelvin_d32(
+namespace {
+// special case of input depth = 32n
+void DepthwiseConvS8D32(
     const tflite::DepthwiseParams& params, const int32_t* output_multiplier,
     const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
     const int8_t* input_data, const tflite::RuntimeShape& filter_shape,
@@ -57,8 +34,6 @@ void DWConv2DKelvin_d32(
 ) {
   const int stride_width = params.stride_width;
   const int stride_height = params.stride_height;
-  const int dilation_width_factor = params.dilation_width_factor;
-  const int dilation_height_factor = params.dilation_height_factor;
   const int pad_width = params.padding_values.width;
   const int pad_height = params.padding_values.height;
   const int32_t input_offset = params.input_offset;
@@ -138,7 +113,24 @@ void DWConv2DKelvin_d32(
   }
 }
 
-void DepthwiseConv2DKelvin(
+// generic implementation based on Kelvin ops
+void DepthwiseConvS8Generic(
+    const tflite::DepthwiseParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int8_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int32_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int8_t* output_data) {
+  // TBD: Use Kelvin implementation to replace the below
+  tflite::reference_integer_ops::DepthwiseConvPerChannel(
+      params, output_multiplier, output_shift, input_shape, input_data,
+      filter_shape, filter_data, bias_shape, bias_data, output_shape,
+      output_data);
+  return;
+}
+}  // namespace
+
+void DepthwiseConvS8(
     const tflite::DepthwiseParams& params, const int32_t* output_multiplier,
     const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
     const int8_t* input_data, const tflite::RuntimeShape& filter_shape,
@@ -154,8 +146,6 @@ void DepthwiseConv2DKelvin(
   const int pad_width = params.padding_values.width;
   const int pad_height = params.padding_values.height;
   const int depth_multiplier = params.depth_multiplier;
-  const int32_t input_offset = params.input_offset;
-  const int32_t output_offset = params.output_offset;
   const int32_t output_activation_min = params.quantized_activation_min;
   const int32_t output_activation_max = params.quantized_activation_max;
 
@@ -165,30 +155,33 @@ void DepthwiseConv2DKelvin(
   TFLITE_DCHECK_EQ(output_shape.DimensionsCount(), 4);
 
   TFLITE_DCHECK_LE(output_activation_min, output_activation_max);
-  const int batches = MatchingDim(input_shape, 0, output_shape, 0);
   const int output_depth = MatchingDim(filter_shape, 3, output_shape, 3);
-  const int input_height = input_shape.Dims(1);
-  const int input_width = input_shape.Dims(2);
   const int input_depth = input_shape.Dims(3);
-  const int filter_height = filter_shape.Dims(1);
-  const int filter_width = filter_shape.Dims(2);
-  const int output_height = output_shape.Dims(1);
-  const int output_width = output_shape.Dims(2);
   TFLITE_DCHECK_EQ(output_depth, input_depth * depth_multiplier);
   TFLITE_DCHECK_EQ(bias_shape.FlatSize(), output_depth);
 
   if (depth_multiplier == 1 && pad_height < 2 && pad_width < 2 &&
       dilation_height_factor == 1 && dilation_width_factor == 1 &&
-      stride_height == 1 && stride_width == 1 && output_depth % 32 == 0) {
-    DWConv2DKelvin_d32(params, output_multiplier, output_shift, input_shape,
-                       input_data, filter_shape, filter_data, bias_shape,
-                       bias_data, output_shape, output_data);
+      stride_height == 1 && stride_width == 1) {
+    // generic implementation by default
+    auto fn = DepthwiseConvS8Generic;
+
+    // special case of output depth = 32n
+    if (output_depth % 32 == 0) {
+      fn = DepthwiseConvS8D32;
+    }
+
+    fn(params, output_multiplier, output_shift, input_shape, input_data,
+       filter_shape, filter_data, bias_shape, bias_data, output_shape,
+       output_data);
     return;
   }
+
+  // Use reference implementation
   tflite::reference_integer_ops::DepthwiseConvPerChannel(
       params, output_multiplier, output_shift, input_shape, input_data,
       filter_shape, filter_data, bias_shape, bias_data, output_shape,
       output_data);
-  return;
 }
+
 }  // namespace kelvin::opt

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@
 
 namespace kelvin::opt {
 
-void leaky_relu_s8(const int8_t* input, int8_t* output,
-                   const int32_t block_size, const int32_t input_zero_point,
-                   const int32_t output_zero_point,
-                   const int32_t output_multiplier_alpha,
-                   const int32_t output_shift_alpha,
-                   const int32_t output_multiplier_identity,
-                   const int32_t output_shift_identity) {
+void LeakyReluS8(const int8_t* input, int8_t* output, const int32_t block_size,
+                 const int32_t input_zero_point,
+                 const int32_t output_zero_point,
+                 const int32_t output_multiplier_alpha,
+                 const int32_t output_shift_alpha,
+                 const int32_t output_multiplier_identity,
+                 const int32_t output_shift_identity) {
   constexpr int32_t quantized_output_min = std::numeric_limits<int16_t>::min();
   constexpr int32_t quantized_output_max = std::numeric_limits<int16_t>::max();
   int32_t right_shift_identity = std::min(output_shift_identity, 0L);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 namespace kelvin::opt {
 
-void *memcpy(void *dst, const void *src, size_t n) {
+void *Memcpy(void *dst, const void *src, size_t n) {
   const uint8_t *s = reinterpret_cast<const uint8_t *>(src);
   uint8_t *d = reinterpret_cast<uint8_t *>(dst);
   int vl;

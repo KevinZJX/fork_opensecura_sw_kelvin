@@ -17,8 +17,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "opt",
     srcs = [
-        "conv.cc",
+        "conv_s16_b32.cc",
+        "conv_s16_b64.cc",
         "conv_s8.cc",
+        "conv_s8_1x1.cc",
+        "conv_s8_3x1_d48.cc",
+        "conv_s8_d32.cc",
         "depthwise_conv_s16.cc",
         "depthwise_conv_s8.cc",
         "elementwise_add_s16.cc",
@@ -26,10 +30,12 @@ cc_library(
         "elementwise_add_s8.cc",
         "leaky_relu_s16.cc",
         "leaky_relu_s8.cc",
+        "max_pool_s8.cc",
         "memcpy.cc",
-        "max_pool_s8.cc"
     ],
     hdrs = [
+        "conv_s8.h",
+        "conv_util.h",
         "opt.h",
         "util.h",
     ],

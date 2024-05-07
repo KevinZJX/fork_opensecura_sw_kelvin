@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 #include "tflm/opt/opt.h"
 
 namespace kelvin::opt {
-void elementwise_add_s32(const int32_t* input1, const int32_t* input2,
-                         int32_t* output, const int32_t output_activation_min,
-                         const int32_t output_activation_max,
-                         const int32_t block_size) {
+void ElementwiseAddS32(const int32_t* input1, const int32_t* input2,
+                       int32_t* output, const int32_t output_activation_min,
+                       const int32_t output_activation_max,
+                       const int32_t block_size) {
   int blocks = block_size;
   int vl;
   getmaxvl_w_m(vl);

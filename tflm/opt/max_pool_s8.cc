@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,10 @@
 #include "tensorflow/lite/kernels/internal/types.h"
 
 namespace kelvin::opt {
-void MaxPoolGeneric(const tflite::PoolParams &params,
-                    const tflite::RuntimeShape &input_shape,
-                    const int8_t *input_data,
-                    const tflite::RuntimeShape &output_shape,
-                    int8_t *output_data) {
+void MaxPoolS8(const tflite::PoolParams &params,
+               const tflite::RuntimeShape &input_shape,
+               const int8_t *input_data,
+               const tflite::RuntimeShape &output_shape, int8_t *output_data) {
   const int batches = MatchingDim(input_shape, 0, output_shape, 0);
   const int depth = MatchingDim(input_shape, 3, output_shape, 3);
   const int input_height = input_shape.Dims(1);
@@ -97,4 +96,4 @@ void MaxPoolGeneric(const tflite::PoolParams &params,
   }
 }
 
-} // namespace kelvin::opt
+}  // namespace kelvin::opt
