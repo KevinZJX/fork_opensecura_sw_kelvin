@@ -33,6 +33,16 @@ void ConvS8K1x1(const tflite::ConvParams& params,
                 const int32_t* bias_data,
                 const tflite::RuntimeShape& output_shape, int8_t* output_data);
 
+// filter depth 4n
+void ConvS8D4(const tflite::ConvParams& params,
+              const int32_t* output_multiplier, const int32_t* output_shift,
+              const tflite::RuntimeShape& input_shape,
+              const int8_t* input_data,
+              const tflite::RuntimeShape& filter_shape,
+              const int8_t* filter_data,
+              const tflite::RuntimeShape& bias_shape, const int32_t* bias_data,
+              const tflite::RuntimeShape& output_shape, int8_t* output_data);
+
 // filter depth 32n
 void ConvS8D32(const tflite::ConvParams& params,
                const int32_t* output_multiplier, const int32_t* output_shift,

@@ -189,19 +189,27 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
   const auto filter_height = filter_shape.Dims(1);
   const auto filter_width = filter_shape.Dims(2);
   const auto filter_depth = filter_shape.Dims(3);
+  const auto output_width = output_shape.Dims(2);
   const auto output_depth = output_shape.Dims(3);
 
   // use generic implementation by default
   auto fn = ConvS8Generic;
 
-  // special case of filter depth = 32n
+  // special case of filter_depth = 4n
   if (dilation_width_factor == 1 && dilation_height_factor == 1 &&
+      stride_width <= 2 && stride_height <= 2 && filter_depth % 4 == 0 &&
+      output_depth % 8 == 0 && output_width >= 8 && pad_width <= 1) {
+    fn = kelvin::opt::ConvS8D4;
+  }
+
+  // special case of filter depth = 32n
+  else if (dilation_width_factor == 1 && dilation_height_factor == 1 &&
       stride_width <= 2 && stride_height <= 2 && filter_depth % 32 == 0) {
     fn = kelvin::opt::ConvS8D32;
   }
 
   // special case of filter size 1x1
-  if (filter_height == 1 && filter_width == 1 && stride_height == 1 &&
+  else if (filter_height == 1 && filter_width == 1 && stride_height == 1 &&
       stride_width == 1 && dilation_height_factor == 1 &&
       dilation_width_factor == 1 && pad_height == 0 && pad_width == 0 &&
       (output_depth % 8) == 0 && (input_depth % 32) == 0) {
@@ -210,7 +218,7 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
   }
 
   // special case of filter size 48x3x1x48
-  if (batches == 1 && filter_height == 3 && filter_width == 1 &&
+  else if (batches == 1 && filter_height == 3 && filter_width == 1 &&
       input_width == 1 && input_depth == 48 && output_depth == 48 &&
       stride_height == 1 && stride_width == 1 && dilation_height_factor == 1 &&
       dilation_width_factor == 1 && pad_height == 0 && pad_width == 0) {
