@@ -20,18 +20,6 @@
 #include "tests/kelvin_isa/kelvin_test.h"
 #include "tests/kelvin_isa/vdwconv_data.h"
 
-struct vdwconv_u8_t {
-  uint32_t mode:2;      // 1:0
-  uint32_t sparsity:2;  // 3:2
-  uint32_t regbase:4;   // 7:4
-  uint32_t rsvd:4;      // 11:8
-  int32_t sbias1:9;    // 20:12
-  uint32_t sdata1:1;    // 21
-  int32_t sbias2:9;    // 30:22
-  uint32_t sdata2:1;    // 31
-};
-static_assert(sizeof(vdwconv_u8_t) == 4);
-
 #ifdef TEST_GEN
 static int32_t dwconv(const vdwconv_u8_t& cmd, uint8_t ina[3], uint8_t inb[3]) {
   int32_t sbias1 = cmd.sbias1;

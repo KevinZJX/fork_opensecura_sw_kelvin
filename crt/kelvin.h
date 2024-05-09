@@ -62,4 +62,16 @@ struct vconv_u8_t {
 };
 static_assert(sizeof(struct vconv_u8_t) == 4);
 
+struct vdwconv_u8_t {
+  uint32_t mode:2;      // 1:0
+  uint32_t sparsity:2;  // 3:2
+  uint32_t regbase:4;   // 7:4
+  uint32_t rsvd:4;      // 11:8
+  int32_t sbias1:9;    // 20:12
+  uint32_t sdata1:1;    // 21
+  int32_t sbias2:9;    // 30:22
+  uint32_t sdata2:1;    // 31
+};
+static_assert(sizeof(struct vdwconv_u8_t) == 4);
+
 #endif  // CRT_KELVIN_H_
