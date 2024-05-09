@@ -24,6 +24,7 @@ cc_library(
         "conv_s8_3x1_d48.cc",
         "conv_s8_d4.cc",
         "conv_s8_d32.cc",
+        "conv_s8_d1.cc",
         "depthwise_conv_s16.cc",
         "depthwise_conv_s8.cc",
         "elementwise_add_s16.cc",

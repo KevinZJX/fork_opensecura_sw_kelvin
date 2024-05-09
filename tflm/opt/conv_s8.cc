@@ -225,6 +225,10 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
     fn = kelvin::opt::ConvS8K3x1D48;
   }
 
+  else if (input_depth == 1 && ((output_depth % 4) == 0)) {
+    fn = kelvin::opt::ConvPerChannelD1;
+  }
+
   fn(params, output_multiplier, output_shift, input_shape, input_data,
      filter_shape, filter_data, bias_shape, bias_data, output_shape,
      output_data);
