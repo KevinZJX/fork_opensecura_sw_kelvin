@@ -34,10 +34,10 @@
 // In order to include the model data generate from Bazel, include the header
 // using the name passed as a macro. For some reason this binary (vs Kelvin)
 // adds space when concatinating so use the model format -smc_bin.h.
-#define MODEL_HEADER_DIRECTORY benchmarks
-#define MODEL_HEADER_TYPE smc_bin.h
-#define MODEL_HEADER STR(MODEL_HEADER_DIRECTORY/BENCHMARK_NAME-MODEL_HEADER_TYPE)
-#include MODEL_HEADER
+#define SMC_BINARY_DIRECTORY BENCHMARK_PATH
+#define SMC_BINARY_TYPE smc_bin.h
+#define SMC_BINARY STR(SMC_BINARY_DIRECTORY/BENCHMARK_NAME-SMC_BINARY_TYPE)
+#include SMC_BINARY
 
 static dif_pinmux_t pinmux;
 static dif_smc_ctrl_t smc_ctrl;

@@ -23,53 +23,67 @@ def kelvin_benchmark_simulator(
         iterations,
         test_data = None,
         profile = False,
+        kelvin_binary_info = None,
+        benchmark_path = "benchmarks",
         hw_test_size = "medium",
         hw_test_tags = [],
         iss_test_size = "small",
         iss_test_tags = [],
         **kwargs):
 
-        kelvin_headers = ["@kelvin_sw//benchmarks:benchmark.h"]
-        model_header_name = "{}_model".format(name)
-        bin_to_c_file(
-            name = model_header_name,
-            srcs = [model],
-            var_name = "g_benchmark_model_data",
-        )
-        kelvin_headers.append(model_header_name)
-
-        if test_data:
-            test_data_header_name = "{}_test_data".format(name)
-            bin_to_c_file(
-                name = test_data_header_name,
-                srcs = [test_data],
-                var_name = "g_benchmark_test_data",
+        if kelvin_binary_info:
+            kelvin_test(
+                name = kelvin_binary_info['name'],
+                srcs = kelvin_binary_info['srcs'],
+                hdrs = kelvin_binary_info['hdrs'],
+                copts = kelvin_binary_info['copts'],
+                deps = kelvin_binary_info['deps'],
+                hw_test_size = "medium",
+                iss_test_size = "medium",
             )
-            kelvin_headers.append(test_data_header_name)
+        else:
+            kelvin_headers = ["@kelvin_sw//benchmarks:benchmark.h"]
+            model_header_name = "{}_model".format(name)
+            bin_to_c_file(
+                name = model_header_name,
+                srcs = [model],
+                var_name = "g_benchmark_model_data",
+            )
+            kelvin_headers.append(model_header_name)
 
-        # Test to run in simulator and MPACT.
-        kelvin_test(
-            name = "{}".format(name),
-            srcs = ["@kelvin_sw//benchmarks:benchmark_kelvin.cc"],
-            hdrs = kelvin_headers,
-            copts = [
-                "-DITERATIONS={}".format(iterations),
-                "-DBENCHMARK_NAME={}".format(name),
-                "-DTEST_DATA={}".format(1 if test_data else 0),
-                "-DPROFILE={}".format(1 if profile else 0),
-            ],
-            deps = [
-                "@kelvin_sw//crt",
-                "@kelvin_sw//benchmarks:benchmark_header",
-                "@kelvin_sw//benchmarks:cycle_count",
-                "@tflite-micro//tensorflow/lite/micro:micro_framework",
-                "@tflite-micro//tensorflow/lite/micro:system_setup",
-            ],
-            hw_test_size = hw_test_size,
-            hw_test_tags = hw_test_tags,
-            iss_test_size = iss_test_size,
-            iss_test_tags = iss_test_tags,
-        )
+            if test_data:
+                test_data_header_name = "{}_test_data".format(name)
+                bin_to_c_file(
+                    name = test_data_header_name,
+                    srcs = [test_data],
+                    var_name = "g_benchmark_test_data",
+                )
+                kelvin_headers.append(test_data_header_name)
+
+            # Test to run in simulator and MPACT.
+            kelvin_test(
+                name = "{}".format(name),
+                srcs = ["@kelvin_sw//benchmarks:benchmark_kelvin.cc"],
+                hdrs = kelvin_headers,
+                copts = [
+                    "-DITERATIONS={}".format(iterations),
+                    "-DBENCHMARK_NAME={}".format(name),
+                    "-DTEST_DATA={}".format(1 if test_data else 0),
+                    "-DPROFILE={}".format(1 if profile else 0),
+                    "-DBENCHMARK_PATH={}".format(benchmark_path),
+                ],
+                deps = [
+                    "@kelvin_sw//crt",
+                    "@kelvin_sw//benchmarks:benchmark_header",
+                    "@kelvin_sw//benchmarks:cycle_count",
+                    "@tflite-micro//tensorflow/lite/micro:micro_framework",
+                    "@tflite-micro//tensorflow/lite/micro:system_setup",
+                ],
+                hw_test_size = hw_test_size,
+                hw_test_tags = hw_test_tags,
+                iss_test_size = iss_test_size,
+                iss_test_tags = iss_test_tags,
+            )
 
 def kelvin_benchmark_fpga(
         name,
@@ -77,6 +91,8 @@ def kelvin_benchmark_fpga(
         iterations,
         test_data = None,
         profile = False,
+        kelvin_binary_info = None,
+        benchmark_path = "benchmarks",
         **kwargs):
         _kelvin_benchmark_device(
             name = name,
@@ -85,6 +101,8 @@ def kelvin_benchmark_fpga(
             iterations = iterations,
             test_data = test_data,
             profile = profile,
+            kelvin_binary_info = kelvin_binary_info,
+            benchmark_path = benchmark_path,
             **kwargs,
         )
 
@@ -94,6 +112,8 @@ def kelvin_benchmark_asic(
         iterations,
         test_data = None,
         profile = False,
+        kelvin_binary_info = None,
+        benchmark_path = "benchmarks",
         **kwargs):
 
         _kelvin_benchmark_device(
@@ -103,6 +123,8 @@ def kelvin_benchmark_asic(
             iterations = iterations,
             test_data = test_data,
             profile = profile,
+            kelvin_binary_info = kelvin_binary_info,
+            benchmark_path = benchmark_path,
             **kwargs,
         )
 
@@ -112,6 +134,8 @@ def kelvin_benchmark_devices(
         iterations,
         test_data = None,
         profile = False,
+        kelvin_binary_info = None,
+        benchmark_path = "benchmarks",
         **kwargs):
 
         kelvin_benchmark_asic(
@@ -120,6 +144,8 @@ def kelvin_benchmark_devices(
             iterations = iterations,
             test_data = test_data,
             profile = profile,
+            kelvin_binary_info = kelvin_binary_info,
+            benchmark_path = benchmark_path,
             **kwargs,
         )
 
@@ -129,6 +155,8 @@ def kelvin_benchmark_devices(
             iterations = iterations,
             test_data = test_data,
             profile = profile,
+            kelvin_binary_info = kelvin_binary_info,
+            benchmark_path = benchmark_path,
             **kwargs,
         )
 
@@ -149,6 +177,8 @@ def _kelvin_benchmark_device(
         iterations,
         test_data = None,
         profile = False,
+        kelvin_binary_info = None,
+        benchmark_path = "benchmarks",
         **kwargs):
 
         # Creation of binaries for running on FPGA
@@ -187,7 +217,10 @@ def _kelvin_benchmark_device(
                 "{}-smc_bin.h".format(name),
                 "@kelvin_sw//benchmarks:benchmark.h",
             ],
-            copts = ["-DBENCHMARK_NAME={}".format(name)],
+            copts = [
+                "-DBENCHMARK_NAME={}".format(name),
+                "-DBENCHMARK_PATH={}".format(benchmark_path),
+            ],
             per_device_deps = {
                 device_type: device_deps("secure_core").get(device_type),
             },
@@ -202,43 +235,54 @@ def _kelvin_benchmark_device(
             ],
         )
 
-        kelvin_headers = ["@kelvin_sw//benchmarks:benchmark.h"]
-        model_header_name = "{}_model".format(name)
-        bin_to_c_file(
-            name = "{}_model".format(name),
-            srcs = [model],
-            var_name = "g_benchmark_model_data",
-        )
-        kelvin_headers.append(model_header_name)
-
-        if test_data:
-            test_data_header_name = "{}_test_data".format(name)
-            bin_to_c_file(
-                name = test_data_header_name,
-                srcs = [test_data],
-                var_name = "g_benchmark_test_data",
+        # If provided Kelvin binary info, use that instead of the standard
+        if kelvin_binary_info:
+            kelvin_binary(
+                name = "{}_kelvin".format(name),
+                srcs = kelvin_binary_info['srcs'],
+                copts = kelvin_binary_info['copts'],
+                hdrs = kelvin_binary_info['hdrs'],
+                deps = kelvin_binary_info['deps'],
             )
-            kelvin_headers.append(test_data_header_name)
+        else:
+            kelvin_headers = ["@kelvin_sw//benchmarks:benchmark.h"]
+            model_header_name = "{}_model".format(name)
+            bin_to_c_file(
+                name = "{}_model".format(name),
+                srcs = [model],
+                var_name = "g_benchmark_model_data",
+            )
+            kelvin_headers.append(model_header_name)
 
-        kelvin_binary(
-            name = "{}_kelvin".format(name),
-            srcs = [
-                "@kelvin_sw//benchmarks:benchmark_kelvin.cc",
-            ],
-            copts = [
-                "-DITERATIONS={}".format(iterations),
-                "-DBENCHMARK_NAME={}".format(name),
-                "-DTEST_DATA={}".format(1 if test_data else 0),
-                "-DPROFILE={}".format(1 if profile else 0),
-            ],
-            hdrs = kelvin_headers,
-            deps = [
-                "@kelvin_sw//benchmarks:benchmark_header",
-                "@kelvin_sw//benchmarks:cycle_count",
-                "@tflite-micro//tensorflow/lite/micro:micro_framework",
-                "@tflite-micro//tensorflow/lite/micro:system_setup",
-            ],
-        )
+            if test_data:
+                test_data_header_name = "{}_test_data".format(name)
+                bin_to_c_file(
+                    name = test_data_header_name,
+                    srcs = [test_data],
+                    var_name = "g_benchmark_test_data",
+                )
+                kelvin_headers.append(test_data_header_name)
+
+            kelvin_binary(
+                name = "{}_kelvin".format(name),
+                srcs = [
+                    "@kelvin_sw//benchmarks:benchmark_kelvin.cc",
+                ],
+                copts = [
+                    "-DITERATIONS={}".format(iterations),
+                    "-DBENCHMARK_NAME={}".format(name),
+                    "-DTEST_DATA={}".format(1 if test_data else 0),
+                    "-DPROFILE={}".format(1 if profile else 0),
+                    "-DBENCHMARK_PATH={}".format(benchmark_path),
+                ],
+                hdrs = kelvin_headers,
+                deps = [
+                    "@kelvin_sw//benchmarks:benchmark_header",
+                    "@kelvin_sw//benchmarks:cycle_count",
+                    "@tflite-micro//tensorflow/lite/micro:micro_framework",
+                    "@tflite-micro//tensorflow/lite/micro:system_setup",
+                ],
+            )
 
         matcha_extflash_tar(
             name = "{}_extflash".format(name),
