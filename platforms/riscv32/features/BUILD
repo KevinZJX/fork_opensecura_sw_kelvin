@@ -111,19 +111,38 @@ feature(
     ],
 )
 
+feature(
+    name = "fastbuild",
+    enabled = False,
+    flag_sets = [
+        flag_set(
+            actions = CPP_ALL_COMPILE_ACTIONS + C_ALL_COMPILE_ACTIONS,
+            flag_groups = [
+                flag_group(
+                    flags = [
+                        "-O2",
+                        "-g",
+                    ],
+                ),
+            ],
+        ),
+    ],
+    provides = ["compilation_mode"],
+)
+
 feature_set(
     name = "rv32im",
     feature = [
-        ":architecture",
-        ":sys_spec",
         ":all_warnings",
         ":all_warnings_as_errors",
+        ":architecture",
+        ":fastbuild",
+        ":sys_spec",
         "@crt//features/common:includes",
         "@crt//features/common:reproducible",
         "@crt//features/common:symbol_garbage_collection",
         "@crt//features/embedded:cc_constructor_destructor",
         "@crt//features/embedded:exceptions",
         "@crt//features/embedded:runtime_type_information",
-        "@crt//platforms/riscv32/features:fastbuild",
     ],
 )

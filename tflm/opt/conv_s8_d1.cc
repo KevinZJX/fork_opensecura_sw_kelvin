@@ -172,19 +172,24 @@ void ConvPerChannelD1(
 
             const int8_t* local_input_data = input_data +
                 tflite::Offset(input_shape, batch, in_y, 0, 0);
-            for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
-              const int in_x = in_x_origin + dilation_width_factor * filter_x;
-              if ((in_x < 0) || (in_x >= input_width)) {
-                continue;
-              }
+            int filter_x = 0;
+            int in_x = in_x_origin;
+            const int8_t* local_filter_data = swizzled_filter_data.get() +
+                  (filter_y * filter_width * 32);
+            while (in_x < 0) {
+              filter_x++;
+              in_x += dilation_width_factor;
+              local_filter_data += 32;
+            }
+            for (; (filter_x < filter_width) && (in_x < input_width);
+                 ++filter_x, in_x += dilation_width_factor,
+                 local_filter_data += 32) {
 
               int16_t input_val = local_input_data[in_x];
               int16_t input_val16 = static_cast<int16_t>(
                   input_val + input_offset);
               vdup_h_x(v32, input_val16);
 
-              const int8_t* local_filter_data = swizzled_filter_data.get() +
-                  (filter_y * filter_width * 32) + (filter_x * 32);
               vld_b_l_xx(v0, local_filter_data, n_channels);
               vaddw_h_vx(v0, v0, 0);
 
@@ -198,11 +203,9 @@ void ConvPerChannelD1(
           }
 
           // Output pipeline
-          vdmulh_w_rn_vv_m(v48, v48, v56);
-          vsha_w_r_vv_m(v48, v48, v60);
-          vadd_w_vx_m(v48, v48, output_offset);
-          vmin_w_vx_m(v48, v48, output_activation_max);
-          vmax_w_vx_m(v48, v48, output_activation_min);
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v48, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
           vsraqs_b_vx(v48, v48, 0);
           vst_b_l_xx(v48, output_data, n_channels);
           output_data += output_depth;

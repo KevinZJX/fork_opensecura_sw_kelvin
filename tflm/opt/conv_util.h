@@ -108,6 +108,18 @@ inline void Swizzle(const int32_t* input, int32_t* output, int N,
   }
 }
 
+// Runs strip-mined output pipeline (without bias addition) in place on
+// registers.
+#define INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(result, mult, shft, output_min, \
+                                              output_max, output_offset)      \
+  {                                                                           \
+    vdmulh_w_rn_vv_m(result, result, mult);                                   \
+    vsha_w_r_vv_m(result, result, shft);                                      \
+    vadd_w_vx_m(result, result, output_offset);                               \
+    vmax_w_vx_m(result, result, output_activation_min);                       \
+    vmin_w_vx_m(result, result, output_activation_max);                       \
+  }
+
 // Run output pipeline on int32 accumulators in [v48-v55] and store results
 // in v48 and v52. Clobbers [v48-v55].
 #define INT32_TO_INT8_OUTPUT_PIPELINE(bias, mult, shft, output_min,        \
