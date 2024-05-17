@@ -26,6 +26,7 @@
 #include "tensorflow/lite/kernels/internal/reference/integer_ops/conv.h"
 #include "tensorflow/lite/kernels/internal/runtime_shape.h"
 #include "tensorflow/lite/kernels/internal/types.h"
+#include "tflm/opt/conv_s8.h"
 
 #define unlikely(x) (__builtin_expect(false || (x), false))
 #define likely(x) (__builtin_expect(false || (x), true))
@@ -36,7 +37,7 @@ namespace {
 void Filter_N_H_W_M(const int8_t* input, int8_t* output, int N, int H, int W, int M) {
   const int8_t(&in)[8][H][W][M] = *(int8_t(*)[8][H][W][M])input;
   int8_t(&out)[H][W][M / 4][8][4] = *(int8_t(*)[H][W][M / 4][8][4]) output;
-  assert(M >= 4);
+  // assert(M >= 4);
   for (int zo = 0; zo < N; ++zo) {
     for (int ky = 0; ky < H; ++ky) {
       for (int kx = 0; kx < W; ++kx) {
@@ -52,7 +53,7 @@ void Filter_N_H_W_M(const int8_t* input, int8_t* output, int N, int H, int W, in
   for (int zo = N; zo < 8; ++zo) {
     for (int ky = 0; ky < H; ++ky) {
       for (int kx = 0; kx < W; ++kx) {
-        for (int zi = 0; zi < M; ++zi) {
+        for (int zi = M; zi < 4; ++zi) {
           const int zi_hi = zi >> 2;  // div4
           const int zi_lo = zi & 3;   // rem4
           out[ky][kx][zi_hi][zo][zi_lo] = 0;

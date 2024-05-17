@@ -71,6 +71,15 @@ void ConvPerChannelD1(
     const int32_t* bias_data, const tflite::RuntimeShape& output_shape,
     int8_t* output_data);
 
+// Input depth = 1, filter_width = 5, filter_height = 5, output_depth = 24
+void ConvPerChannelD1OD24_5x5(
+    const tflite::ConvParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int8_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int32_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int8_t* output_data);
+
 }  // namespace kelvin::opt
 
 #endif  // TFLM_OPT_CONV_S8_H_
