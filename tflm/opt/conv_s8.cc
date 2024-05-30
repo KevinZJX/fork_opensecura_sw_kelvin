@@ -200,6 +200,15 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
   return; \
 }
 
+  // special case of filter size 1x1
+  if (filter_height == 1 && filter_width == 1 && stride_height == 1 &&
+      stride_width == 1 && dilation_height_factor == 1 &&
+      dilation_width_factor == 1 && pad_height == 0 && pad_width == 0 &&
+      (input_depth == filter_depth) && (output_depth % 8) == 0 &&
+      (input_depth % 32) == 0) {
+    RUN_KERNEL(kelvin::opt::ConvS8K1x1);
+  }
+
   if (input_depth == 1 && filter_width == 5 && filter_height == 5 &&
       output_depth == 24) {
     RUN_KERNEL(kelvin::opt::ConvPerChannelD1OD24_5x5);
@@ -216,15 +225,6 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
   if (dilation_width_factor == 1 && dilation_height_factor == 1 &&
       stride_width <= 2 && stride_height <= 2 && filter_depth % 32 == 0) {
     RUN_KERNEL(kelvin::opt::ConvS8D32);
-  }
-
-  // special case of filter size 1x1
-  if (filter_height == 1 && filter_width == 1 && stride_height == 1 &&
-      stride_width == 1 && dilation_height_factor == 1 &&
-      dilation_width_factor == 1 && pad_height == 0 && pad_width == 0 &&
-      (output_depth % 8) == 0 && (input_depth % 32) == 0) {
-    // TODO(ndodda): uncomment it when all tests are passed
-    // RUN_KERNEL(kelvin::opt::ConvS8K1x1);
   }
 
   // special case of filter size 48x3x1x48
