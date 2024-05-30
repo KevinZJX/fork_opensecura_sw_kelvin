@@ -105,6 +105,10 @@ void MaxPoolS8(const tflite::PoolParams& params,
                const tflite::RuntimeShape& input_shape,
                const int8_t* input_data,
                const tflite::RuntimeShape& output_shape, int8_t* output_data);
+void LogisticS8(int32_t input_zero_point, int32_t input_range_radius,
+                int32_t input_multiplier, int32_t input_left_shift,
+                int32_t input_size, const int8_t* input_data,
+                int8_t* output_data);
 
 }  // namespace kelvin::opt
 

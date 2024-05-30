@@ -86,6 +86,22 @@ kelvin_test(
 )
 
 kelvin_test(
+    name = "logistic_test",
+    srcs = [
+        "@tflite-micro//tensorflow/lite/micro/kernels:logistic_test.cc",
+    ],
+    deps = [
+        "//crt",
+        "@tflite-micro//tensorflow/lite/c:common",
+        "@tflite-micro//tensorflow/lite/kernels/internal:tensor",
+        "@tflite-micro//tensorflow/lite/micro:micro_utils",
+        "@tflite-micro//tensorflow/lite/micro:test_helpers",
+        "@tflite-micro//tensorflow/lite/micro/kernels:kernel_runner",
+        "@tflite-micro//tensorflow/lite/micro/testing:micro_test",
+    ],
+)
+
+kelvin_test(
     name = "pooling_test",
     srcs = [
         "@tflite-micro//tensorflow/lite/micro/kernels:pooling_test.cc",

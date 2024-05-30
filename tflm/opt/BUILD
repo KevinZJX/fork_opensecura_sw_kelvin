@@ -32,6 +32,7 @@ cc_library(
         "elementwise_add_s8.cc",
         "leaky_relu_s16.cc",
         "leaky_relu_s8.cc",
+        "logistic_s8.cc",
         "max_pool_s8.cc",
         "memcpy.cc",
     ],
