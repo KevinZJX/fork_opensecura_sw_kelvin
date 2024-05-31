@@ -204,9 +204,14 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
   if (filter_height == 1 && filter_width == 1 && stride_height == 1 &&
       stride_width == 1 && dilation_height_factor == 1 &&
       dilation_width_factor == 1 && pad_height == 0 && pad_width == 0 &&
-      (input_depth == filter_depth) && (output_depth % 8) == 0 &&
-      (input_depth % 32) == 0) {
-    RUN_KERNEL(kelvin::opt::ConvS8K1x1);
+      (input_depth == filter_depth)) {
+    if ((output_depth % 8) == 0 && (input_depth % 32) == 0) {
+      RUN_KERNEL(kelvin::opt::ConvS8K1x1D32);
+    }
+
+    if ((output_depth % 8) == 0 && (input_depth == 16)) {
+      RUN_KERNEL(kelvin::opt::ConvS8K1x1D16);
+    }
   }
 
   if (input_depth == 1 && filter_width == 5 && filter_height == 5 &&
