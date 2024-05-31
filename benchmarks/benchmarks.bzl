@@ -30,6 +30,7 @@ def kelvin_benchmark_simulator(
         hw_test_tags = [],
         iss_test_size = "small",
         iss_test_tags = [],
+        arena_size_bytes = 1536 * 1024, # 1.5MB
         **kwargs):
 
         if kelvin_binary_info:
@@ -81,6 +82,7 @@ def kelvin_benchmark_simulator(
                     "-DTEST_DATA_OUTPUT={}".format(1 if test_data_output else 0),
                     "-DPROFILE={}".format(1 if profile else 0),
                     "-DBENCHMARK_PATH={}".format(benchmark_path),
+                    "-DARENA_SIZE_BYTES={}".format(arena_size_bytes),
                 ],
                 deps = [
                     "@kelvin_sw//crt",
@@ -190,6 +192,7 @@ def _kelvin_benchmark_device(
         profile = False,
         kelvin_binary_info = None,
         benchmark_path = "benchmarks",
+        arena_size_bytes = 1536 * 1024, # 1.5MB
         **kwargs):
 
         # Creation of binaries for running on FPGA
@@ -294,6 +297,7 @@ def _kelvin_benchmark_device(
                     "-DTEST_DATA_OUTPUT={}".format(1 if test_data_output else 0),
                     "-DPROFILE={}".format(1 if profile else 0),
                     "-DBENCHMARK_PATH={}".format(benchmark_path),
+                    "-DARENA_SIZE_BYTES={}".format(arena_size_bytes),
                 ],
                 hdrs = kelvin_headers,
                 deps = [
