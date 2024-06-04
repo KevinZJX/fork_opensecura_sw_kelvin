@@ -190,6 +190,7 @@ def _kelvin_benchmark_device(
         kelvin_binary_info = None,
         benchmark_path = "benchmarks",
         arena_size_bytes = 1536 * 1024,  # 1.5MB
+        tags = [],
         **kwargs):
     # Creation of binaries for running on FPGA
     smc_flash_binary(
@@ -308,6 +309,7 @@ def _kelvin_benchmark_device(
         name = "{}_extflash".format(name),
         kelvin_binary = ":{}_kelvin.bin".format(name),
         sc_binary = ":{}_sec_{}_bin".format(name, device_type),
+        tags = tags,
     )
 
     # Create a filegroup with all device targets.
