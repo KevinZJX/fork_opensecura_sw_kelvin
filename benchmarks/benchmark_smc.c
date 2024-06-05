@@ -140,13 +140,15 @@ void _ottf_main(void) {
   uint64_t average_cycles = udiv64_slow(cycles, iterations, NULL);
   uint64_t wall_time_us = timer_finish - timer_start;
   uint64_t average_wall_time_us = udiv64_slow(wall_time_us, iterations, NULL);
-  uint32_t mismatch_count = output_header_ptr->mismatch_count;
   LOG_INFO("Iterations: %d", iterations);
   _print64("Total Cycles", cycles);
   _print64("Average Cycles per Iteration", average_cycles);
   _print64("Wall time (us)", wall_time_us);
   _print64("Wall time per Iteration (us)", average_wall_time_us);
+#if (TEST_DATA_OUTPUT == 1)
+  uint32_t mismatch_count = output_header_ptr->mismatch_count;
   LOG_INFO("Mismatch count: %d", mismatch_count);
+#endif
   LOG_INFO("========== End Benchmark ==========");
   while (true) {
     wait_for_interrupt();

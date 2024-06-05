@@ -25,7 +25,7 @@ def kelvin_benchmark_simulator(
         test_data_output = None,
         profile = False,
         kelvin_binary_info = None,
-        benchmark_path = "benchmarks",
+        benchmark_path = "benchmarks/",
         hw_test_size = "medium",
         hw_test_tags = [],
         iss_test_size = "small",
@@ -103,7 +103,7 @@ def kelvin_benchmark_fpga(
         test_data = None,
         profile = False,
         kelvin_binary_info = None,
-        benchmark_path = "benchmarks",
+        benchmark_path = "benchmarks/",
         **kwargs):
     _kelvin_benchmark_device(
         name = name,
@@ -124,7 +124,7 @@ def kelvin_benchmark_asic(
         test_data = None,
         profile = False,
         kelvin_binary_info = None,
-        benchmark_path = "benchmarks",
+        benchmark_path = "benchmarks/",
         **kwargs):
     _kelvin_benchmark_device(
         name = name,
@@ -145,7 +145,7 @@ def kelvin_benchmark_devices(
         test_data = None,
         profile = False,
         kelvin_binary_info = None,
-        benchmark_path = "benchmarks",
+        benchmark_path = "benchmarks/",
         **kwargs):
     kelvin_benchmark_asic(
         name = "{}_asic".format(name),
@@ -188,7 +188,7 @@ def _kelvin_benchmark_device(
         test_data_output = None,
         profile = False,
         kelvin_binary_info = None,
-        benchmark_path = "benchmarks",
+        benchmark_path = "benchmarks/",
         arena_size_bytes = 1536 * 1024,  # 1.5MB
         tags = [],
         **kwargs):
@@ -199,7 +199,10 @@ def _kelvin_benchmark_device(
             "@kelvin_sw//benchmarks:benchmark_smc.c",
             "@kelvin_sw//benchmarks:benchmark.h",
         ],
-        copts = ["-DBENCHMARK_NAME={}".format(name)],
+        copts = [
+            "-DBENCHMARK_NAME={}".format(name),
+            "-DTEST_DATA_OUTPUT={}".format(1 if test_data_output else 0),
+        ],
         per_device_deps = {
             device_type: device_deps("smc").get(device_type),
         },
