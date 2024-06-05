@@ -16,10 +16,10 @@
 
 #include <memory>
 
-#include "crt/kelvin.h"
-#include "crt/log.h"
 #include "benchmarks/benchmark.h"
 #include "benchmarks/cycle_count.h"
+#include "crt/kelvin.h"
+#include "crt/log.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
@@ -34,20 +34,23 @@
 
 // In order to include the model data generate from Bazel, include the header
 // using the name passed as a macro.
-#define MODEL_HEADER_DIRECTORY BENCHMARK_PATH/
+#define MODEL_HEADER_DIRECTORY BENCHMARK_PATH
 #define MODEL_HEADER_TYPE _model.h
-#define MODEL_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME MODEL_HEADER_TYPE)
+#define MODEL_HEADER \
+  STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME MODEL_HEADER_TYPE)
 #include MODEL_HEADER
 
 #if (TEST_DATA_INPUT == 1)
 #define TEST_DATA_INPUT_HEADER_TYPE _input.h
-#define TEST_DATA_INPUT_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME TEST_DATA_INPUT_HEADER_TYPE)
+#define TEST_DATA_INPUT_HEADER \
+  STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME TEST_DATA_INPUT_HEADER_TYPE)
 #include TEST_DATA_INPUT_HEADER
 #endif
 
 #if (TEST_DATA_OUTPUT == 1)
 #define TEST_DATA_OUTPUT_HEADER_TYPE _output.h
-#define TEST_DATA_OUTPUT_HEADER STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME TEST_DATA_OUTPUT_HEADER_TYPE)
+#define TEST_DATA_OUTPUT_HEADER \
+  STR(MODEL_HEADER_DIRECTORY BENCHMARK_NAME TEST_DATA_OUTPUT_HEADER_TYPE)
 #include TEST_DATA_OUTPUT_HEADER
 #endif
 
@@ -59,16 +62,19 @@ constexpr int kTensorArenaSize = 1536 * 1024;
 #endif
 uint8_t g_tensor_arena[kTensorArenaSize] __attribute__((aligned(64)));
 
-__attribute__((section(".model_output_header"))) BenchmarkOutputHeader output_header = {
-    .return_code = 0, // Set by kelvin_start based on return value in main.
+__attribute__((
+    section(".model_output_header"))) BenchmarkOutputHeader output_header = {
+    .return_code = 0,  // Set by kelvin_start based on return value in main.
     .iterations = 0,
     .cycles = 0,
     .mismatch_count = 0,
 };
 
-// This includes all ops currently used in the Kelvin model suite. More can be added.
+// This includes all ops currently used in the Kelvin model suite. More can be
+// added.
 constexpr int kAllOpsNum = 28;
-std::unique_ptr<tflite::MicroMutableOpResolver<kAllOpsNum>> GetAllOpsResolver() {
+std::unique_ptr<tflite::MicroMutableOpResolver<kAllOpsNum>>
+GetAllOpsResolver() {
   tflite::MicroMutableOpResolver<kAllOpsNum> resolver;
   resolver.AddAveragePool2D();
   resolver.AddMaxPool2D();
@@ -110,28 +116,32 @@ void _print64(const char* header, uint64_t number) {
 constexpr int kSuccess = 0;
 constexpr int kAllocatonFailed = -1;
 constexpr int kInvokeFailed = -2;
-} // namespace
+}  // namespace
 
-
-int main(int argc, char **argv) {
-  std::unique_ptr<tflite::MicroMutableOpResolver<kAllOpsNum>> resolver = GetAllOpsResolver();
+int main(int argc, char** argv) {
+  std::unique_ptr<tflite::MicroMutableOpResolver<kAllOpsNum>> resolver =
+      GetAllOpsResolver();
 
   const auto* model = tflite::GetModel(g_benchmark_model_data);
 
   uint8_t variable_arena[2048];
-  tflite::MicroAllocator *variable_allocator =
+  tflite::MicroAllocator* variable_allocator =
       tflite::MicroAllocator::Create(variable_arena, 1024);
-  tflite::MicroResourceVariables *resource_variables =
+  tflite::MicroResourceVariables* resource_variables =
       tflite::MicroResourceVariables::Create(variable_allocator, 20);
 #if (PROFILE == 1)
   tflite::MicroProfiler profiler;
-  std::unique_ptr<tflite::MicroInterpreter> interpreter = std::make_unique<tflite::MicroInterpreter>(
-      model, *resolver.get(), g_tensor_arena, kTensorArenaSize, resource_variables, &profiler);
+  std::unique_ptr<tflite::MicroInterpreter> interpreter =
+      std::make_unique<tflite::MicroInterpreter>(
+          model, *resolver.get(), g_tensor_arena, kTensorArenaSize,
+          resource_variables, &profiler);
   // For a profiled model, just run a single iteration
   const int iterations = 1;
 #else
-  std::unique_ptr<tflite::MicroInterpreter> interpreter = std::make_unique<tflite::MicroInterpreter>(
-      model, *resolver.get(), g_tensor_arena, kTensorArenaSize, resource_variables);
+  std::unique_ptr<tflite::MicroInterpreter> interpreter =
+      std::make_unique<tflite::MicroInterpreter>(
+          model, *resolver.get(), g_tensor_arena, kTensorArenaSize,
+          resource_variables);
   const int iterations = ITERATIONS;
 #endif
 
@@ -142,7 +152,8 @@ int main(int argc, char **argv) {
   TfLiteTensor* input = interpreter->input(0);
 
 #if (TEST_DATA_INPUT == 1)
-  memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_input, input->bytes);
+  memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_input,
+         input->bytes);
 #else
   memset(tflite::GetTensorData<uint8_t>(input), 0, input->bytes);
 #endif
@@ -157,9 +168,10 @@ int main(int argc, char **argv) {
   // TODO(michaelbrooks): Possibly set/verify test data?
   for (int i = 0; i < iterations; ++i) {
 #if (TEST_DATA_INPUT == 1)
-  memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_input, input->bytes);
+    memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_input,
+           input->bytes);
 #else
-  memset(tflite::GetTensorData<uint8_t>(input), 0, input->bytes);
+    memset(tflite::GetTensorData<uint8_t>(input), 0, input->bytes);
 #endif
     interpreter->Invoke();
   }
