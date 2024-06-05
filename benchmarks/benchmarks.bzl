@@ -199,7 +199,10 @@ def _kelvin_benchmark_device(
             "@kelvin_sw//benchmarks:benchmark_smc.c",
             "@kelvin_sw//benchmarks:benchmark.h",
         ],
-        copts = ["-DBENCHMARK_NAME={}".format(name)],
+        copts = [
+            "-DBENCHMARK_NAME={}".format(name),
+            "-DTEST_DATA_OUTPUT={}".format(1 if test_data_output else 0),
+        ],
         per_device_deps = {
             device_type: device_deps("smc").get(device_type),
         },

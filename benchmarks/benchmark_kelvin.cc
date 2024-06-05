@@ -166,6 +166,7 @@ int main(int argc, char **argv) {
   uint64_t end = mcycle_read();
   uint64_t num_cycles = end - begin;
 
+  output_header.mismatch_count = 0;
 #if (TEST_DATA_OUTPUT == 1)
   TfLiteTensor* output = interpreter->output(0);
   int mismatch_count = 0;
