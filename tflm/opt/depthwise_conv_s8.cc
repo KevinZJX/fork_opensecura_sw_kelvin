@@ -95,55 +95,88 @@ void DepthwiseConvS83x3D32_Stride1(
     cmds.dwconv.sparsity = 0;
     cmds.dwconv.regbase = 0;
 
+#define FLT_0_0 v0
+#define FLT_0_1 v3
+#define FLT_0_2 v6
+#define FLT_1_0 v1
+#define FLT_1_1 v4
+#define FLT_1_2 v7
+#define FLT_2_0 v2
+#define FLT_2_1 v5
+#define FLT_2_2 v8
+
+#define INPUT_0_0 v9
+#define INPUT_0_1 v12
+#define INPUT_0_2 v15
+#define INPUT_0_3 v18
+#define INPUT_0_4 v21
+#define INPUT_0_5 v24
+#define INPUT_1_0 v10
+#define INPUT_1_1 v13
+#define INPUT_1_2 v16
+#define INPUT_1_3 v19
+#define INPUT_1_4 v22
+#define INPUT_1_5 v25
+#define INPUT_2_0 v11
+#define INPUT_2_1 v14
+#define INPUT_2_2 v17
+#define INPUT_2_3 v20
+#define INPUT_2_4 v23
+#define INPUT_2_5 v26
+
+#define INPUT_PTRS(_strides) \
+  const int in_y_origin = (out_y * stride_height) - pad_height; \
+  const int in_x_origin = (out_x * stride_width) - pad_width; \
+  const int8_t* p_in_0 = input_data + \
+      (batch * input_height * input_width * input_depth) + \
+      (in_y_origin * input_width * input_depth) + \
+      ((in_x_origin + _strides) * input_depth) + \
+      in_channel; \
+  const int8_t* p_in_1 = p_in_0 + (input_width * input_depth); \
+  const int8_t* p_in_2 = p_in_1 + (input_width * input_depth); \
+  (void)p_in_2;
+
+#define COMPUTE() \
+  adwinit_v(v48, v48); \
+  adwconv_vxv(v48, INPUT_0_0, cmds, FLT_0_0); \
+  adwconv_vxv(v48, INPUT_0_1, cmds, FLT_0_1); \
+  vdwconv_vxv(v48, INPUT_0_2, cmds, FLT_0_2);
+
     // Don't reorder me, otherwise data will not be
     // loaded in the correct order
     // (we can reuse the p_flt* due to the `p` vld variant).
     const int8_t* p_flt0 = filter_data + in_channel;
     const int8_t* p_flt1 = p_flt0 + input_depth;
     const int32_t stride = 2 * input_depth;
-    vld_b_sp_xx(v6, p_flt0, stride);
-    vld_b_sp_xx(v7, p_flt1, stride);
-    vld_b_sp_xx(v8, p_flt0, stride);
-    vld_b_sp_xx(v9, p_flt1, stride);
-    vld_b_sp_xx(v10, p_flt0, stride);
-    vld_b_sp_xx(v11, p_flt1, stride);
-    vld_b_sp_xx(v12, p_flt0, stride);
-    vld_b_sp_xx(v13, p_flt1, stride);
-    vld_b_sp_xx(v14, p_flt0, stride);
+    vld_b_sp_xx(FLT_0_0, p_flt0, stride);
+    vld_b_sp_xx(FLT_0_1, p_flt1, stride);
+    vld_b_sp_xx(FLT_0_2, p_flt0, stride);
+    vld_b_sp_xx(FLT_1_0, p_flt1, stride);
+    vld_b_sp_xx(FLT_1_1, p_flt0, stride);
+    vld_b_sp_xx(FLT_1_2, p_flt1, stride);
+    vld_b_sp_xx(FLT_2_0, p_flt0, stride);
+    vld_b_sp_xx(FLT_2_1, p_flt1, stride);
+    vld_b_sp_xx(FLT_2_2, p_flt0, stride);
 
     for (int batch = 0; batch < batches; ++batch) {
       int out_y = 0;
       for (; out_y < pad_height; ++out_y) {
         int out_x = 0;
-        const int in_y_origin = (out_y * stride_height) - pad_height;
-        assert(in_y_origin < 0);
-        vdup_b_x(v15, -input_offset);
-        vdup_b_x(v16, -input_offset);
-        vdup_b_x(v17, -input_offset);
-        const int8_t* p_in_0 = input_data +
-            (batch * input_height * input_width * input_depth) +
-            (in_y_origin * input_width * input_depth) +
-            (((out_x * stride_width) - pad_width) * input_depth) +
-            in_channel;
-        const int8_t* p_in_1 = p_in_0 + (input_width * input_depth);
-        const int8_t* p_in_2 = p_in_1 + (input_width * input_depth);
+        vdup_b_x(INPUT_0_0, -input_offset);
+        vdup_b_x(INPUT_0_1, -input_offset);
+        vdup_b_x(INPUT_0_2, -input_offset);
         for (; out_x < pad_width; ++out_x) {
+          INPUT_PTRS(1);
           vmv_v_m(v48, v52);
 
-          vdup_b_x(v18, -input_offset);
-          p_in_1 += input_depth;
-          vld_b_sp_xx(v19, p_in_1, input_depth);
-          vld_b_sp_xx(v20, p_in_1, input_depth);
-          vdup_b_x(v21, -input_offset);
-          p_in_2 += input_depth;
-          vld_b_sp_xx(v22, p_in_2, input_depth);
-          vld_b_sp_xx(v23, p_in_2, input_depth);
+          vdup_b_x(INPUT_1_0, -input_offset);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_2, p_in_1, input_depth);
+          vdup_b_x(INPUT_2_0, -input_offset);
+          vld_b_sp_xx(INPUT_2_1, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_2_2, p_in_2, input_depth);
 
-          adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v18, cmds, v9);
-          vdwconv_vxv(v48, v21, cmds, v12);
-
+          COMPUTE();
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v48, v56, v60,
               output_activation_min,
@@ -153,24 +186,18 @@ void DepthwiseConvS83x3D32_Stride1(
           vst_b_x(v48, p_output);
 
           p_output += output_depth;
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
-          p_in_2 -= (2 * stride_width * input_depth);
         }
         for (; out_x < output_width - pad_width; ++out_x) {
+          INPUT_PTRS(0);
           vmv_v_m(v48, v52);
-          vld_b_sp_xx(v18, p_in_1, input_depth);
-          vld_b_sp_xx(v19, p_in_1, input_depth);
-          vld_b_sp_xx(v20, p_in_1, input_depth);
-          vld_b_sp_xx(v21, p_in_2, input_depth);
-          vld_b_sp_xx(v22, p_in_2, input_depth);
-          vld_b_sp_xx(v23, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_1_0, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_2, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_2_0, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_2_1, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_2_2, p_in_2, input_depth);
 
-          adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v18, cmds, v9);
-          vdwconv_vxv(v48, v21, cmds, v12);
-
+          COMPUTE();
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v48, v56, v60,
               output_activation_min,
@@ -179,25 +206,19 @@ void DepthwiseConvS83x3D32_Stride1(
           vsraqs_b_vx(v48, v48, 0);
           vst_b_x(v48, p_output);
           p_output += output_depth;
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
-          p_in_2 -= (2 * stride_width * input_depth);
         }
         for (; out_x < output_width; ++out_x) {
+          INPUT_PTRS(0);
           vmv_v_m(v48, v52);
 
-          vld_b_sp_xx(v18, p_in_1, input_depth);
-          vld_b_sp_xx(v19, p_in_1, input_depth);
-          vdup_b_x(v20, -input_offset);
-          vld_b_sp_xx(v21, p_in_2, input_depth);
-          vld_b_sp_xx(v22, p_in_2, input_depth);
-          vdup_b_x(v23, -input_offset);
+          vld_b_sp_xx(INPUT_1_0, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, input_depth);
+          vdup_b_x(INPUT_1_2, -input_offset);
+          vld_b_sp_xx(INPUT_2_0, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_2_1, p_in_2, input_depth);
+          vdup_b_x(INPUT_2_2, -input_offset);
 
-          adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v18, cmds, v9);
-          vdwconv_vxv(v48, v21, cmds, v12);
-
+          COMPUTE();
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v48, v56, v60,
               output_activation_min,
@@ -207,41 +228,25 @@ void DepthwiseConvS83x3D32_Stride1(
           vst_b_x(v48, p_output);
 
           p_output += output_depth;
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
-          p_in_2 -= (2 * stride_width * input_depth);
         }
       }
       for (; out_y < output_height - pad_height; ++out_y) {
-        const int in_y_origin = (out_y * stride_height) - pad_height;
         int out_x = 0;
-        const int8_t* p_in_0 = input_data +
-            (batch * input_height * input_width * input_depth) +
-            (in_y_origin * input_width * input_depth) +
-            (((out_x * stride_width) - pad_width) * input_depth) +
-            in_channel;
-        const int8_t* p_in_1 = p_in_0 + (input_width * input_depth);
-        const int8_t* p_in_2 = p_in_1 + (input_width * input_depth);
         for (; out_x < pad_width; ++out_x) {
+          INPUT_PTRS(1);
           vmv_v_m(v48, v52);
 
-          vdup_b_x(v15, -input_offset);
-          vdup_b_x(v18, -input_offset);
-          vdup_b_x(v21, -input_offset);
-          p_in_0 += input_depth;
-          p_in_1 += input_depth;
-          p_in_2 += input_depth;
-          vld_b_sp_xx(v16, p_in_0, input_depth);
-          vld_b_sp_xx(v17, p_in_0, input_depth);
-          vld_b_sp_xx(v19, p_in_1, input_depth);
-          vld_b_sp_xx(v20, p_in_1, input_depth);
-          vld_b_sp_xx(v22, p_in_2, input_depth);
-          vld_b_sp_xx(v23, p_in_2, input_depth);
+          vdup_b_x(INPUT_0_0, -input_offset);
+          vdup_b_x(INPUT_1_0, -input_offset);
+          vdup_b_x(INPUT_2_0, -input_offset);
+          vld_b_sp_xx(INPUT_0_1, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_0_2, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_2, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_2_1, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_2_2, p_in_2, input_depth);
 
-          adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v18, cmds, v9);
-          vdwconv_vxv(v48, v21, cmds, v12);
+          COMPUTE();
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v48, v56, v60,
               output_activation_min,
@@ -251,77 +256,108 @@ void DepthwiseConvS83x3D32_Stride1(
           vst_b_x(v48, p_output);
 
           p_output += output_depth;
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
-          p_in_2 -= (2 * stride_width * input_depth);
         }
-        for (; out_x + 2 <= output_width - pad_width; out_x += 2) {
+        for (; out_x + 4 <= output_width - pad_width; out_x += 4) {
+          INPUT_PTRS(0);
           // Initialize accumulators w/ bias data.
+          vmv_v_m(v36, v52);
+          vmv_v_m(v40, v52);
           vmv_v_m(v44, v52);
           vmv_v_m(v48, v52);
 
-          vld_b_sp_xx(v15, p_in_0, stride_width * input_depth);
-          vld_b_sp_xx(v16, p_in_0, stride_width * input_depth);
-          vld_b_sp_xx(v17, p_in_0, stride_width * input_depth);
-          vld_b_sp_xx(v18, p_in_0, stride_width * input_depth);
-          vld_b_sp_xx(v19, p_in_1, stride_width * input_depth);
-          vld_b_sp_xx(v20, p_in_1, stride_width * input_depth);
-          vld_b_sp_xx(v21, p_in_1, stride_width * input_depth);
-          vld_b_sp_xx(v22, p_in_1, stride_width * input_depth);
-          vld_b_sp_xx(v23, p_in_2, stride_width * input_depth);
-          vld_b_sp_xx(v24, p_in_2, stride_width * input_depth);
-          vld_b_sp_xx(v25, p_in_2, stride_width * input_depth);
-          vld_b_sp_xx(v26, p_in_2, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_0_0, p_in_0, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_1_0, p_in_1, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_2_0, p_in_2, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_0_1, p_in_0, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_2_1, p_in_2, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_0_2, p_in_0, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_1_2, p_in_1, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_2_2, p_in_2, stride_width * input_depth);
 
           adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v19, cmds, v9);
-          vdwconv_vxv(v48, v23, cmds, v12);
+          adwconv_vxv(v48, INPUT_0_0, cmds, FLT_0_0);
+          adwconv_vxv(v48, INPUT_0_1, cmds, FLT_0_1);
+          vdwconv_vxv(v48, INPUT_0_2, cmds, FLT_0_2);
+
+          vld_b_sp_xx(INPUT_0_3, p_in_0, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_1_3, p_in_1, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_2_3, p_in_2, stride_width * input_depth);
 
           adwinit_v(v44, v44);
-          adwconv_vxv(v44, v16, cmds, v6);
-          adwconv_vxv(v44, v20, cmds, v9);
-          vdwconv_vxv(v44, v24, cmds, v12);
+          adwconv_vxv(v44, INPUT_0_1, cmds, FLT_0_0);
+          adwconv_vxv(v44, INPUT_0_2, cmds, FLT_0_1);
+          vdwconv_vxv(v44, INPUT_0_3, cmds, FLT_0_2);
+
+          vld_b_sp_xx(INPUT_0_4, p_in_0, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_1_4, p_in_1, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_2_4, p_in_2, stride_width * input_depth);
+
+          adwinit_v(v40, v40);
+          adwconv_vxv(v40, INPUT_0_2, cmds, FLT_0_0);
+          adwconv_vxv(v40, INPUT_0_3, cmds, FLT_0_1);
+          vdwconv_vxv(v40, INPUT_0_4, cmds, FLT_0_2);
+
+          vld_b_sp_xx(INPUT_0_5, p_in_0, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_1_5, p_in_1, stride_width * input_depth);
+          vld_b_sp_xx(INPUT_2_5, p_in_2, stride_width * input_depth);
+
+          adwinit_v(v36, v36);
+          adwconv_vxv(v36, INPUT_0_3, cmds, FLT_0_0);
+          adwconv_vxv(v36, INPUT_0_4, cmds, FLT_0_1);
+          vdwconv_vxv(v36, INPUT_0_5, cmds, FLT_0_2);
+
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v48, v56, v60,
+              output_activation_min,
+              output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v48, v48, 0);
+          vst_b_x(v48, p_output);
+          p_output += output_depth;
 
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v44, v56, v60,
               output_activation_min,
               output_activation_max,
               output_offset);
-          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-              v48, v56, v60,
-              output_activation_min,
-              output_activation_max,
-              output_offset);
-          vsraqs_b_vx(v48, v48, 0);
           vsraqs_b_vx(v44, v44, 0);
-          vst_b_x(v48, p_output);
-          p_output += output_depth;
           vst_b_x(v44, p_output);
           p_output += output_depth;
 
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
-          p_in_2 -= (2 * stride_width * input_depth);
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v40, v56, v60,
+              output_activation_min,
+              output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v40, v40, 0);
+          vst_b_x(v40, p_output);
+          p_output += output_depth;
+
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v36, v56, v60,
+              output_activation_min,
+              output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v36, v36, 0);
+          vst_b_x(v36, p_output);
+          p_output += output_depth;
         }
         for (; out_x < output_width - pad_width; ++out_x) {
+          INPUT_PTRS(0);
           vmv_v_m(v48, v52);
 
-          vld_b_sp_xx(v15, p_in_0, input_depth);
-          vld_b_sp_xx(v16, p_in_0, input_depth);
-          vld_b_sp_xx(v17, p_in_0, input_depth);
-          vld_b_sp_xx(v18, p_in_1, input_depth);
-          vld_b_sp_xx(v19, p_in_1, input_depth);
-          vld_b_sp_xx(v20, p_in_1, input_depth);
-          vld_b_sp_xx(v21, p_in_2, input_depth);
-          vld_b_sp_xx(v22, p_in_2, input_depth);
-          vld_b_sp_xx(v23, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_0_0, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_0_1, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_0_2, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_1_0, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_2, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_2_0, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_2_1, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_2_2, p_in_2, input_depth);
 
-          adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v18, cmds, v9);
-          vdwconv_vxv(v48, v21, cmds, v12);
-
+          COMPUTE();
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v48, v56, v60,
               output_activation_min,
@@ -330,27 +366,22 @@ void DepthwiseConvS83x3D32_Stride1(
           vsraqs_b_vx(v48, v48, 0);
           vst_b_x(v48, p_output);
           p_output += output_depth;
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
-          p_in_2 -= (2 * stride_width * input_depth);
         }
         for (; out_x < output_width; ++out_x) {
+          INPUT_PTRS(0);
           vmv_v_m(v48, v52);
 
-          vdup_b_x(v17, -input_offset);
-          vdup_b_x(v20, -input_offset);
-          vdup_b_x(v23, -input_offset);
-          vld_b_sp_xx(v15, p_in_0, input_depth);
-          vld_b_sp_xx(v16, p_in_0, input_depth);
-          vld_b_sp_xx(v18, p_in_1, input_depth);
-          vld_b_sp_xx(v19, p_in_1, input_depth);
-          vld_b_sp_xx(v21, p_in_2, input_depth);
-          vld_b_sp_xx(v22, p_in_2, input_depth);
+          vdup_b_x(INPUT_0_2, -input_offset);
+          vdup_b_x(INPUT_1_2, -input_offset);
+          vdup_b_x(INPUT_2_2, -input_offset);
+          vld_b_sp_xx(INPUT_0_0, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_0_1, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_1_0, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_2_0, p_in_2, input_depth);
+          vld_b_sp_xx(INPUT_2_1, p_in_2, input_depth);
 
-          adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v18, cmds, v9);
-          vdwconv_vxv(v48, v21, cmds, v12);
+          COMPUTE();
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v48, v56, v60,
               output_activation_min,
@@ -360,41 +391,25 @@ void DepthwiseConvS83x3D32_Stride1(
           vst_b_x(v48, p_output);
 
           p_output += output_depth;
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
-          p_in_2 -= (2 * stride_width * input_depth);
         }
       }
       for (; out_y < output_height; ++out_y) {
-        const int in_y_origin = (out_y * stride_height) - pad_height;
-        assert(in_y_origin + 2 >= input_height);
-        vdup_b_x(v21, -input_offset);
-        vdup_b_x(v22, -input_offset);
-        vdup_b_x(v23, -input_offset);
+        vdup_b_x(INPUT_2_0, -input_offset);
+        vdup_b_x(INPUT_2_1, -input_offset);
+        vdup_b_x(INPUT_2_2, -input_offset);
         int out_x = 0;
-        const int8_t* p_in_0 = input_data +
-            (batch * input_height * input_width * input_depth) +
-            (in_y_origin * input_width * input_depth) +
-            (((out_x * stride_width) - pad_width) * input_depth) +
-            in_channel;
-        const int8_t* p_in_1 = p_in_0 + (input_width * input_depth);
         for (; out_x < pad_width; ++out_x) {
+          INPUT_PTRS(1);
           vmv_v_m(v48, v52);
 
-          vdup_b_x(v15, -input_offset);
-          p_in_0 += input_depth;
-          vld_b_sp_xx(v16, p_in_0, input_depth);
-          vld_b_sp_xx(v17, p_in_0, input_depth);
-          vdup_b_x(v18, -input_offset);
-          p_in_1 += input_depth;
-          vld_b_sp_xx(v19, p_in_1, input_depth);
-          vld_b_sp_xx(v20, p_in_1, input_depth);
+          vdup_b_x(INPUT_0_0, -input_offset);
+          vld_b_sp_xx(INPUT_0_1, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_0_2, p_in_0, input_depth);
+          vdup_b_x(INPUT_1_0, -input_offset);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_2, p_in_1, input_depth);
 
-          adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v18, cmds, v9);
-          vdwconv_vxv(v48, v21, cmds, v12);
-
+          COMPUTE();
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v48, v56, v60,
               output_activation_min,
@@ -403,23 +418,18 @@ void DepthwiseConvS83x3D32_Stride1(
           vsraqs_b_vx(v48, v48, 0);
           vst_b_x(v48, p_output);
           p_output += output_depth;
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
         }
         for (; out_x < output_width - pad_width; ++out_x) {
+          INPUT_PTRS(0);
           vmv_v_m(v48, v52);
-          vld_b_sp_xx(v15, p_in_0, input_depth);
-          vld_b_sp_xx(v16, p_in_0, input_depth);
-          vld_b_sp_xx(v17, p_in_0, input_depth);
-          vld_b_sp_xx(v18, p_in_1, input_depth);
-          vld_b_sp_xx(v19, p_in_1, input_depth);
-          vld_b_sp_xx(v20, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_0_0, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_0_1, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_0_2, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_1_0, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_2, p_in_1, input_depth);
 
-          adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v18, cmds, v9);
-          vdwconv_vxv(v48, v21, cmds, v12);
-
+          COMPUTE();
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v48, v56, v60,
               output_activation_min,
@@ -428,24 +438,19 @@ void DepthwiseConvS83x3D32_Stride1(
           vsraqs_b_vx(v48, v48, 0);
           vst_b_x(v48, p_output);
           p_output += output_depth;
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
         }
         for (; out_x < output_width; ++out_x) {
+          INPUT_PTRS(0);
           vmv_v_m(v48, v52);
 
-          vld_b_sp_xx(v15, p_in_0, input_depth);
-          vld_b_sp_xx(v16, p_in_0, input_depth);
-          vdup_b_x(v17, -input_offset);
-          vld_b_sp_xx(v18, p_in_1, input_depth);
-          vld_b_sp_xx(v19, p_in_1, input_depth);
-          vdup_b_x(v20, -input_offset);
+          vld_b_sp_xx(INPUT_0_0, p_in_0, input_depth);
+          vld_b_sp_xx(INPUT_0_1, p_in_0, input_depth);
+          vdup_b_x(INPUT_0_2, -input_offset);
+          vld_b_sp_xx(INPUT_1_0, p_in_1, input_depth);
+          vld_b_sp_xx(INPUT_1_1, p_in_1, input_depth);
+          vdup_b_x(INPUT_1_2, -input_offset);
 
-          adwinit_v(v48, v48);
-          adwconv_vxv(v48, v15, cmds, v6);
-          adwconv_vxv(v48, v18, cmds, v9);
-          vdwconv_vxv(v48, v21, cmds, v12);
-
+          COMPUTE();
           INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
               v48, v56, v60,
               output_activation_min,
@@ -454,12 +459,20 @@ void DepthwiseConvS83x3D32_Stride1(
           vsraqs_b_vx(v48, v48, 0);
           vst_b_x(v48, p_output);
           p_output += output_depth;
-          p_in_0 -= (2 * stride_width * input_depth);
-          p_in_1 -= (2 * stride_width * input_depth);
         }
       }
     }
   }
+#undef FLT_0_0
+#undef FLT_0_1
+#undef FLT_0_2
+#undef FLT_1_0
+#undef FLT_1_1
+#undef FLT_1_2
+#undef FLT_2_0
+#undef FLT_2_1
+#undef FLT_2_2
+#undef COMPUTE
 }
 
 // special case of input depth = 32n, filter shape of 3x3
