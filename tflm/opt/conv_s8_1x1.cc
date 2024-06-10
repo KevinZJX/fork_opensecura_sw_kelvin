@@ -144,11 +144,8 @@ void ConvS8K1x1D32(
       }
 
       vcget(v48);
-      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-          v48, v20, v24, output_activation_min, output_activation_max,
-          output_offset);
-      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-          v52, v20, v24, output_activation_min, output_activation_max,
+      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE2(
+          v48, v52, v20, v24, output_activation_min, output_activation_max,
           output_offset);
       vsraqs_b_vx(v48, v48, 0);
       vsraqs_b_vx(v52, v52, 0);
@@ -262,11 +259,8 @@ void ConvS8K1x1D16(
       aconv_vxv(v48, v0, cmds, v8);
 
       vcget(v48);
-      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-          v48, v20, v24, output_activation_min, output_activation_max,
-          output_offset);
-      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-          v52, v20, v24, output_activation_min, output_activation_max,
+      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE2(
+          v48, v52, v20, v24, output_activation_min, output_activation_max,
           output_offset);
       vsraqs_b_vx(v48, v48, 0);
       vsraqs_b_vx(v52, v52, 0);
@@ -307,11 +301,8 @@ void ConvS8K1x1D16(
       aconv_vxv(v48, v0, cmds, v8);
 
       vcget(v48);
-      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-          v48, v20, v24, output_activation_min, output_activation_max,
-          output_offset);
-      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-          v52, v20, v24, output_activation_min, output_activation_max,
+      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE2(
+          v48, v52, v20, v24, output_activation_min, output_activation_max,
           output_offset);
       vsraqs_b_vx(v48, v48, 0);
       vsraqs_b_vx(v52, v52, 0);

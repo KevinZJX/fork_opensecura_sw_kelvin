@@ -150,6 +150,73 @@ inline void Swizzle(const int32_t* input, int32_t* output, int N,
     vmin_w_vx_m(result, result, output_activation_max);                       \
   }
 
+// As above, but interleaves 2 sets of outputs.
+#define INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE2(result0, result1, mult, shft,  \
+                                              output_min, \
+                                              output_max, output_offset)      \
+  {                                                                           \
+    vdmulh_w_rn_vv_m(result0, result0, mult);                                   \
+    vdmulh_w_rn_vv_m(result1, result1, mult);                                   \
+    vsha_w_r_vv_m(result0, result0, shft);                                      \
+    vsha_w_r_vv_m(result1, result1, shft);                                      \
+    vadd_w_vx_m(result0, result0, output_offset);                               \
+    vadd_w_vx_m(result1, result1, output_offset);                               \
+    vmax_w_vx_m(result0, result0, output_activation_min);                       \
+    vmax_w_vx_m(result1, result1, output_activation_min);                       \
+    vmin_w_vx_m(result0, result0, output_activation_max);                       \
+    vmin_w_vx_m(result1, result1, output_activation_max);                       \
+  }
+
+// As above, but interleaves 3 sets of outputs.
+#define INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE3(result0, result1, result2, \
+                                              mult, shft,  \
+                                              output_min, \
+                                              output_max, output_offset)      \
+  {                                                                           \
+    vdmulh_w_rn_vv_m(result0, result0, mult);                                   \
+    vdmulh_w_rn_vv_m(result1, result1, mult);                                   \
+    vdmulh_w_rn_vv_m(result2, result2, mult);                                   \
+    vsha_w_r_vv_m(result0, result0, shft);                                      \
+    vsha_w_r_vv_m(result1, result1, shft);                                      \
+    vsha_w_r_vv_m(result2, result2, shft);                                      \
+    vadd_w_vx_m(result0, result0, output_offset);                               \
+    vadd_w_vx_m(result1, result1, output_offset);                               \
+    vadd_w_vx_m(result2, result2, output_offset);                               \
+    vmax_w_vx_m(result0, result0, output_activation_min);                       \
+    vmax_w_vx_m(result1, result1, output_activation_min);                       \
+    vmax_w_vx_m(result2, result2, output_activation_min);                       \
+    vmin_w_vx_m(result0, result0, output_activation_max);                       \
+    vmin_w_vx_m(result1, result1, output_activation_max);                       \
+    vmin_w_vx_m(result2, result2, output_activation_max);                       \
+  }
+
+// As above, but interleaves 4 sets of outputs.
+#define INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE4(result0, result1, result2, result3, mult, shft,  \
+                                              output_min, \
+                                              output_max, output_offset)      \
+  {                                                                           \
+    vdmulh_w_rn_vv_m(result0, result0, mult);                                   \
+    vdmulh_w_rn_vv_m(result1, result1, mult);                                   \
+    vdmulh_w_rn_vv_m(result2, result2, mult);                                   \
+    vdmulh_w_rn_vv_m(result3, result3, mult);                                   \
+    vsha_w_r_vv_m(result0, result0, shft);                                      \
+    vsha_w_r_vv_m(result1, result1, shft);                                      \
+    vsha_w_r_vv_m(result2, result2, shft);                                      \
+    vsha_w_r_vv_m(result3, result3, shft);                                      \
+    vadd_w_vx_m(result0, result0, output_offset);                               \
+    vadd_w_vx_m(result1, result1, output_offset);                               \
+    vadd_w_vx_m(result2, result2, output_offset);                               \
+    vadd_w_vx_m(result3, result3, output_offset);                               \
+    vmax_w_vx_m(result0, result0, output_activation_min);                       \
+    vmax_w_vx_m(result1, result1, output_activation_min);                       \
+    vmax_w_vx_m(result2, result2, output_activation_min);                       \
+    vmax_w_vx_m(result3, result3, output_activation_min);                       \
+    vmin_w_vx_m(result0, result0, output_activation_max);                       \
+    vmin_w_vx_m(result1, result1, output_activation_max);                       \
+    vmin_w_vx_m(result2, result2, output_activation_max);                       \
+    vmin_w_vx_m(result3, result3, output_activation_max);                       \
+  }
+
 // Run output pipeline on int32 accumulators in [v48-v55] and store results
 // in v48 and v52. Clobbers [v48-v55].
 #define INT32_TO_INT8_OUTPUT_PIPELINE(bias, mult, shft, output_min,        \

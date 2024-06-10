@@ -307,39 +307,25 @@ void DepthwiseConvS83x3D32_Stride1(
           adwconv_vxv(v36, INPUT_0_4, cmds, FLT_0_1);
           vdwconv_vxv(v36, INPUT_0_5, cmds, FLT_0_2);
 
-          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-              v48, v56, v60,
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE4(
+              v48, v44, v40, v36, v56, v60,
               output_activation_min,
               output_activation_max,
               output_offset);
           vsraqs_b_vx(v48, v48, 0);
+          vsraqs_b_vx(v44, v44, 0);
+          vsraqs_b_vx(v40, v40, 0);
+          vsraqs_b_vx(v36, v36, 0);
+
           vst_b_x(v48, p_output);
           p_output += output_depth;
 
-          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-              v44, v56, v60,
-              output_activation_min,
-              output_activation_max,
-              output_offset);
-          vsraqs_b_vx(v44, v44, 0);
           vst_b_x(v44, p_output);
           p_output += output_depth;
 
-          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-              v40, v56, v60,
-              output_activation_min,
-              output_activation_max,
-              output_offset);
-          vsraqs_b_vx(v40, v40, 0);
           vst_b_x(v40, p_output);
           p_output += output_depth;
 
-          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
-              v36, v56, v60,
-              output_activation_min,
-              output_activation_max,
-              output_offset);
-          vsraqs_b_vx(v36, v36, 0);
           vst_b_x(v36, p_output);
           p_output += output_depth;
         }
@@ -1336,28 +1322,7 @@ void DepthwiseConvS85x5D32_Stride1(
           vrsub_w_vx_m(v44, v44, 0);
 
           // Compute final outputs, for both 5x5 patches, and store.
-          // NB: We don't use the normal output pipeline macro here,
-          // as interleaving improves performance on hardware.
-          vdmulh_w_rn_vv_m(v60, v60, v40);
-          vdmulh_w_rn_vv_m(v56, v56, v40);
-          vdmulh_w_rn_vv_m(v52, v52, v40);
-          vdmulh_w_rn_vv_m(v48, v48, v40);
-          vsha_w_r_vv_m(v60, v60, v44);
-          vsha_w_r_vv_m(v56, v56, v44);
-          vsha_w_r_vv_m(v52, v52, v44);
-          vsha_w_r_vv_m(v48, v48, v44);
-          vadd_w_vx_m(v60, v60, output_offset);
-          vadd_w_vx_m(v56, v56, output_offset);
-          vadd_w_vx_m(v52, v52, output_offset);
-          vadd_w_vx_m(v48, v48, output_offset);
-          vmax_w_vx_m(v60, v60, output_activation_min);
-          vmax_w_vx_m(v56, v56, output_activation_min);
-          vmax_w_vx_m(v52, v52, output_activation_min);
-          vmax_w_vx_m(v48, v48, output_activation_min);
-          vmin_w_vx_m(v60, v60, output_activation_max);
-          vmin_w_vx_m(v56, v56, output_activation_max);
-          vmin_w_vx_m(v52, v52, output_activation_max);
-          vmin_w_vx_m(v48, v48, output_activation_max);
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE4(v60, v56, v52, v48, v40, v44, output_activation_min, output_activation_max, output_offset);
           vsraqs_b_vx(v48, v48, 0);
           vst_b_x(v48, p_output);
           p_output += output_depth;
