@@ -35,6 +35,7 @@ cc_library(
         "logistic_s8.cc",
         "max_pool_s8.cc",
         "memcpy.cc",
+        "resize_nearest_neighbor_s8.cc",
     ],
     hdrs = [
         "conv_s8.h",

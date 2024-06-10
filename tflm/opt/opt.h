@@ -109,6 +109,26 @@ void LogisticS8(int32_t input_zero_point, int32_t input_range_radius,
                 int32_t input_multiplier, int32_t input_left_shift,
                 int32_t input_size, const int8_t* input_data,
                 int8_t* output_data);
+void KelvinResizeNearestNeighbor(
+    const tflite::ResizeNearestNeighborParams& op_params,
+    const tflite::RuntimeShape& unextended_input_shape,
+    const int8_t* input_data, const tflite::RuntimeShape& output_size_shape,
+    const int32_t* output_size_data,
+    const tflite::RuntimeShape& unextended_output_shape, int8_t* output_data);
+void KelvinResizeNN2x(const tflite::ResizeNearestNeighborParams& op_params,
+                      const tflite::RuntimeShape& input_shape,
+                      const tflite::RuntimeShape& output_shape,
+                      const int32_t input_height, const int32_t input_width,
+                      const int32_t output_height, const int32_t output_width,
+                      const int8_t* input_data, int8_t* output_data);
+void KelvinResizeNNGeneric(const tflite::ResizeNearestNeighborParams& op_params,
+                           const tflite::RuntimeShape& input_shape,
+                           const tflite::RuntimeShape& output_shape,
+                           const int32_t input_height,
+                           const int32_t input_width,
+                           const int32_t output_height,
+                           const int32_t output_width, const int8_t* input_data,
+                           int8_t* output_data);
 
 }  // namespace kelvin::opt
 
