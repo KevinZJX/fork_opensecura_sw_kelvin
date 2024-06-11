@@ -592,15 +592,13 @@ void ConvS8W8D4(
                 vld_b_s_xx_m(v4, p_in_x0, stride);
                 p_in_x0 += 4 * stride;
 
-                {
-                  size_t local_filter_offset = y_filter_offset +
-                                              (filter_x * 8 * input_depth) +
-                                              (in_channel * 8);
-                  int8_t* p_local_filter_start =
-                      p_swizzled_filter_data + local_filter_offset;
-                  vld_b_p_x_m(v8, p_local_filter_start);
-                  vld_b_x_m(v12, p_local_filter_start);
-                }
+                const size_t local_filter_offset = y_filter_offset +
+                    (filter_x * 8 * input_depth) + (in_channel * 8);
+                int8_t* p_local_filter_start =
+                    p_swizzled_filter_data + local_filter_offset;
+                vld_b_x_m(v8, p_local_filter_start);
+                vld_b_x_m(v12, p_local_filter_start + 128);
+                p_local_filter_start += 8 * stride;
 
                 aconv_vxv(v48, v0, cmds, v8);
                 filter_x += stride_width;
@@ -618,13 +616,9 @@ void ConvS8W8D4(
                   vld_b_l_xx(v23, p_in_x0, in_channels_this_iter);
                   p_in_x0 += stride;
 
-                  size_t local_filter_offset0 = y_filter_offset +
-                              (filter_x * 8 * input_depth) +
-                              (in_channel * 8);
-                  int8_t* p_local_filter_start0 =
-                      p_swizzled_filter_data + local_filter_offset0;
-                  vld_b_x_m(v24, p_local_filter_start0);
-                  vld_b_x_m(v28, p_local_filter_start0 + 128);
+                  vld_b_x_m(v24, p_local_filter_start);
+                  vld_b_x_m(v28, p_local_filter_start + 128);
+                  p_local_filter_start += 8 * stride;
 
                   aconv_vxv(v48, v16, cmds, v24);
 
@@ -639,19 +633,15 @@ void ConvS8W8D4(
                   vld_b_l_xx(v7, p_in_x0, in_channels_this_iter);
                   p_in_x0 += stride;
 
-                  size_t local_filter_offset1 = y_filter_offset +
-                              ((filter_x + stride_width) * 8 * input_depth) +
-                              (in_channel * 8);
-                  int8_t* p_local_filter_start1 =
-                      p_swizzled_filter_data + local_filter_offset1;
-                  vld_b_x_m(v8, p_local_filter_start1);
-                  vld_b_x_m(v12, p_local_filter_start1 + 128);
+                  vld_b_x_m(v8, p_local_filter_start);
+                  vld_b_x_m(v12, p_local_filter_start + 128);
+                  p_local_filter_start += 8 * stride;
 
                   aconv_vxv(v48, v0, cmds, v8);
                 }
 
-                for (; filter_x < filter_width; filter_x += stride_width) {
-                  // Iteration 1
+                if (filter_x < filter_width) {
+                  // Final Iteration
                   vmv_v(v16, v1);
                   vmv_v(v17, v2);
                   vmv_v(v18, v3);
@@ -660,13 +650,7 @@ void ConvS8W8D4(
                   vmv_v(v21, v6);
                   vmv_v(v22, v7);
                   vld_b_l_xx(v23, p_in_x0, in_channels_this_iter);
-                  p_in_x0 += stride;
 
-                  size_t local_filter_offset = y_filter_offset +
-                              (filter_x * 8 * input_depth) +
-                              (in_channel * 8);
-                  int8_t* p_local_filter_start =
-                      p_swizzled_filter_data + local_filter_offset;
                   vld_b_x_m(v24, p_local_filter_start);
                   vld_b_x_m(v28, p_local_filter_start + 128);
 
