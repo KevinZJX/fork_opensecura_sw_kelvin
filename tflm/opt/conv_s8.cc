@@ -214,7 +214,7 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
       RUN_KERNEL(kelvin::opt::ConvS8K1x1D32);
     }
 
-    if ((output_depth % 8) == 0 && (input_depth == 16)) {
+    if ((output_depth % 16) == 0 && (input_depth == 16)) {
       RUN_KERNEL(kelvin::opt::ConvS8K1x1D16);
     }
   }
