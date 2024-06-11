@@ -113,23 +113,15 @@ inline void Filter_N_H_W_M(const int8_t* input, int8_t* output, int N, int H,
 // Swizzle values, and duplicate 4 times for stripmining.
 inline void Swizzle(const int32_t* input, int32_t* output, int N,
                     bool negate = false) {
-  const int32_t(&in)[N] = *(int32_t(*)[N])input;
-  int32_t(&out)[N * 4] = *(int32_t(*)[N * 4]) output;
+  assert(N <= 8);
+  const int32_t(&in)[8] = *(int32_t(*)[8])input;
+  int32_t(&out)[32] = *(int32_t(*)[32]) output;
   // Convert to accumulator swizzle pattern.
-  for (int i = 0; i < N / 8; ++i) {
-    int32_t* out0 = out + i * 32 + 0;
-    int32_t* out1 = out + i * 32 + 16;
-    int32_t* out2 = out + i * 32 + 8;
-    int32_t* out3 = out + i * 32 + 24;
-    for (int j = 0; j < 4; ++j) {
-      const int32_t* p_in = in + i * 8;
-      for (int k = 0; k < 2; ++k) {
-        *out0++ = *p_in++;
-        *out1++ = *p_in++;
-        *out2++ = *p_in++;
-        *out3++ = *p_in++;
-      }
-    }
+  memset(out, 0, 32 * sizeof(int32_t));
+  int offsets[] = {0, 16, 8, 24, 1, 17, 9, 25};
+  for (int i = 0; i < N; ++i) {
+    int offset = offsets[i];
+    out[0 + offset] = out[2 + offset] = out[4 + offset] = out[6 + offset] = in[i];
   }
   if (negate) {
     for (int i = 0; i < N * 4; ++i) {
