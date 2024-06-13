@@ -130,6 +130,33 @@ inline void Swizzle(const int32_t* input, int32_t* output, int N,
   }
 }
 
+template <int N, bool negate=false>
+inline void Swizzle(const int32_t* input, int32_t* output) {
+  const int32_t(&in)[N] = *(int32_t(*)[N])input;
+  int32_t(&out)[N * 4] = *(int32_t(*)[N * 4]) output;
+  // Convert to accumulator swizzle pattern.
+  for (int i = 0; i < N / 8; ++i) {
+    int32_t* out0 = out + i * 32 + 0;
+    int32_t* out1 = out + i * 32 + 16;
+    int32_t* out2 = out + i * 32 + 8;
+    int32_t* out3 = out + i * 32 + 24;
+    for (int j = 0; j < 4; ++j) {
+      const int32_t* p_in = in + i * 8;
+      for (int k = 0; k < 2; ++k) {
+        *out0++ = *p_in++;
+        *out1++ = *p_in++;
+        *out2++ = *p_in++;
+        *out3++ = *p_in++;
+      }
+    }
+  }
+  if (negate) {
+    for (int i = 0; i < N * 4; ++i) {
+      out[i] = -out[i];
+    }
+  }
+}
+
 // Runs strip-mined output pipeline (without bias addition) in place on
 // registers.
 #define INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(result, mult, shft, output_min, \

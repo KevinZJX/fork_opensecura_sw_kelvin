@@ -63,9 +63,9 @@ void ConvS8K3x1D48(
   int32_t bias[48 * 4];
   int32_t mult[48 * 4];
   int32_t shft[48 * 4];
-  Swizzle(bias_data, bias, 48);
-  Swizzle(output_multiplier, mult, 48);
-  Swizzle(output_shift, shft, 48, true);
+  Swizzle<48>(bias_data, bias);
+  Swizzle<48>(output_multiplier, mult);
+  Swizzle<48, true>(output_shift, shft);
 
   int8_t juggled_filter_data[48 / 8][3][1][48 / 4][8][4];
   Filter_N_H_W_M<48>(filter_data, juggled_filter_data[0][0][0][0][0], 3, 1, 48);
