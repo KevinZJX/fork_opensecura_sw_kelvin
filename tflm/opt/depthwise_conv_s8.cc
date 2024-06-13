@@ -1835,8 +1835,6 @@ void DepthwiseConvS85x5D32(
   const int input_height = input_shape.Dims(1);
   const int input_width = input_shape.Dims(2);
   const int input_depth = input_shape.Dims(3);
-  const int filter_height = filter_shape.Dims(1);
-  const int filter_width = filter_shape.Dims(2);
   const int output_height = output_shape.Dims(1);
   const int output_width = output_shape.Dims(2);
   const int output_depth = output_shape.Dims(3);
@@ -1844,134 +1842,742 @@ void DepthwiseConvS85x5D32(
   int32_t swizzled_shift_multi[32];
   int32_t swizzled_output_multi[32];
 
+#define FLT_0_0 v0
+#define FLT_0_1 v3
+#define FLT_0_2 v6
+#define FLT_0_3 v9
+#define FLT_0_4 v12
+#define FLT_1_0 v1
+#define FLT_1_1 v4
+#define FLT_1_2 v7
+#define FLT_1_3 v10
+#define FLT_1_4 v13
+#define FLT_2_0 v2
+#define FLT_2_1 v5
+#define FLT_2_2 v8
+#define FLT_2_3 v11
+#define FLT_2_4 v14
+#define FLT_3_0 v15
+#define FLT_3_1 v16
+#define FLT_3_2 v17
+#define FLT_3_3 v18
+#define FLT_3_4 v19
+#define FLT_HOLE v20
+#define FLT_4_0 v21
+#define FLT_4_1 v22
+#define FLT_4_2 v23
+#define FLT_4_3 v24
+#define FLT_4_4 v25
+
+#define INPUT_0_0 v26
+#define INPUT_0_1 v29
+#define INPUT_0_2 v32
+#define INPUT_0_3 v35
+#define INPUT_0_4 v38
+#define INPUT_1_0 v27
+#define INPUT_1_1 v30
+#define INPUT_1_2 v33
+#define INPUT_1_3 v36
+#define INPUT_1_4 v39
+#define INPUT_2_0 v28
+#define INPUT_2_1 v31
+#define INPUT_2_2 v34
+#define INPUT_2_3 v37
+#define INPUT_2_4 v40
+#define INPUT_3_0 v41
+#define INPUT_3_1 v42
+#define INPUT_3_2 v43
+#define INPUT_3_3 v44
+#define INPUT_3_4 v45
+#define INPUT_4_0 v46
+#define INPUT_4_1 v47
+#define INPUT_4_2 v48
+#define INPUT_4_3 v49
+#define INPUT_4_4 v50
+
   for (int in_channel = 0; in_channel + 32 <= input_depth; in_channel += 32) {
     const int output_channel = in_channel;
     VectorSwizzle(bias_data + output_channel, swizzled_bias_data, 32);
     VectorSwizzle(output_multiplier + output_channel, swizzled_output_multi, 32);
     VectorSwizzle(output_shift + output_channel, swizzled_shift_multi, 32);
 
-    vld_w_x_m(v52, swizzled_bias_data);
+    union {
+      vdwconv_u8_t dwconv;
+      uint32_t raw;
+    } cmds;
+    cmds.raw = 0;
+    cmds.dwconv.sdata1 = true;
+    cmds.dwconv.sbias1 = input_offset;
+    cmds.dwconv.sdata2 = true;
+    cmds.dwconv.sbias2 = 0;
+    cmds.dwconv.mode = 0;
+    cmds.dwconv.sparsity = 0;
+    cmds.dwconv.regbase = 0;
+
     vld_w_x_m(v56, swizzled_output_multi);
     vld_w_x_m(v60, swizzled_shift_multi);
     vrsub_w_vx_m(v60, v60, 0);
 
-    // Don't reorder me!
     const int8_t* p_flt = filter_data + in_channel;
-    vld_b_sp_xx(v6, p_flt, input_depth);
-    vld_b_sp_xx(v7, p_flt, input_depth);
-    vld_b_sp_xx_m(v8, p_flt, input_depth);
-    vld_b_sp_xx_m(v12, p_flt, input_depth);
-    vld_b_sp_xx_m(v16, p_flt, input_depth);
-    vld_b_sp_xx_m(v20, p_flt, input_depth);
-    vld_b_sp_xx_m(v24, p_flt, input_depth);
-    vld_b_sp_xx(v28, p_flt, input_depth);
-    vld_b_sp_xx(v29, p_flt, input_depth);
-    vld_b_sp_xx(v30, p_flt, input_depth);
+    vld_b_sp_xx(FLT_0_0, p_flt, input_depth);
+    vld_b_sp_xx(FLT_0_1, p_flt, input_depth);
+    vld_b_sp_xx(FLT_0_2, p_flt, input_depth);
+    vld_b_sp_xx(FLT_0_3, p_flt, input_depth);
+    vld_b_sp_xx(FLT_0_4, p_flt, input_depth);
 
+    vld_b_sp_xx(FLT_1_0, p_flt, input_depth);
+    vld_b_sp_xx(FLT_1_1, p_flt, input_depth);
+    vld_b_sp_xx(FLT_1_2, p_flt, input_depth);
+    vld_b_sp_xx(FLT_1_3, p_flt, input_depth);
+    vld_b_sp_xx(FLT_1_4, p_flt, input_depth);
+
+    vld_b_sp_xx(FLT_2_0, p_flt, input_depth);
+    vld_b_sp_xx(FLT_2_1, p_flt, input_depth);
+    vld_b_sp_xx(FLT_2_2, p_flt, input_depth);
+    vld_b_sp_xx(FLT_2_3, p_flt, input_depth);
+    vld_b_sp_xx(FLT_2_4, p_flt, input_depth);
+
+    vld_b_sp_xx(FLT_3_0, p_flt, input_depth);
+    vld_b_sp_xx(FLT_3_1, p_flt, input_depth);
+    vld_b_sp_xx(FLT_3_2, p_flt, input_depth);
+    vld_b_sp_xx(FLT_3_3, p_flt, input_depth);
+    vld_b_sp_xx(FLT_3_4, p_flt, input_depth);
+
+    vld_b_sp_xx(FLT_4_0, p_flt, input_depth);
+    vld_b_sp_xx(FLT_4_1, p_flt, input_depth);
+    vld_b_sp_xx(FLT_4_2, p_flt, input_depth);
+    vld_b_sp_xx(FLT_4_3, p_flt, input_depth);
+    vld_b_sp_xx(FLT_4_4, p_flt, input_depth);
+    vdup_b_x(FLT_HOLE, 0);
+
+#define COMPUTE()                              \
+  vld_w_x_m(v52, swizzled_bias_data);          \
+  adwinit_v(v52, v52);                         \
+  adwconv_vxv(v52, INPUT_0_0, cmds, FLT_0_0);  \
+  adwconv_vxv(v52, INPUT_0_1, cmds, FLT_0_1);  \
+  adwconv_vxv(v52, INPUT_0_2, cmds, FLT_0_2);  \
+  adwconv_vxv(v52, INPUT_0_3, cmds, FLT_0_3);  \
+  adwconv_vxv(v52, INPUT_0_4, cmds, FLT_0_4);  \
+  adwconv_vxv(v52, INPUT_3_0, cmds, FLT_3_0);  \
+  adwconv_vxv(v52, INPUT_3_3, cmds, FLT_3_3);  \
+  adwconv_vxv(v52, INPUT_3_4, cmds, FLT_HOLE); \
+  vdwconv_vxv(v52, INPUT_4_2, cmds, FLT_4_2);
+
+#define INPUT_PTRS()                                                    \
+  const int8_t* p_input_0 =                                             \
+      input_data + (batch * input_height * input_width * input_depth) + \
+      (in_y_origin * input_width * input_depth) +                       \
+      (in_x_origin * input_depth) + in_channel;                         \
+  const int8_t* p_input_1 = p_input_0 + (input_width * input_depth);    \
+  const int8_t* p_input_2 = p_input_1 + (input_width * input_depth);    \
+  const int8_t* p_input_3 = p_input_2 + (input_width * input_depth);    \
+  const int8_t* p_input_4 = p_input_3 + (input_width * input_depth);    \
+  (void)p_input_4;
 
     for (int batch = 0; batch < batches; ++batch) {
-      const int8_t* p_input = input_data + (batch * input_width * input_height * input_depth) + in_channel;
-      const int8_t* p_output = output_data + (batch * output_width * output_height * output_depth) + output_channel;
-      for (int out_y = 0; out_y < output_height; ++out_y) {
-        const int out_y_offset = (out_y * output_width * output_depth);
-        for (int out_x = 0; out_x < output_width; ++out_x) {
+      int out_y = 0;
+      int8_t* p_output = output_data +
+                         (batch * output_height * output_width * output_depth) +
+                         output_channel;
+      do {
+        const int in_y_origin = (out_y * stride_height) - pad_height;
+        if (in_y_origin >= 0) {
+          break;
+        }
+        int out_x = 0;
+        do {
           const int in_x_origin = (out_x * stride_width) - pad_width;
-          const int in_y_origin = (out_y * stride_height) - pad_height;
+          if (in_x_origin >= 0) {
+            break;
+          }
+          INPUT_PTRS();
+#define LOAD_INPUT(y, x)                                       \
+  if (in_y_origin + y < 0) {                                   \
+    vdup_b_x(INPUT_##y##_##x, -input_offset);                  \
+  } else if (in_x_origin + x < 0) {                            \
+    vdup_b_x(INPUT_##y##_##x, -input_offset);                  \
+  } else {                                                     \
+    vld_b_x(INPUT_##y##_##x, p_input_##y + (x * input_depth)); \
+  }
 
-          // Initialize accumulators w/ bias_data
-          vmv_v_m(v48, v52);
+          LOAD_INPUT(0, 0);
+          LOAD_INPUT(0, 1);
+          LOAD_INPUT(0, 2);
+          LOAD_INPUT(0, 3);
+          LOAD_INPUT(0, 4);
+          LOAD_INPUT(1, 0);
+          LOAD_INPUT(1, 1);
+          LOAD_INPUT(1, 2);
+          LOAD_INPUT(1, 3);
+          LOAD_INPUT(1, 4);
+          LOAD_INPUT(2, 0);
+          LOAD_INPUT(2, 1);
+          LOAD_INPUT(2, 2);
+          LOAD_INPUT(2, 3);
+          LOAD_INPUT(2, 4);
+          LOAD_INPUT(3, 0);
+          LOAD_INPUT(3, 1);
+          LOAD_INPUT(3, 2);
+          LOAD_INPUT(3, 3);
+          LOAD_INPUT(3, 4);
+          LOAD_INPUT(4, 0);
+          LOAD_INPUT(4, 1);
+          LOAD_INPUT(4, 2);
+          LOAD_INPUT(4, 3);
+          LOAD_INPUT(4, 4);
+#undef LOAD_INPUT
+          COMPUTE();
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v52, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v52, v52, 0);
+          vst_b_x(v52, p_output);
+          p_output += output_depth;
+          ++out_x;
+        } while (out_x < output_width);
+        do {
+          const int in_x_origin = (out_x * stride_width) - pad_width;
+          if (in_x_origin + 4 >= input_width) {
+            break;
+          }
+          INPUT_PTRS();
+          vdup_b_x(INPUT_0_0, -input_offset);
+          vdup_b_x(INPUT_0_1, -input_offset);
+          vdup_b_x(INPUT_0_2, -input_offset);
+          vdup_b_x(INPUT_0_3, -input_offset);
+          vdup_b_x(INPUT_0_4, -input_offset);
+          if (in_y_origin + 1 < 0) {
+            vdup_b_x(INPUT_1_0, -input_offset);
+            vdup_b_x(INPUT_1_1, -input_offset);
+            vdup_b_x(INPUT_1_2, -input_offset);
+            vdup_b_x(INPUT_1_3, -input_offset);
+            vdup_b_x(INPUT_1_4, -input_offset);
+          } else {
+            vld_b_sp_xx(INPUT_1_0, p_input_1, input_depth);
+            vld_b_sp_xx(INPUT_1_1, p_input_1, input_depth);
+            vld_b_sp_xx(INPUT_1_2, p_input_1, input_depth);
+            vld_b_sp_xx(INPUT_1_3, p_input_1, input_depth);
+            vld_b_sp_xx(INPUT_1_4, p_input_1, input_depth);
+          }
+          if (in_y_origin + 2 < 0) {
+            vdup_b_x(INPUT_2_0, -input_offset);
+            vdup_b_x(INPUT_2_1, -input_offset);
+            vdup_b_x(INPUT_2_2, -input_offset);
+            vdup_b_x(INPUT_2_3, -input_offset);
+            vdup_b_x(INPUT_2_4, -input_offset);
+          } else {
+            vld_b_sp_xx(INPUT_2_0, p_input_2, input_depth);
+            vld_b_sp_xx(INPUT_2_1, p_input_2, input_depth);
+            vld_b_sp_xx(INPUT_2_2, p_input_2, input_depth);
+            vld_b_sp_xx(INPUT_2_3, p_input_2, input_depth);
+            vld_b_sp_xx(INPUT_2_4, p_input_2, input_depth);
+          }
+          if (in_y_origin + 3 < 0) {
+            vdup_b_x(INPUT_3_0, -input_offset);
+            vdup_b_x(INPUT_3_1, -input_offset);
+            vdup_b_x(INPUT_3_2, -input_offset);
+            vdup_b_x(INPUT_3_3, -input_offset);
+            vdup_b_x(INPUT_3_4, -input_offset);
+          } else {
+            vld_b_sp_xx(INPUT_3_0, p_input_3, input_depth);
+            vld_b_sp_xx(INPUT_3_1, p_input_3, input_depth);
+            vld_b_sp_xx(INPUT_3_2, p_input_3, input_depth);
+            vld_b_sp_xx(INPUT_3_3, p_input_3, input_depth);
+            vld_b_sp_xx(INPUT_3_4, p_input_3, input_depth);
+          }
+          if (in_y_origin + 4 < 0) {
+            vdup_b_x(INPUT_4_0, -input_offset);
+            vdup_b_x(INPUT_4_1, -input_offset);
+            vdup_b_x(INPUT_4_2, -input_offset);
+            vdup_b_x(INPUT_4_3, -input_offset);
+            vdup_b_x(INPUT_4_4, -input_offset);
+          } else {
+            vld_b_sp_xx(INPUT_4_0, p_input_4, input_depth);
+            vld_b_sp_xx(INPUT_4_1, p_input_4, input_depth);
+            vld_b_sp_xx(INPUT_4_2, p_input_4, input_depth);
+            vld_b_sp_xx(INPUT_4_3, p_input_4, input_depth);
+            vld_b_sp_xx(INPUT_4_4, p_input_4, input_depth);
+          }
+          COMPUTE();
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v52, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v52, v52, 0);
+          vst_b_x(v52, p_output);
+          p_output += output_depth;
+          ++out_x;
+        } while (out_x < output_width);
+        do {
+          const int in_x_origin = (out_x * stride_width) - pad_width;
+          INPUT_PTRS();
+#define LOAD_INPUT(y, x)                                       \
+  if (in_y_origin + y < 0) {                                   \
+    vdup_b_x(INPUT_##y##_##x, -input_offset);                  \
+  } else if (in_x_origin + x >= input_width) {                 \
+    vdup_b_x(INPUT_##y##_##x, -input_offset);                  \
+  } else {                                                     \
+    vld_b_x(INPUT_##y##_##x, p_input_##y + (x * input_depth)); \
+  }
 
-          for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
-            const int in_y = in_y_origin + filter_y;
-            if ((in_y < 0) || (in_y >= input_height)) {
-              continue;
-            }
-            switch (filter_y) {
-              case 0:
-                vaddw_h_vx(v31, v6, 0);
-                vaddw_h_vx(v33, v7, 0);
-                vaddw_h_vx(v35, v8, 0);
-                vaddw_h_vx(v37, v9, 0);
-                vaddw_h_vx(v39, v10, 0);
-                break;
-              case 1:
-                vaddw_h_vx(v31, v11, 0);
-                vaddw_h_vx(v33, v12, 0);
-                vaddw_h_vx(v35, v13, 0);
-                vaddw_h_vx(v37, v14, 0);
-                vaddw_h_vx(v39, v15, 0);
-                break;
-              case 2:
-                vaddw_h_vx(v31, v16, 0);
-                vaddw_h_vx(v33, v17, 0);
-                vaddw_h_vx(v35, v18, 0);
-                vaddw_h_vx(v37, v19, 0);
-                vaddw_h_vx(v39, v20, 0);
-                break;
-              case 3:
-                vaddw_h_vx(v31, v21, 0);
-                vaddw_h_vx(v33, v22, 0);
-                vaddw_h_vx(v35, v23, 0);
-                vaddw_h_vx(v37, v24, 0);
-                vaddw_h_vx(v39, v25, 0);
-                break;
-              case 4:
-                vaddw_h_vx(v31, v26, 0);
-                vaddw_h_vx(v33, v27, 0);
-                vaddw_h_vx(v35, v28, 0);
-                vaddw_h_vx(v37, v29, 0);
-                vaddw_h_vx(v39, v30, 0);
-                break;
-            }
-            const int in_y_offset = in_y  * input_width * input_depth;
-            for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
-              const int in_x = in_x_origin + filter_x;
-              if ((in_x < 0) || (in_x >= input_width)) {
-                continue;
-              }
-
-              vld_b_x(v0, p_input + (in_x * input_depth) + in_y_offset);
-
-              vaddw_h_vx(v0, v0, 0);
-              vadd_h_vx(v0, v0, static_cast<int16_t>(input_offset));
-              vadd_h_vx(v1, v1,
-                        static_cast<int16_t>(input_offset));  // v0 v1 input
-              switch (filter_x) {
-                case 0:
-                  vmulw_w_vv(v2, v1, v32);
-                  vmulw_w_vv(v0, v0, v31);
-                  break;
-                case 1:
-                  vmulw_w_vv(v2, v1, v34);
-                  vmulw_w_vv(v0, v0, v33);
-                  break;
-                case 2:
-                  vmulw_w_vv(v2, v1, v36);
-                  vmulw_w_vv(v0, v0, v35);
-                  break;
-                case 3:
-                  vmulw_w_vv(v2, v1, v38);
-                  vmulw_w_vv(v0, v0, v37);
-                  break;
-                case 4:
-                  vmulw_w_vv(v2, v1, v40);
-                  vmulw_w_vv(v0, v0, v39);
-                  break;
-              }
-              vadd_w_vv_m(v48, v48, v0);
-            }
+          LOAD_INPUT(0, 0);
+          LOAD_INPUT(0, 1);
+          LOAD_INPUT(0, 2);
+          LOAD_INPUT(0, 3);
+          LOAD_INPUT(0, 4);
+          LOAD_INPUT(1, 0);
+          LOAD_INPUT(1, 1);
+          LOAD_INPUT(1, 2);
+          LOAD_INPUT(1, 3);
+          LOAD_INPUT(1, 4);
+          LOAD_INPUT(2, 0);
+          LOAD_INPUT(2, 1);
+          LOAD_INPUT(2, 2);
+          LOAD_INPUT(2, 3);
+          LOAD_INPUT(2, 4);
+          LOAD_INPUT(3, 0);
+          LOAD_INPUT(3, 1);
+          LOAD_INPUT(3, 2);
+          LOAD_INPUT(3, 3);
+          LOAD_INPUT(3, 4);
+          LOAD_INPUT(4, 0);
+          LOAD_INPUT(4, 1);
+          LOAD_INPUT(4, 2);
+          LOAD_INPUT(4, 3);
+          LOAD_INPUT(4, 4);
+#undef LOAD_INPUT
+          COMPUTE();
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v52, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v52, v52, 0);
+          vst_b_x(v52, p_output);
+          p_output += output_depth;
+          ++out_x;
+        } while (out_x < output_width);
+        ++out_y;
+      } while (out_y < output_height);
+      do {
+        const int in_y_origin = (out_y * stride_height) - pad_height;
+        if (in_y_origin + 4 >= input_height) {
+          break;
+        }
+        int out_x = 0;
+        do {
+          const int in_x_origin = (out_x * stride_width) - pad_width;
+          if (in_x_origin >= 0) {
+            break;
+          }
+          INPUT_PTRS();
+          vdup_b_x(INPUT_0_0, -input_offset);
+          vdup_b_x(INPUT_1_0, -input_offset);
+          vdup_b_x(INPUT_2_0, -input_offset);
+          vdup_b_x(INPUT_3_0, -input_offset);
+          vdup_b_x(INPUT_4_0, -input_offset);
+          if (in_x_origin + 1 < 0) {
+            vdup_b_x(INPUT_0_1, -input_offset);
+            vdup_b_x(INPUT_1_1, -input_offset);
+            vdup_b_x(INPUT_2_1, -input_offset);
+            vdup_b_x(INPUT_3_1, -input_offset);
+            vdup_b_x(INPUT_4_1, -input_offset);
+          } else {
+            vld_b_x(INPUT_0_1, p_input_0 + (1 * input_depth));
+            vld_b_x(INPUT_1_1, p_input_1 + (1 * input_depth));
+            vld_b_x(INPUT_2_1, p_input_2 + (1 * input_depth));
+            vld_b_x(INPUT_3_1, p_input_3 + (1 * input_depth));
+            vld_b_x(INPUT_4_1, p_input_4 + (1 * input_depth));
+          }
+          if (in_x_origin + 2 < 0) {
+            vdup_b_x(INPUT_0_2, -input_offset);
+            vdup_b_x(INPUT_1_2, -input_offset);
+            vdup_b_x(INPUT_2_2, -input_offset);
+            vdup_b_x(INPUT_3_2, -input_offset);
+            vdup_b_x(INPUT_4_2, -input_offset);
+          } else {
+            vld_b_x(INPUT_0_2, p_input_0 + (2 * input_depth));
+            vld_b_x(INPUT_1_2, p_input_1 + (2 * input_depth));
+            vld_b_x(INPUT_2_2, p_input_2 + (2 * input_depth));
+            vld_b_x(INPUT_3_2, p_input_3 + (2 * input_depth));
+            vld_b_x(INPUT_4_2, p_input_4 + (2 * input_depth));
+          }
+          if (in_x_origin + 3 < 0) {
+            vdup_b_x(INPUT_0_3, -input_offset);
+            vdup_b_x(INPUT_1_3, -input_offset);
+            vdup_b_x(INPUT_2_3, -input_offset);
+            vdup_b_x(INPUT_3_3, -input_offset);
+            vdup_b_x(INPUT_4_3, -input_offset);
+          } else {
+            vld_b_x(INPUT_0_3, p_input_0 + (3 * input_depth));
+            vld_b_x(INPUT_1_3, p_input_1 + (3 * input_depth));
+            vld_b_x(INPUT_2_3, p_input_2 + (3 * input_depth));
+            vld_b_x(INPUT_3_3, p_input_3 + (3 * input_depth));
+            vld_b_x(INPUT_4_3, p_input_4 + (3 * input_depth));
+          }
+          if (in_x_origin + 4 < 0) {
+            vdup_b_x(INPUT_0_4, -input_offset);
+            vdup_b_x(INPUT_1_4, -input_offset);
+            vdup_b_x(INPUT_2_4, -input_offset);
+            vdup_b_x(INPUT_3_4, -input_offset);
+            vdup_b_x(INPUT_4_4, -input_offset);
+          } else {
+            vld_b_x(INPUT_0_4, p_input_0 + (4 * input_depth));
+            vld_b_x(INPUT_1_4, p_input_1 + (4 * input_depth));
+            vld_b_x(INPUT_2_4, p_input_2 + (4 * input_depth));
+            vld_b_x(INPUT_3_4, p_input_3 + (4 * input_depth));
+            vld_b_x(INPUT_4_4, p_input_4 + (4 * input_depth));
           }
 
-          vdmulh_w_rn_vv_m(v48, v48, v56);
-          vsha_w_r_vv_m(v48, v48, v60);
-          vadd_w_vx_m(v48, v48, output_offset);
-          vmax_w_vx_m(v48, v48, output_activation_min);
-          vmin_w_vx_m(v48, v48, output_activation_max);
-          vsraqs_b_vx(v48, v48, 0);
-          vst_b_x(v48, p_output + out_y_offset + (out_x * output_depth));
-        }
-      }
+          COMPUTE();
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v52, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v52, v52, 0);
+          vst_b_x(v52, p_output);
+          p_output += output_depth;
+          ++out_x;
+        } while (out_x < output_width);
+        do {
+          const int in_x_origin = (out_x * stride_width) - pad_width;
+          if (in_x_origin + 4 >= input_width) {
+            break;
+          }
+          INPUT_PTRS();
+          vld_b_sp_xx(INPUT_0_0, p_input_0, input_depth);
+          vld_b_sp_xx(INPUT_0_1, p_input_0, input_depth);
+          vld_b_sp_xx(INPUT_0_2, p_input_0, input_depth);
+          vld_b_sp_xx(INPUT_0_3, p_input_0, input_depth);
+          vld_b_sp_xx(INPUT_0_4, p_input_0, input_depth);
+          vld_b_sp_xx(INPUT_1_0, p_input_1, input_depth);
+          vld_b_sp_xx(INPUT_1_1, p_input_1, input_depth);
+          vld_b_sp_xx(INPUT_1_2, p_input_1, input_depth);
+          vld_b_sp_xx(INPUT_1_3, p_input_1, input_depth);
+          vld_b_sp_xx(INPUT_1_4, p_input_1, input_depth);
+          vld_b_sp_xx(INPUT_2_0, p_input_2, input_depth);
+          vld_b_sp_xx(INPUT_2_1, p_input_2, input_depth);
+          vld_b_sp_xx(INPUT_2_2, p_input_2, input_depth);
+          vld_b_sp_xx(INPUT_2_3, p_input_2, input_depth);
+          vld_b_sp_xx(INPUT_2_4, p_input_2, input_depth);
+          vld_b_sp_xx(INPUT_3_0, p_input_3, input_depth);
+          vld_b_sp_xx(INPUT_3_1, p_input_3, input_depth);
+          vld_b_sp_xx(INPUT_3_2, p_input_3, input_depth);
+          vld_b_sp_xx(INPUT_3_3, p_input_3, input_depth);
+          vld_b_sp_xx(INPUT_3_4, p_input_3, input_depth);
+          vld_b_sp_xx(INPUT_4_0, p_input_4, input_depth);
+          vld_b_sp_xx(INPUT_4_1, p_input_4, input_depth);
+          vld_b_sp_xx(INPUT_4_2, p_input_4, input_depth);
+          vld_b_sp_xx(INPUT_4_3, p_input_4, input_depth);
+          vld_b_sp_xx(INPUT_4_4, p_input_4, input_depth);
+
+          COMPUTE();
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v52, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v52, v52, 0);
+          vst_b_x(v52, p_output);
+          p_output += output_depth;
+          ++out_x;
+        } while (out_x < output_width);
+        do {
+          const int in_x_origin = (out_x * stride_width) - pad_width;
+          INPUT_PTRS();
+          if (in_x_origin >= input_width) {
+            vdup_b_x(INPUT_0_0, -input_offset);
+            vdup_b_x(INPUT_1_0, -input_offset);
+            vdup_b_x(INPUT_2_0, -input_offset);
+            vdup_b_x(INPUT_3_0, -input_offset);
+            vdup_b_x(INPUT_4_0, -input_offset);
+          } else {
+            vld_b_x(INPUT_0_0, p_input_0);
+            vld_b_x(INPUT_1_0, p_input_1);
+            vld_b_x(INPUT_2_0, p_input_2);
+            vld_b_x(INPUT_3_0, p_input_3);
+            vld_b_x(INPUT_4_0, p_input_4);
+          }
+          if (in_x_origin + 1 >= input_width) {
+            vdup_b_x(INPUT_0_1, -input_offset);
+            vdup_b_x(INPUT_1_1, -input_offset);
+            vdup_b_x(INPUT_2_1, -input_offset);
+            vdup_b_x(INPUT_3_1, -input_offset);
+            vdup_b_x(INPUT_4_1, -input_offset);
+          } else {
+            vld_b_x(INPUT_0_1, p_input_0 + (1 * input_depth));
+            vld_b_x(INPUT_1_1, p_input_1 + (1 * input_depth));
+            vld_b_x(INPUT_2_1, p_input_2 + (1 * input_depth));
+            vld_b_x(INPUT_3_1, p_input_3 + (1 * input_depth));
+            vld_b_x(INPUT_4_1, p_input_4 + (1 * input_depth));
+          }
+          if (in_x_origin + 2 >= input_width) {
+            vdup_b_x(INPUT_0_2, -input_offset);
+            vdup_b_x(INPUT_1_2, -input_offset);
+            vdup_b_x(INPUT_2_2, -input_offset);
+            vdup_b_x(INPUT_3_2, -input_offset);
+            vdup_b_x(INPUT_4_2, -input_offset);
+          } else {
+            vld_b_x(INPUT_0_2, p_input_0 + (2 * input_depth));
+            vld_b_x(INPUT_1_2, p_input_1 + (2 * input_depth));
+            vld_b_x(INPUT_2_2, p_input_2 + (2 * input_depth));
+            vld_b_x(INPUT_3_2, p_input_3 + (2 * input_depth));
+            vld_b_x(INPUT_4_2, p_input_4 + (2 * input_depth));
+          }
+          if (in_x_origin + 3 >= input_width) {
+            vdup_b_x(INPUT_0_3, -input_offset);
+            vdup_b_x(INPUT_1_3, -input_offset);
+            vdup_b_x(INPUT_2_3, -input_offset);
+            vdup_b_x(INPUT_3_3, -input_offset);
+            vdup_b_x(INPUT_4_3, -input_offset);
+          } else {
+            vld_b_x(INPUT_0_3, p_input_0 + (3 * input_depth));
+            vld_b_x(INPUT_1_3, p_input_1 + (3 * input_depth));
+            vld_b_x(INPUT_2_3, p_input_2 + (3 * input_depth));
+            vld_b_x(INPUT_3_3, p_input_3 + (3 * input_depth));
+            vld_b_x(INPUT_4_3, p_input_4 + (3 * input_depth));
+          }
+          vdup_b_x(INPUT_0_4, -input_offset);
+          vdup_b_x(INPUT_1_4, -input_offset);
+          vdup_b_x(INPUT_2_4, -input_offset);
+          vdup_b_x(INPUT_3_4, -input_offset);
+          vdup_b_x(INPUT_4_4, -input_offset);
+
+          COMPUTE();
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v52, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v52, v52, 0);
+          vst_b_x(v52, p_output);
+          p_output += output_depth;
+          ++out_x;
+        } while (out_x < output_width);
+        ++out_y;
+      } while (out_y < output_height);
+      do {
+        const int in_y_origin = (out_y * stride_height) - pad_height;
+        int out_x = 0;
+        do {
+          const int in_x_origin = (out_x * stride_width) - pad_width;
+          if (in_x_origin >= 0) {
+            break;
+          }
+          INPUT_PTRS();
+#define LOAD_INPUT(y, x)                                       \
+  if (in_y_origin + y >= input_height) {                       \
+    vdup_b_x(INPUT_##y##_##x, -input_offset);                  \
+  } else if (in_x_origin + x < 0) {                            \
+    vdup_b_x(INPUT_##y##_##x, -input_offset);                  \
+  } else {                                                     \
+    vld_b_x(INPUT_##y##_##x, p_input_##y + (x * input_depth)); \
+  }
+
+          LOAD_INPUT(0, 0);
+          LOAD_INPUT(0, 1);
+          LOAD_INPUT(0, 2);
+          LOAD_INPUT(0, 3);
+          LOAD_INPUT(0, 4);
+          LOAD_INPUT(1, 0);
+          LOAD_INPUT(1, 1);
+          LOAD_INPUT(1, 2);
+          LOAD_INPUT(1, 3);
+          LOAD_INPUT(1, 4);
+          LOAD_INPUT(2, 0);
+          LOAD_INPUT(2, 1);
+          LOAD_INPUT(2, 2);
+          LOAD_INPUT(2, 3);
+          LOAD_INPUT(2, 4);
+          LOAD_INPUT(3, 0);
+          LOAD_INPUT(3, 1);
+          LOAD_INPUT(3, 2);
+          LOAD_INPUT(3, 3);
+          LOAD_INPUT(3, 4);
+          LOAD_INPUT(4, 0);
+          LOAD_INPUT(4, 1);
+          LOAD_INPUT(4, 2);
+          LOAD_INPUT(4, 3);
+          LOAD_INPUT(4, 4);
+#undef LOAD_INPUT
+          COMPUTE();
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v52, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v52, v52, 0);
+          vst_b_x(v52, p_output);
+          p_output += output_depth;
+          ++out_x;
+        } while (out_x < output_width);
+        do {
+          const int in_x_origin = (out_x * stride_width) - pad_width;
+          if (in_x_origin + 4 >= input_width) {
+            break;
+          }
+          INPUT_PTRS();
+          if (in_y_origin >= input_height) {
+            vdup_b_x(INPUT_0_0, -input_offset);
+            vdup_b_x(INPUT_0_1, -input_offset);
+            vdup_b_x(INPUT_0_2, -input_offset);
+            vdup_b_x(INPUT_0_3, -input_offset);
+            vdup_b_x(INPUT_0_4, -input_offset);
+          } else {
+            vld_b_sp_xx(INPUT_0_0, p_input_0, input_depth);
+            vld_b_sp_xx(INPUT_0_1, p_input_0, input_depth);
+            vld_b_sp_xx(INPUT_0_2, p_input_0, input_depth);
+            vld_b_sp_xx(INPUT_0_3, p_input_0, input_depth);
+            vld_b_sp_xx(INPUT_0_4, p_input_0, input_depth);
+          }
+          if (in_y_origin + 1 >= input_height) {
+            vdup_b_x(INPUT_1_0, -input_offset);
+            vdup_b_x(INPUT_1_1, -input_offset);
+            vdup_b_x(INPUT_1_2, -input_offset);
+            vdup_b_x(INPUT_1_3, -input_offset);
+            vdup_b_x(INPUT_1_4, -input_offset);
+          } else {
+            vld_b_sp_xx(INPUT_1_0, p_input_1, input_depth);
+            vld_b_sp_xx(INPUT_1_1, p_input_1, input_depth);
+            vld_b_sp_xx(INPUT_1_2, p_input_1, input_depth);
+            vld_b_sp_xx(INPUT_1_3, p_input_1, input_depth);
+            vld_b_sp_xx(INPUT_1_4, p_input_1, input_depth);
+          }
+          if (in_y_origin + 2 >= input_height) {
+            vdup_b_x(INPUT_2_0, -input_offset);
+            vdup_b_x(INPUT_2_1, -input_offset);
+            vdup_b_x(INPUT_2_2, -input_offset);
+            vdup_b_x(INPUT_2_3, -input_offset);
+            vdup_b_x(INPUT_2_4, -input_offset);
+          } else {
+            vld_b_sp_xx(INPUT_2_0, p_input_2, input_depth);
+            vld_b_sp_xx(INPUT_2_1, p_input_2, input_depth);
+            vld_b_sp_xx(INPUT_2_2, p_input_2, input_depth);
+            vld_b_sp_xx(INPUT_2_3, p_input_2, input_depth);
+            vld_b_sp_xx(INPUT_2_4, p_input_2, input_depth);
+          }
+          if (in_y_origin + 3 >= input_height) {
+            vdup_b_x(INPUT_3_0, -input_offset);
+            vdup_b_x(INPUT_3_1, -input_offset);
+            vdup_b_x(INPUT_3_2, -input_offset);
+            vdup_b_x(INPUT_3_3, -input_offset);
+            vdup_b_x(INPUT_3_4, -input_offset);
+          } else {
+            vld_b_sp_xx(INPUT_3_0, p_input_3, input_depth);
+            vld_b_sp_xx(INPUT_3_1, p_input_3, input_depth);
+            vld_b_sp_xx(INPUT_3_2, p_input_3, input_depth);
+            vld_b_sp_xx(INPUT_3_3, p_input_3, input_depth);
+            vld_b_sp_xx(INPUT_3_4, p_input_3, input_depth);
+          }
+          vdup_b_x(INPUT_4_0, -input_offset);
+          vdup_b_x(INPUT_4_1, -input_offset);
+          vdup_b_x(INPUT_4_2, -input_offset);
+          vdup_b_x(INPUT_4_3, -input_offset);
+          vdup_b_x(INPUT_4_4, -input_offset);
+
+          COMPUTE();
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v52, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v52, v52, 0);
+          vst_b_x(v52, p_output);
+          p_output += output_depth;
+          ++out_x;
+        } while (out_x < output_width);
+        do {
+          const int in_x_origin = (out_x * stride_width) - pad_width;
+          INPUT_PTRS();
+#define LOAD_INPUT(y, x)                                       \
+  if (in_y_origin + y >= input_height) {                       \
+    vdup_b_x(INPUT_##y##_##x, -input_offset);                  \
+  } else if (in_x_origin + x >= input_width) {                 \
+    vdup_b_x(INPUT_##y##_##x, -input_offset);                  \
+  } else {                                                     \
+    vld_b_x(INPUT_##y##_##x, p_input_##y + (x * input_depth)); \
+  }
+
+          LOAD_INPUT(0, 0);
+          LOAD_INPUT(0, 1);
+          LOAD_INPUT(0, 2);
+          LOAD_INPUT(0, 3);
+          LOAD_INPUT(0, 4);
+          LOAD_INPUT(1, 0);
+          LOAD_INPUT(1, 1);
+          LOAD_INPUT(1, 2);
+          LOAD_INPUT(1, 3);
+          LOAD_INPUT(1, 4);
+          LOAD_INPUT(2, 0);
+          LOAD_INPUT(2, 1);
+          LOAD_INPUT(2, 2);
+          LOAD_INPUT(2, 3);
+          LOAD_INPUT(2, 4);
+          LOAD_INPUT(3, 0);
+          LOAD_INPUT(3, 1);
+          LOAD_INPUT(3, 2);
+          LOAD_INPUT(3, 3);
+          LOAD_INPUT(3, 4);
+          LOAD_INPUT(4, 0);
+          LOAD_INPUT(4, 1);
+          LOAD_INPUT(4, 2);
+          LOAD_INPUT(4, 3);
+          LOAD_INPUT(4, 4);
+#undef LOAD_INPUT
+          COMPUTE();
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v52, v56, v60, output_activation_min, output_activation_max,
+              output_offset);
+          vsraqs_b_vx(v52, v52, 0);
+          vst_b_x(v52, p_output);
+          p_output += output_depth;
+          ++out_x;
+        } while (out_x < output_width);
+        ++out_y;
+      } while (out_y < output_height);
     }
+
+#undef COMPUTE
+#undef INPUT_PTRS
+#undef FLT_0_0
+#undef FLT_0_1
+#undef FLT_0_2
+#undef FLT_0_3
+#undef FLT_0_4
+#undef FLT_1_0
+#undef FLT_1_1
+#undef FLT_1_2
+#undef FLT_1_3
+#undef FLT_1_4
+#undef FLT_2_0
+#undef FLT_2_1
+#undef FLT_2_2
+#undef FLT_2_3
+#undef FLT_2_4
+#undef FLT_3_0
+#undef FLT_3_1
+#undef FLT_3_2
+#undef FLT_3_3
+#undef FLT_3_4
+#undef FLT_HOLE
+#undef FLT_4_0
+#undef FLT_4_1
+#undef FLT_4_2
+#undef FLT_4_3
+#undef FLT_4_4
+#undef INPUT_0_0
+#undef INPUT_0_1
+#undef INPUT_0_2
+#undef INPUT_0_3
+#undef INPUT_0_4
+#undef INPUT_1_0
+#undef INPUT_1_1
+#undef INPUT_1_2
+#undef INPUT_1_3
+#undef INPUT_1_4
+#undef INPUT_2_0
+#undef INPUT_2_1
+#undef INPUT_2_2
+#undef INPUT_2_3
+#undef INPUT_2_4
+#undef INPUT_3_0
+#undef INPUT_3_1
+#undef INPUT_3_2
+#undef INPUT_3_3
+#undef INPUT_3_4
+#undef INPUT_4_0
+#undef INPUT_4_1
+#undef INPUT_4_2
+#undef INPUT_4_3
+#undef INPUT_4_4
   }
 }
 
