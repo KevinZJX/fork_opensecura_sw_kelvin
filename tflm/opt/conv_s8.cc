@@ -220,6 +220,7 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
   }
 
   if (input_depth == 1 && filter_width == 5 && filter_height == 5 &&
+      stride_width == 2 &&
       output_depth == 24) {
     RUN_KERNEL(kelvin::opt::ConvPerChannelD1OD24_5x5);
   }

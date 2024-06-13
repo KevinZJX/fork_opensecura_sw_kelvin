@@ -67,6 +67,67 @@ void JumptableSwizzle(const int32_t* input, int32_t* output, int n) {
 
 }  // namespace
 
+#define FLT_0_0 v0
+#define FLT_0_1 v3
+#define FLT_0_2 v6
+#define FLT_0_3 v9
+#define FLT_0_4 v12
+
+#define FLT_1_0 v1
+#define FLT_1_1 v4
+#define FLT_1_2 v7
+#define FLT_1_3 v10
+#define FLT_1_4 v13
+
+#define FLT_2_0 v2
+#define FLT_2_1 v5
+#define FLT_2_2 v8
+#define FLT_2_3 v11
+#define FLT_2_4 v14
+
+#define FLT_3_0 v15
+#define FLT_3_1 v16
+#define FLT_3_2 v17
+#define FLT_3_3 v18
+#define FLT_3_4 v19
+
+#define FLT_HOLE v20
+#define FLT_4_0 v21
+#define FLT_4_1 v22
+#define FLT_4_2 v23
+#define FLT_4_3 v24
+#define FLT_4_4 v25
+
+#define INPUT_0_0 v26
+#define INPUT_0_1 v29
+#define INPUT_0_2 v32
+#define INPUT_0_3 v35
+#define INPUT_0_4 v38
+
+#define INPUT_1_0 v27
+#define INPUT_1_1 v30
+#define INPUT_1_2 v33
+#define INPUT_1_3 v36
+#define INPUT_1_4 v39
+
+#define INPUT_2_0 v28
+#define INPUT_2_1 v31
+#define INPUT_2_2 v34
+#define INPUT_2_3 v37
+#define INPUT_2_4 v40
+
+#define INPUT_3_0 v41
+#define INPUT_3_1 v42
+#define INPUT_3_2 v43
+#define INPUT_3_3 v44
+#define INPUT_3_4 v45
+
+#define INPUT_4_0 v46
+#define INPUT_4_1 v47
+#define INPUT_4_2 v48
+#define INPUT_4_3 v49
+#define INPUT_4_4 v50
+
 #define CALCULATE_IN_X(in_x_origin)                        \
   {                                                        \
     _Pragma("GCC unroll 5") for (int i = 0; i < 5; ++i) {  \
@@ -83,93 +144,93 @@ void JumptableSwizzle(const int32_t* input, int32_t* output, int n) {
 
 #define PAD_ROW_0(input_offset)   \
   {                               \
-    vdup_b_x(v27, -input_offset); \
-    vdup_b_x(v28, -input_offset); \
-    vdup_b_x(v29, -input_offset); \
-    vdup_b_x(v30, -input_offset); \
-    vdup_b_x(v31, -input_offset); \
+    vdup_b_x(INPUT_0_0, -input_offset); \
+    vdup_b_x(INPUT_0_1, -input_offset); \
+    vdup_b_x(INPUT_0_2, -input_offset); \
+    vdup_b_x(INPUT_0_3, -input_offset); \
+    vdup_b_x(INPUT_0_4, -input_offset); \
   }
 #define PAD_ROW_1(input_offset)   \
   {                               \
-    vdup_b_x(v32, -input_offset); \
-    vdup_b_x(v33, -input_offset); \
-    vdup_b_x(v34, -input_offset); \
-    vdup_b_x(v35, -input_offset); \
-    vdup_b_x(v36, -input_offset); \
+    vdup_b_x(INPUT_1_0, -input_offset); \
+    vdup_b_x(INPUT_1_1, -input_offset); \
+    vdup_b_x(INPUT_1_2, -input_offset); \
+    vdup_b_x(INPUT_1_3, -input_offset); \
+    vdup_b_x(INPUT_1_4, -input_offset); \
   }
 #define PAD_ROW_2(input_offset)   \
-  {                               \
-    vdup_b_x(v37, -input_offset); \
-    vdup_b_x(v38, -input_offset); \
-    vdup_b_x(v39, -input_offset); \
-    vdup_b_x(v40, -input_offset); \
-    vdup_b_x(v41, -input_offset); \
+  {                            \
+    vdup_b_x(INPUT_2_0, -input_offset); \
+    vdup_b_x(INPUT_2_1, -input_offset); \
+    vdup_b_x(INPUT_2_2, -input_offset); \
+    vdup_b_x(INPUT_2_3, -input_offset); \
+    vdup_b_x(INPUT_2_4, -input_offset); \
   }
 #define PAD_ROW_3(input_offset)   \
   {                               \
-    vdup_b_x(v42, -input_offset); \
-    vdup_b_x(v43, -input_offset); \
-    vdup_b_x(v44, -input_offset); \
-    vdup_b_x(v45, -input_offset); \
-    vdup_b_x(v46, -input_offset); \
+    vdup_b_x(INPUT_3_0, -input_offset); \
+    vdup_b_x(INPUT_3_1, -input_offset); \
+    vdup_b_x(INPUT_3_2, -input_offset); \
+    vdup_b_x(INPUT_3_3, -input_offset); \
+    vdup_b_x(INPUT_3_4, -input_offset); \
   }
 #define PAD_ROW_4(input_offset)   \
   {                               \
-    vdup_b_x(v47, -input_offset); \
-    vdup_b_x(v48, -input_offset); \
-    vdup_b_x(v49, -input_offset); \
-    vdup_b_x(v50, -input_offset); \
-    vdup_b_x(v51, -input_offset); \
+    vdup_b_x(INPUT_4_0, -input_offset); \
+    vdup_b_x(INPUT_4_1, -input_offset); \
+    vdup_b_x(INPUT_4_2, -input_offset); \
+    vdup_b_x(INPUT_4_3, -input_offset); \
+    vdup_b_x(INPUT_4_4, -input_offset); \
   }
 
 #define LOAD_ROW_0(p_input, input_width, in_y, in_x)         \
   {                                                          \
     const int8_t* p_row = p_input + (in_y[0] * input_width); \
-    vdup_b_x(v27, *(p_row + in_x[0]));                       \
-    vdup_b_x(v28, *(p_row + in_x[1]));                       \
-    vdup_b_x(v29, *(p_row + in_x[2]));                       \
-    vdup_b_x(v30, *(p_row + in_x[3]));                       \
-    vdup_b_x(v31, *(p_row + in_x[4]));                       \
+    vdup_b_x(INPUT_0_0, *(p_row + in_x[0]));                       \
+    vdup_b_x(INPUT_0_1, *(p_row + in_x[1]));                       \
+    vdup_b_x(INPUT_0_2, *(p_row + in_x[2]));                       \
+    vdup_b_x(INPUT_0_3, *(p_row + in_x[3]));                       \
+    vdup_b_x(INPUT_0_4, *(p_row + in_x[4]));                       \
   }
 
 #define LOAD_ROW_1(p_input, input_width, in_y, in_x)         \
   {                                                          \
     const int8_t* p_row = p_input + (in_y[1] * input_width); \
-    vdup_b_x(v32, *(p_row + in_x[0]));                       \
-    vdup_b_x(v33, *(p_row + in_x[1]));                       \
-    vdup_b_x(v34, *(p_row + in_x[2]));                       \
-    vdup_b_x(v35, *(p_row + in_x[3]));                       \
-    vdup_b_x(v36, *(p_row + in_x[4]));                       \
+    vdup_b_x(INPUT_1_0, *(p_row + in_x[0]));                       \
+    vdup_b_x(INPUT_1_1, *(p_row + in_x[1]));                       \
+    vdup_b_x(INPUT_1_2, *(p_row + in_x[2]));                       \
+    vdup_b_x(INPUT_1_3, *(p_row + in_x[3]));                       \
+    vdup_b_x(INPUT_1_4, *(p_row + in_x[4]));                       \
   }
 
 #define LOAD_ROW_2(p_input, input_width, in_y, in_x)         \
   {                                                          \
     const int8_t* p_row = p_input + (in_y[2] * input_width); \
-    vdup_b_x(v37, *(p_row + in_x[0]));                       \
-    vdup_b_x(v38, *(p_row + in_x[1]));                       \
-    vdup_b_x(v39, *(p_row + in_x[2]));                       \
-    vdup_b_x(v40, *(p_row + in_x[3]));                       \
-    vdup_b_x(v41, *(p_row + in_x[4]));                       \
+    vdup_b_x(INPUT_2_0, *(p_row + in_x[0]));                       \
+    vdup_b_x(INPUT_2_1, *(p_row + in_x[1]));                       \
+    vdup_b_x(INPUT_2_2, *(p_row + in_x[2]));                       \
+    vdup_b_x(INPUT_2_3, *(p_row + in_x[3]));                       \
+    vdup_b_x(INPUT_2_4, *(p_row + in_x[4]));                       \
   }
 
 #define LOAD_ROW_3(p_input, input_width, in_y, in_x)         \
   {                                                          \
     const int8_t* p_row = p_input + (in_y[3] * input_width); \
-    vdup_b_x(v42, *(p_row + in_x[0]));                       \
-    vdup_b_x(v43, *(p_row + in_x[1]));                       \
-    vdup_b_x(v44, *(p_row + in_x[2]));                       \
-    vdup_b_x(v45, *(p_row + in_x[3]));                       \
-    vdup_b_x(v46, *(p_row + in_x[4]));                       \
+    vdup_b_x(INPUT_3_0, *(p_row + in_x[0]));                       \
+    vdup_b_x(INPUT_3_1, *(p_row + in_x[1]));                       \
+    vdup_b_x(INPUT_3_2, *(p_row + in_x[2]));                       \
+    vdup_b_x(INPUT_3_3, *(p_row + in_x[3]));                       \
+    vdup_b_x(INPUT_3_4, *(p_row + in_x[4]));                       \
   }
 
 #define LOAD_ROW_4(p_input, input_width, in_y, in_x)         \
   {                                                          \
     const int8_t* p_row = p_input + (in_y[4] * input_width); \
-    vdup_b_x(v47, *(p_row + in_x[0]));                       \
-    vdup_b_x(v48, *(p_row + in_x[1]));                       \
-    vdup_b_x(v49, *(p_row + in_x[2]));                       \
-    vdup_b_x(v50, *(p_row + in_x[3]));                       \
-    vdup_b_x(v51, *(p_row + in_x[4]));                       \
+    vdup_b_x(INPUT_4_0, *(p_row + in_x[0]));                       \
+    vdup_b_x(INPUT_4_1, *(p_row + in_x[1]));                       \
+    vdup_b_x(INPUT_4_2, *(p_row + in_x[2]));                       \
+    vdup_b_x(INPUT_4_3, *(p_row + in_x[3]));                       \
+    vdup_b_x(INPUT_4_4, *(p_row + in_x[4]));                       \
   }
 
 #define H_PAD_OR_LOAD_ROW_0(p_input, input_width, input_offset, in_y, in_x) \
@@ -178,29 +239,29 @@ void JumptableSwizzle(const int32_t* input, int32_t* output, int n) {
   } else {                                                                  \
     const int8_t* p_row = p_input + (in_y[0] * input_width);                \
     if (in_x[0] < 0 || in_x[0] >= input_width) {                            \
-      vdup_b_x(v27, -input_offset);                                         \
+      vdup_b_x(INPUT_0_0, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v27, *(p_row + in_x[0]));                                    \
+      vdup_b_x(INPUT_0_0, *(p_row + in_x[0]));                                    \
     }                                                                       \
     if (in_x[1] < 0 || in_x[1] >= input_width) {                            \
-      vdup_b_x(v28, -input_offset);                                         \
+      vdup_b_x(INPUT_0_1, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v28, *(p_row + in_x[1]));                                    \
+      vdup_b_x(INPUT_0_1, *(p_row + in_x[1]));                                    \
     }                                                                       \
     if (in_x[2] < 0 || in_x[2] >= input_width) {                            \
-      vdup_b_x(v29, -input_offset);                                         \
+      vdup_b_x(INPUT_0_2, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v29, *(p_row + in_x[2]));                                    \
+      vdup_b_x(INPUT_0_2, *(p_row + in_x[2]));                                    \
     }                                                                       \
     if (in_x[3] < 0 || in_x[3] >= input_width) {                            \
-      vdup_b_x(v30, -input_offset);                                         \
+      vdup_b_x(INPUT_0_3, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v30, *(p_row + in_x[3]));                                    \
+      vdup_b_x(INPUT_0_3, *(p_row + in_x[3]));                                    \
     }                                                                       \
     if (in_x[4] < 0 || in_x[4] >= input_width) {                            \
-      vdup_b_x(v31, -input_offset);                                         \
+      vdup_b_x(INPUT_0_4, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v31, *(p_row + in_x[4]));                                    \
+      vdup_b_x(INPUT_0_4, *(p_row + in_x[4]));                                    \
     }                                                                       \
   }
 
@@ -210,29 +271,29 @@ void JumptableSwizzle(const int32_t* input, int32_t* output, int n) {
   } else {                                                                  \
     const int8_t* p_row = p_input + (in_y[1] * input_width);                \
     if (in_x[0] < 0 || in_x[0] >= input_width) {                            \
-      vdup_b_x(v32, -input_offset);                                         \
+      vdup_b_x(INPUT_1_0, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v32, *(p_row + in_x[0]));                                    \
+      vdup_b_x(INPUT_1_0, *(p_row + in_x[0]));                                    \
     }                                                                       \
     if (in_x[1] < 0 || in_x[1] >= input_width) {                            \
-      vdup_b_x(v33, -input_offset);                                         \
+      vdup_b_x(INPUT_1_1, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v33, *(p_row + in_x[1]));                                    \
+      vdup_b_x(INPUT_1_1, *(p_row + in_x[1]));                                    \
     }                                                                       \
     if (in_x[2] < 0 || in_x[2] >= input_width) {                            \
-      vdup_b_x(v34, -input_offset);                                         \
+      vdup_b_x(INPUT_1_2, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v34, *(p_row + in_x[2]));                                    \
+      vdup_b_x(INPUT_1_2, *(p_row + in_x[2]));                                    \
     }                                                                       \
     if (in_x[3] < 0 || in_x[3] >= input_width) {                            \
-      vdup_b_x(v35, -input_offset);                                         \
+      vdup_b_x(INPUT_1_3, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v35, *(p_row + in_x[3]));                                    \
+      vdup_b_x(INPUT_1_3, *(p_row + in_x[3]));                                    \
     }                                                                       \
     if (in_x[4] < 0 || in_x[4] >= input_width) {                            \
-      vdup_b_x(v36, -input_offset);                                         \
+      vdup_b_x(INPUT_1_4, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v36, *(p_row + in_x[4]));                                    \
+      vdup_b_x(INPUT_1_4, *(p_row + in_x[4]));                                    \
     }                                                                       \
   }
 
@@ -242,29 +303,29 @@ void JumptableSwizzle(const int32_t* input, int32_t* output, int n) {
   } else {                                                                  \
     const int8_t* p_row = p_input + (in_y[2] * input_width);                \
     if (in_x[0] < 0 || in_x[0] >= input_width) {                            \
-      vdup_b_x(v37, -input_offset);                                         \
+      vdup_b_x(INPUT_2_0, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v37, *(p_row + in_x[0]));                                    \
+      vdup_b_x(INPUT_2_0, *(p_row + in_x[0]));                                    \
     }                                                                       \
     if (in_x[1] < 0 || in_x[1] >= input_width) {                            \
-      vdup_b_x(v38, -input_offset);                                         \
+      vdup_b_x(INPUT_2_1, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v38, *(p_row + in_x[1]));                                    \
+      vdup_b_x(INPUT_2_1, *(p_row + in_x[1]));                                    \
     }                                                                       \
     if (in_x[2] < 0 || in_x[2] >= input_width) {                            \
-      vdup_b_x(v39, -input_offset);                                         \
+      vdup_b_x(INPUT_2_2, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v39, *(p_row + in_x[2]));                                    \
+      vdup_b_x(INPUT_2_2, *(p_row + in_x[2]));                                    \
     }                                                                       \
     if (in_x[3] < 0 || in_x[3] >= input_width) {                            \
-      vdup_b_x(v40, -input_offset);                                         \
+      vdup_b_x(INPUT_2_3, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v40, *(p_row + in_x[3]));                                    \
+      vdup_b_x(INPUT_2_3, *(p_row + in_x[3]));                                    \
     }                                                                       \
     if (in_x[4] < 0 || in_x[4] >= input_width) {                            \
-      vdup_b_x(v41, -input_offset);                                         \
+      vdup_b_x(INPUT_2_4, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v41, *(p_row + in_x[4]));                                    \
+      vdup_b_x(INPUT_2_4, *(p_row + in_x[4]));                                    \
     }                                                                       \
   }
 
@@ -274,29 +335,29 @@ void JumptableSwizzle(const int32_t* input, int32_t* output, int n) {
   } else {                                                                  \
     const int8_t* p_row = p_input + (in_y[3] * input_width);                \
     if (in_x[0] < 0 || in_x[0] >= input_width) {                            \
-      vdup_b_x(v42, -input_offset);                                         \
+      vdup_b_x(INPUT_3_0, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v42, *(p_row + in_x[0]));                                    \
+      vdup_b_x(INPUT_3_0, *(p_row + in_x[0]));                                    \
     }                                                                       \
     if (in_x[1] < 0 || in_x[1] >= input_width) {                            \
-      vdup_b_x(v43, -input_offset);                                         \
+      vdup_b_x(INPUT_3_1, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v43, *(p_row + in_x[1]));                                    \
+      vdup_b_x(INPUT_3_1, *(p_row + in_x[1]));                                    \
     }                                                                       \
     if (in_x[2] < 0 || in_x[2] >= input_width) {                            \
-      vdup_b_x(v44, -input_offset);                                         \
+      vdup_b_x(INPUT_3_2, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v44, *(p_row + in_x[2]));                                    \
+      vdup_b_x(INPUT_3_2, *(p_row + in_x[2]));                                    \
     }                                                                       \
     if (in_x[3] < 0 || in_x[3] >= input_width) {                            \
-      vdup_b_x(v45, -input_offset);                                         \
+      vdup_b_x(INPUT_3_3, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v45, *(p_row + in_x[3]));                                    \
+      vdup_b_x(INPUT_3_3, *(p_row + in_x[3]));                                    \
     }                                                                       \
     if (in_x[4] < 0 || in_x[4] >= input_width) {                            \
-      vdup_b_x(v46, -input_offset);                                         \
+      vdup_b_x(INPUT_3_4, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v46, *(p_row + in_x[4]));                                    \
+      vdup_b_x(INPUT_3_4, *(p_row + in_x[4]));                                    \
     }                                                                       \
   }
 
@@ -306,29 +367,29 @@ void JumptableSwizzle(const int32_t* input, int32_t* output, int n) {
   } else {                                                                  \
     const int8_t* p_row = p_input + (in_y[4] * input_width);                \
     if (in_x[0] < 0 || in_x[0] >= input_width) {                            \
-      vdup_b_x(v47, -input_offset);                                         \
+      vdup_b_x(INPUT_4_0, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v47, *(p_row + in_x[0]));                                    \
+      vdup_b_x(INPUT_4_0, *(p_row + in_x[0]));                                    \
     }                                                                       \
     if (in_x[1] < 0 || in_x[1] >= input_width) {                            \
-      vdup_b_x(v48, -input_offset);                                         \
+      vdup_b_x(INPUT_4_1, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v48, *(p_row + in_x[1]));                                    \
+      vdup_b_x(INPUT_4_1, *(p_row + in_x[1]));                                    \
     }                                                                       \
     if (in_x[2] < 0 || in_x[2] >= input_width) {                            \
-      vdup_b_x(v49, -input_offset);                                         \
+      vdup_b_x(INPUT_4_2, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v49, *(p_row + in_x[2]));                                    \
+      vdup_b_x(INPUT_4_2, *(p_row + in_x[2]));                                    \
     }                                                                       \
     if (in_x[3] < 0 || in_x[3] >= input_width) {                            \
-      vdup_b_x(v50, -input_offset);                                         \
+      vdup_b_x(INPUT_4_3, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v50, *(p_row + in_x[3]));                                    \
+      vdup_b_x(INPUT_4_3, *(p_row + in_x[3]));                                    \
     }                                                                       \
     if (in_x[4] < 0 || in_x[4] >= input_width) {                            \
-      vdup_b_x(v51, -input_offset);                                         \
+      vdup_b_x(INPUT_4_4, -input_offset);                                         \
     } else {                                                                \
-      vdup_b_x(v51, *(p_row + in_x[4]));                                    \
+      vdup_b_x(INPUT_4_4, *(p_row + in_x[4]));                                    \
     }                                                                       \
   }
 
@@ -371,15 +432,15 @@ void JumptableSwizzle(const int32_t* input, int32_t* output, int n) {
   {                                       \
     vld_w_x_m(v60, swizzled_bias_data);   \
     adwinit_v(v60, v60);                  \
-    adwconv_vxv(v60, v27, cmds, v0);      \
-    adwconv_vxv(v60, v30, cmds, v3);      \
-    adwconv_vxv(v60, v33, cmds, v6);      \
-    adwconv_vxv(v60, v36, cmds, v9);      \
-    adwconv_vxv(v60, v39, cmds, v12);     \
-    adwconv_vxv(v60, v42, cmds, v15);     \
-    adwconv_vxv(v60, v45, cmds, v18);     \
-    adwconv_vxv(v60, v48, cmds, v21);     \
-    vdwconv_vxv(v60, v51, cmds, v24);     \
+    adwconv_vxv(v60, INPUT_0_0, cmds, FLT_0_0);      \
+    adwconv_vxv(v60, INPUT_0_1, cmds, FLT_0_1);      \
+    adwconv_vxv(v60, INPUT_0_2, cmds, FLT_0_2);      \
+    adwconv_vxv(v60, INPUT_0_3, cmds, FLT_0_3);      \
+    adwconv_vxv(v60, INPUT_0_4, cmds, FLT_0_4);     \
+    adwconv_vxv(v60, INPUT_3_0, cmds, FLT_3_0);     \
+    adwconv_vxv(v60, INPUT_3_3, cmds, FLT_3_3);     \
+    adwconv_vxv(v60, INPUT_3_4, cmds, FLT_HOLE);     \
+    vdwconv_vxv(v60, INPUT_4_2, cmds, FLT_4_2);     \
   }
 
 #define OUTPUT(output_activation_min, output_activation_max, output_offset, \
@@ -459,42 +520,42 @@ void ConvPerChannelD1OD24_5x5(
       }
     }
   }
+
   const int8_t* p_flt_0 = swizzled_filter_data.get() + (0 * filter_width * 24);
   const int8_t* p_flt_1 = swizzled_filter_data.get() + (1 * filter_width * 24);
   const int8_t* p_flt_2 = swizzled_filter_data.get() + (2 * filter_width * 24);
   const int8_t* p_flt_3 = swizzled_filter_data.get() + (3 * filter_width * 24);
   const int8_t* p_flt_4 = swizzled_filter_data.get() + (4 * filter_width * 24);
-  vld_b_l_xx(v0, p_flt_0 + (0 * 24), 24);
-  vld_b_l_xx(v1, p_flt_0 + (1 * 24), 24);
-  vld_b_l_xx(v2, p_flt_0 + (2 * 24), 24);
-  vld_b_l_xx(v3, p_flt_0 + (3 * 24), 24);
-  vld_b_l_xx(v4, p_flt_0 + (4 * 24), 24);
+  vld_b_lp_xx(FLT_0_0, p_flt_0, 24);
+  vld_b_lp_xx(FLT_0_1, p_flt_0, 24);
+  vld_b_lp_xx(FLT_0_2, p_flt_0, 24);
+  vld_b_lp_xx(FLT_0_3, p_flt_0, 24);
+  vld_b_lp_xx(FLT_0_4, p_flt_0, 24);
 
-  vld_b_l_xx(v5, p_flt_1 + (0 * 24), 24);
-  vld_b_l_xx(v6, p_flt_1 + (1 * 24), 24);
-  vld_b_l_xx(v7, p_flt_1 + (2 * 24), 24);
-  vld_b_l_xx(v8, p_flt_1 + (3 * 24), 24);
-  vld_b_l_xx(v9, p_flt_1 + (4 * 24), 24);
+  vld_b_lp_xx(FLT_1_0, p_flt_1, 24);
+  vld_b_lp_xx(FLT_1_1, p_flt_1, 24);
+  vld_b_lp_xx(FLT_1_2, p_flt_1, 24);
+  vld_b_lp_xx(FLT_1_3, p_flt_1, 24);
+  vld_b_lp_xx(FLT_1_4, p_flt_1, 24);
 
-  vld_b_l_xx(v10, p_flt_2 + (0 * 24), 24);
-  vld_b_l_xx(v11, p_flt_2 + (1 * 24), 24);
-  vld_b_l_xx(v12, p_flt_2 + (2 * 24), 24);
-  vld_b_l_xx(v13, p_flt_2 + (3 * 24), 24);
-  vld_b_l_xx(v14, p_flt_2 + (4 * 24), 24);
+  vld_b_lp_xx(FLT_2_0, p_flt_2, 24);
+  vld_b_lp_xx(FLT_2_1, p_flt_2, 24);
+  vld_b_lp_xx(FLT_2_2, p_flt_2, 24);
+  vld_b_lp_xx(FLT_2_3, p_flt_2, 24);
+  vld_b_lp_xx(FLT_2_4, p_flt_2, 24);
 
-  vld_b_l_xx(v15, p_flt_3 + (0 * 24), 24);
-  vld_b_l_xx(v16, p_flt_3 + (1 * 24), 24);
-  vld_b_l_xx(v17, p_flt_3 + (2 * 24), 24);
-  vld_b_l_xx(v18, p_flt_3 + (3 * 24), 24);
-  vld_b_l_xx(v19, p_flt_3 + (4 * 24), 24);
+  vld_b_lp_xx(FLT_3_0, p_flt_3, 24);
+  vld_b_lp_xx(FLT_3_1, p_flt_3, 24);
+  vld_b_lp_xx(FLT_3_2, p_flt_3, 24);
+  vld_b_lp_xx(FLT_3_3, p_flt_3, 24);
+  vld_b_lp_xx(FLT_3_4, p_flt_3, 24);
 
-  vld_b_l_xx(v20, p_flt_4 + (0 * 24), 24);
-  vld_b_l_xx(v21, p_flt_4 + (1 * 24), 24);
-  vld_b_l_xx(v22, p_flt_4 + (2 * 24), 24);
-  vld_b_l_xx(v23, p_flt_4 + (3 * 24), 24);
-  vld_b_l_xx(v24, p_flt_4 + (4 * 24), 24);
-  vdup_b_x(v25, 0);
-  vdup_b_x(v26, 0);
+  vdup_b_x(FLT_HOLE, 0);
+  vld_b_lp_xx(FLT_4_0, p_flt_4, 24);
+  vld_b_lp_xx(FLT_4_1, p_flt_4, 24);
+  vld_b_lp_xx(FLT_4_2, p_flt_4, 24);
+  vld_b_lp_xx(FLT_4_3, p_flt_4, 24);
+  vld_b_lp_xx(FLT_4_4, p_flt_4, 24);
 
   union {
     vdwconv_u8_t dwconv;
@@ -524,7 +585,7 @@ void ConvPerChannelD1OD24_5x5(
 
   int8_t* local_output_data = output_data + out_channel;
   int in_y[5];
-  int in_x[5];
+  int in_x[7];
   int out_y = 0;
   const int8_t* p_input = input_data;
   // Handle top row padding
@@ -613,6 +674,109 @@ void ConvPerChannelD1OD24_5x5(
       COMPUTE(cmds, swizzled_bias_data);
       OUTPUT(output_activation_min, output_activation_max, output_offset,
              local_output_data, n_channels);
+      local_output_data += output_depth;
+    }
+    for (; out_x + 2 <= (output_width - pad_width); out_x += 2) {
+      const int in_x_origin = (out_x * stride_width) - pad_width;
+
+      #pragma GCC unroll 7
+      for (int i = 0; i < 7; ++i) {
+        in_x[i] = in_x_origin + (dilation_width_factor * i);
+      }
+      const int8_t* p_rows[5];
+      #pragma GCC unroll 5
+      for (int i = 0; i < 5; ++i) {
+        p_rows[i] = p_input + (in_y[i] * input_width);
+      }
+
+      vdup_b_x(INPUT_0_0, *(p_rows[0] + in_x[0]));
+      vdup_b_x(INPUT_0_1, *(p_rows[0] + in_x[1]));
+      vdup_b_x(INPUT_0_2, *(p_rows[0] + in_x[2]));
+      vdup_b_x(INPUT_0_3, *(p_rows[0] + in_x[3]));
+      vdup_b_x(INPUT_0_4, *(p_rows[0] + in_x[4]));
+
+      vdup_b_x(INPUT_1_0, *(p_rows[1] + in_x[0]));
+      vdup_b_x(INPUT_1_1, *(p_rows[1] + in_x[1]));
+      vdup_b_x(INPUT_1_2, *(p_rows[1] + in_x[2]));
+      vdup_b_x(INPUT_1_3, *(p_rows[1] + in_x[3]));
+      vdup_b_x(INPUT_1_4, *(p_rows[1] + in_x[4]));
+
+      vdup_b_x(INPUT_2_0, *(p_rows[2] + in_x[0]));
+      vdup_b_x(INPUT_2_1, *(p_rows[2] + in_x[1]));
+      vdup_b_x(INPUT_2_2, *(p_rows[2] + in_x[2]));
+      vdup_b_x(INPUT_2_3, *(p_rows[2] + in_x[3]));
+      vdup_b_x(INPUT_2_4, *(p_rows[2] + in_x[4]));
+
+      vdup_b_x(INPUT_3_0, *(p_rows[3] + in_x[0]));
+      vdup_b_x(INPUT_3_1, *(p_rows[3] + in_x[1]));
+      vdup_b_x(INPUT_3_2, *(p_rows[3] + in_x[2]));
+      vdup_b_x(INPUT_3_3, *(p_rows[3] + in_x[3]));
+      vdup_b_x(INPUT_3_4, *(p_rows[3] + in_x[4]));
+
+      vdup_b_x(INPUT_4_0, *(p_rows[4] + in_x[0]));
+      vdup_b_x(INPUT_4_1, *(p_rows[4] + in_x[1]));
+      vdup_b_x(INPUT_4_2, *(p_rows[4] + in_x[2]));
+      vdup_b_x(INPUT_4_3, *(p_rows[4] + in_x[3]));
+      vdup_b_x(INPUT_4_4, *(p_rows[4] + in_x[4]));
+
+      vld_w_x_m(v60, swizzled_bias_data);
+      adwinit_v(v60, v60);
+      adwconv_vxv(v60, INPUT_0_0, cmds, FLT_0_0);
+      adwconv_vxv(v60, INPUT_0_1, cmds, FLT_0_1);
+      adwconv_vxv(v60, INPUT_0_2, cmds, FLT_0_2);
+      adwconv_vxv(v60, INPUT_0_3, cmds, FLT_0_3);
+      adwconv_vxv(v60, INPUT_0_4, cmds, FLT_0_4);
+      adwconv_vxv(v60, INPUT_3_0, cmds, FLT_3_0);
+      adwconv_vxv(v60, INPUT_3_3, cmds, FLT_3_3);
+      adwconv_vxv(v60, INPUT_3_4, cmds, FLT_HOLE);
+      vdwconv_vxv(v60, INPUT_4_2, cmds, FLT_4_2);
+      vmv_v(INPUT_0_0, v60);
+      vmv_v(INPUT_1_0, v61);
+      vmv_v(INPUT_2_0, v62);
+      vmv_v(INPUT_0_1, v63);
+
+      vdup_b_x(INPUT_3_0, *(p_rows[3] + in_x[5]));
+      vdup_b_x(INPUT_3_1, *(p_rows[3] + in_x[6]));
+
+      vmv_v(INPUT_4_0, INPUT_4_2);
+      vmv_v(INPUT_4_1, INPUT_4_3);
+      vmv_v(INPUT_4_2, INPUT_4_4);
+      vdup_b_x(INPUT_4_3, *(p_rows[4] + in_x[5]));
+      vdup_b_x(INPUT_4_4, *(p_rows[4] + in_x[6]));
+
+      vld_w_x_m(v60, swizzled_bias_data);
+      adwinit_v(v60, v60);
+      adwconv_vxv(v60, INPUT_0_2, cmds, FLT_0_0);
+      adwconv_vxv(v60, INPUT_0_3, cmds, FLT_0_1);
+
+      vmv_v(INPUT_0_2, INPUT_0_0);
+      vmv_v(INPUT_1_2, INPUT_1_0);
+      vmv_v(INPUT_2_2, INPUT_2_0);
+      vmv_v(INPUT_0_3, INPUT_0_1);
+
+      vdup_b_x(INPUT_0_0, *(p_rows[0] + in_x[5]));
+      vdup_b_x(INPUT_0_1, *(p_rows[0] + in_x[6]));
+      vdup_b_x(INPUT_1_0, *(p_rows[1] + in_x[5]));
+      vdup_b_x(INPUT_1_1, *(p_rows[1] + in_x[6]));
+      vdup_b_x(INPUT_2_0, *(p_rows[2] + in_x[5]));
+      vdup_b_x(INPUT_2_1, *(p_rows[2] + in_x[6]));
+
+      adwconv_vxv(v60, INPUT_0_4, cmds, FLT_0_2);
+      adwconv_vxv(v60, INPUT_0_0, cmds, FLT_0_3);
+      adwconv_vxv(v60, INPUT_0_1, cmds, FLT_0_4);
+      adwconv_vxv(v60, INPUT_3_2, cmds, FLT_3_0);
+      adwconv_vxv(v60, INPUT_3_0, cmds, FLT_3_3);
+      adwconv_vxv(v60, INPUT_3_4, cmds, FLT_HOLE);
+      vdwconv_vxv(v60, INPUT_4_2, cmds, FLT_4_2);
+      INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE2(
+        v60, INPUT_0_2, v52, v56, output_activation_min,
+        output_activation_max, output_offset
+      );
+      vsraqs_b_vx(INPUT_0_2, INPUT_0_2, 0);
+      vst_b_l_xx(INPUT_0_2, local_output_data, n_channels);
+      local_output_data += output_depth;
+      vsraqs_b_vx(v60, v60, 0);
+      vst_b_l_xx(v60, local_output_data, n_channels);
       local_output_data += output_depth;
     }
     for (; out_x < (output_width - pad_width); ++out_x) {
@@ -736,6 +900,62 @@ void ConvPerChannelD1OD24_5x5(
 #undef PAD_ROW_4
 #undef CALCULATE_IN_X
 #undef CALCULATE_IN_Y
+#undef INPUT_0_0
+#undef INPUT_0_1
+#undef INPUT_0_2
+#undef INPUT_0_3
+#undef INPUT_0_4
+#undef INPUT_1_0
+#undef INPUT_1_1
+#undef INPUT_1_2
+#undef INPUT_1_3
+#undef INPUT_1_4
+#undef INPUT_2_0
+#undef INPUT_2_1
+#undef INPUT_2_2
+#undef INPUT_2_3
+#undef INPUT_2_4
+#undef INPUT_3_0
+#undef INPUT_3_1
+#undef INPUT_3_2
+#undef INPUT_3_3
+#undef INPUT_3_4
+#undef INPUT_4_0
+#undef INPUT_4_1
+#undef INPUT_4_2
+#undef INPUT_4_3
+#undef INPUT_4_4
+#undef INPUT_0_5
+#undef INPUT_1_5
+#undef INPUT_2_5
+#undef INPUT_3_5
+#undef INPUT_4_5
+#undef FLT_0_0
+#undef FLT_0_1
+#undef FLT_0_2
+#undef FLT_0_3
+#undef FLT_0_4
+#undef FLT_1_0
+#undef FLT_1_1
+#undef FLT_1_2
+#undef FLT_1_3
+#undef FLT_1_4
+#undef FLT_2_0
+#undef FLT_2_1
+#undef FLT_2_2
+#undef FLT_2_3
+#undef FLT_2_4
+#undef FLT_3_0
+#undef FLT_3_1
+#undef FLT_3_2
+#undef FLT_3_3
+#undef FLT_3_4
+#undef FLT_HOLE
+#undef FLT_4_0
+#undef FLT_4_1
+#undef FLT_4_2
+#undef FLT_4_3
+#undef FLT_4_4
 
 void ConvPerChannelD1(
     const tflite::ConvParams& params, const int32_t* output_multiplier,
