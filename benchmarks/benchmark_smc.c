@@ -80,6 +80,7 @@ void ottf_external_isr(void) {
 
 
 void _ottf_main(void) {
+  test_status_set(kTestStatusInTest);
   // Initialize the SMC UART to enable logging for non-DV simulation platforms.
   if (kDeviceType != kDeviceSimDV) {
     init_uart(TOP_MATCHA_SMC_UART_BASE_ADDR, &smc_uart);
@@ -134,6 +135,7 @@ void _ottf_main(void) {
 
   if (output_header_ptr->return_code) {
     LOG_FATAL("Kelvin returned an error: %d", output_header_ptr->return_code);
+    test_status_set(kTestStatusFailed);
   }
   uint32_t iterations = output_header_ptr->iterations;
   uint64_t cycles = output_header_ptr->cycles;
@@ -150,6 +152,7 @@ void _ottf_main(void) {
   LOG_INFO("Mismatch count: %d", mismatch_count);
 #endif
   LOG_INFO("========== End Benchmark ==========");
+  test_status_set(kTestStatusPassed);
   while (true) {
     wait_for_interrupt();
   };
