@@ -184,6 +184,8 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
   const auto dilation_height_factor = params.dilation_height_factor;
   const auto pad_width = params.padding_values.width;
   const auto pad_height = params.padding_values.height;
+  const auto input_batch = input_shape.Dims(0);
+  const auto input_height = input_shape.Dims(1);
   const auto input_width = input_shape.Dims(2);
   const auto input_depth = input_shape.Dims(3);
   const auto filter_height = filter_shape.Dims(1);
@@ -205,13 +207,18 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
       stride_width == 1 && dilation_height_factor == 1 &&
       dilation_width_factor == 1 && pad_height == 0 && pad_width == 0 &&
       (input_depth == filter_depth)) {
-    if ((output_depth % 8) == 0 && (input_depth % 32) == 0) {
+
+    if ((input_depth == 32) && (input_batch * input_height * input_width) >= 4) {
       RUN_KERNEL(kelvin::opt::ConvS8K1x1D32);
+    }
+
+    if ((output_depth % 8) == 0 && (input_depth % 32) == 0) {
+      RUN_KERNEL(kelvin::opt::ConvS8K1x1DMod32);
     }
 
     // TODO: Relax this kernel for all output_depths
     if ((output_depth < 8) && (input_depth % 32) == 0) {
-      RUN_KERNEL(kelvin::opt::ConvS8K1x1D32);
+      RUN_KERNEL(kelvin::opt::ConvS8K1x1DMod32);
     }
 
     if ((output_depth % 16) == 0 && (input_depth == 16)) {

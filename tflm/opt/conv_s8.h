@@ -23,6 +23,17 @@
 namespace kelvin::opt {
 
 // filter 1x1 d%32==0
+void ConvS8K1x1DMod32(const tflite::ConvParams& params,
+                   const int32_t* output_multiplier, const int32_t* output_shift,
+                   const tflite::RuntimeShape& input_shape,
+                   const int8_t* input_data,
+                   const tflite::RuntimeShape& filter_shape,
+                   const int8_t* filter_data,
+                   const tflite::RuntimeShape& bias_shape,
+                   const int32_t* bias_data,
+                   const tflite::RuntimeShape& output_shape, int8_t* output_data);
+
+// filter 1x1 d==32
 void ConvS8K1x1D32(const tflite::ConvParams& params,
                    const int32_t* output_multiplier, const int32_t* output_shift,
                    const tflite::RuntimeShape& input_shape,
