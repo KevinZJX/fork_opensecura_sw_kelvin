@@ -88,22 +88,16 @@ void ElementwiseAddS8(const int8_t* input1, const int8_t* input2,
     vdmulh_w_r_vx_m(v12, v12, input2_mult);
     vsha_w_r_vx_m(v4, v4, -input1_shift);
     vsha_w_r_vx_m(v12, v12, -input2_shift);
-    vadd_w_vx_m(v4, v4, input1_offset);
-    vadd_w_vx_m(v12, v12, input2_offset);
 
     vdmulh_w_r_vx_m(v20, v20, input1_mult);
     vsha_w_r_vx_m(v20, v20, -input1_shift);
-    vadd_w_vx_m(v20, v20, input1_offset);
     vdmulh_w_r_vx_m(v28, v28, input2_mult);
     vsha_w_r_vx_m(v28, v28, -input2_shift);
-    vadd_w_vx_m(v28, v28, input2_offset);
 
     vdmulh_w_r_vx_m(v36, v36, input1_mult);
     vsha_w_r_vx_m(v36, v36, -input1_shift);
-    vadd_w_vx_m(v36, v36, input1_offset);
     vdmulh_w_r_vx_m(v44, v44, input2_mult);
     vsha_w_r_vx_m(v44, v44, -input2_shift);
-    vadd_w_vx_m(v44, v44, input2_offset);
 
     vadd_w_vv_m(v12, v4, v12);
     vadd_w_vv_m(v28, v20, v28);
@@ -158,8 +152,6 @@ void ElementwiseAddS8(const int8_t* input1, const int8_t* input2,
     vdmulh_w_r_vx_m(v12, v12, input2_mult);
     vsha_w_r_vx_m(v4, v4, -input1_shift);
     vsha_w_r_vx_m(v12, v12, -input2_shift);
-    vadd_w_vx_m(v4, v4, input1_offset);
-    vadd_w_vx_m(v12, v12, input2_offset);
 
     vadd_w_vv_m(v16, v4, v12);
 

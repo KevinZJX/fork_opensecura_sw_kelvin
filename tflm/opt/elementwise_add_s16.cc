@@ -57,10 +57,10 @@ void ElementwiseAddS16(const int16_t* input1, const int16_t* input2,
     vmul_w_vx_m(vm2, vm2, input2_shift_mul);
     vmul_w_vx_m(vm3, vm3, input2_shift_mul);
 
-    rescale_m(vm0, vm0, input1_mult, input1_shift, input1_offset);
-    rescale_m(vm1, vm1, input1_mult, input1_shift, input1_offset);
-    rescale_m(vm2, vm2, input2_mult, input2_shift, input2_offset);
-    rescale_m(vm3, vm3, input2_mult, input2_shift, input2_offset);
+    rescale_m(vm0, vm0, input1_mult, input1_shift, 0);
+    rescale_m(vm1, vm1, input1_mult, input1_shift, 0);
+    rescale_m(vm2, vm2, input2_mult, input2_shift, 0);
+    rescale_m(vm3, vm3, input2_mult, input2_shift, 0);
 
     // Sum the rescaled inputs.
     vadd_w_vv_m(vm0, vm0, vm2);
