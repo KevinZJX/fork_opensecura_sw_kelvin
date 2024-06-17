@@ -169,7 +169,7 @@ void ConvS8D4(
           acset_v(v48, v48);
           int in_channel = 0;
           do {
-            int in_channels_this_iter = std::min(filter_input_depth, 32);
+            int in_channels_this_iter = std::min(filter_input_depth - in_channel, 32);
             // Calculate first valid filter_y
             int filter_y = 0;
             {
@@ -456,7 +456,7 @@ void ConvS8W8D4(
 
           int in_channel = 0;
           while (in_channel < filter_input_depth) {
-            int in_channels_this_iter = std::min(filter_input_depth, 32);
+            int in_channels_this_iter = std::min(filter_input_depth - in_channel, 32);
             // Calculate first valid filter_y
             int filter_y = 0;
             {
@@ -556,7 +556,7 @@ void ConvS8W8D4(
           acset_v(v48, v48);
           int in_channel = 0;
           while (in_channel < filter_input_depth) {
-            int in_channels_this_iter = std::min(filter_input_depth, 32);
+            int in_channels_this_iter = std::min(filter_input_depth - in_channel, 32);
             cmds.conv.stop = (in_channels_this_iter / 4) - 1;
 
             // Calculate first valid filter_y
@@ -693,7 +693,7 @@ void ConvS8W8D4(
           int in_channel = 0;
 
           while (in_channel < filter_input_depth) {
-            int in_channels_this_iter = std::min(filter_input_depth, 32);
+            int in_channels_this_iter = std::min(filter_input_depth - in_channel, 32);
             // Calculate first valid filter_y
             int filter_y = 0;
             {
