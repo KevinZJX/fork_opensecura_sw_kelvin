@@ -417,6 +417,7 @@ void ConvS16B64(
     const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
     const int64_t* bias_data, const tflite::RuntimeShape& output_shape,
     int16_t* output_data) {
+  const auto input_height = input_shape.Dims(1);
   const auto input_depth = input_shape.Dims(3);
   const auto filter_height = filter_shape.Dims(1);
   const auto filter_width = filter_shape.Dims(2);
@@ -436,12 +437,12 @@ void ConvS16B64(
     // 1xn non group filter
     bool group_conv = !(input_depth == filter_depth);
     int32_t fan_in = filter_width * filter_depth;
-    if (!group_conv && fan_in % 32 == 0) {
+    if (!group_conv && fan_in % 32 == 0 && input_height == 1) {
       fn = ConvS16B64K1xnNonGroup;
     }
 
     // 1xn group filter
-    if (fan_in % 32 == 0) {
+    if (fan_in % 32 == 0 && input_height == 1) {
       fn = ConvS16B64K1xnGroup;
     }
   }
