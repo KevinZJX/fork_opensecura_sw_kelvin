@@ -35,6 +35,7 @@ cc_library(
         "leaky_relu_s16.cc",
         "leaky_relu_s8.cc",
         "logistic_s8.cc",
+        "max_pool_s16.cc",
         "max_pool_s8.cc",
         "memcpy.cc",
         "resize_nearest_neighbor_s8.cc",

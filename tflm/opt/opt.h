@@ -97,6 +97,10 @@ void MaxPoolS8(const tflite::PoolParams& params,
                const tflite::RuntimeShape& input_shape,
                const int8_t* input_data,
                const tflite::RuntimeShape& output_shape, int8_t* output_data);
+void MaxPoolS16(const tflite::PoolParams& params,
+                const tflite::RuntimeShape& input_shape,
+                const int16_t* input_data,
+                const tflite::RuntimeShape& output_shape, int16_t* output_data);
 void MulS8(const tflite::ArithmeticParams& params,
            const tflite::RuntimeShape& input1_shape, const int8_t* input1_data,
            const tflite::RuntimeShape& input2_shape, const int8_t* input2_data,
