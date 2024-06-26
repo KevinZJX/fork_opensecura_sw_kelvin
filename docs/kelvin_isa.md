@@ -85,6 +85,10 @@ operations. Conceptually the register file is reduced from 64 locations to 16,
 where a stripmine register must use a mod4 base aligned register (eg. v0, v4,
 v8, ...). Normal instruction and stripmine variants may be mixed together.
 
+Currently, neither the assembler nor kelvin_sim checks for invalid stripmine
+registers. Code using invalid registers (like v1) will compile and sim, but
+will cause FPGA to hang.
+
 When stripmining is used in conjunction with instructions which use a register
 index as a base to several registers, the offset of +4 (instead of +1) shall be
 used. e.g., {vm0,vm1} becomes {{v0,v1,v2,v3},{v4,v5,v6,v7}}.
@@ -753,7 +757,7 @@ for L in Op.typelen
 
 ### ACONV
 
-Convolution ALU operation.
+Performs matmul vs1*vs3, accumulating into the accumulator.
 
 **Encodings**
 
@@ -787,29 +791,32 @@ for Y in [0..N-1]
          (signed(SData2,Data2{7:0}) + signed(Bias2{8:0})){9:0}){18:0}
 ```
 
-Length (stop - start + 1) is in 32bit accumulator lane count, as all inputs will
-horizontally reduce to this size.
+vs1 goes to the *narrow* port of the matmul. 8 vectors are always used.
 
-The Start and Stop definition allows for a partial window of input values to be
-transpose broadcast into the convolution unit.
+vs3 goes to the *wide* port of the matmul, up to 8 vectors are used.
+
+vx2 specifies control params used in the operation and has the following
+format:
 
 Mode   | Mode | Usage
 :----: | :--: | :-----------------------------------------------:
 Common |      | Mode[1:0] Start[6:2] Stop[11:7]
 s8     | 0    | SData2[31] SBias2[30:22] SData1[21] SBias1[20:12]
 
-```
-# SIMD256
-acc.out = {v48..55}
-narrow0 = {v0..7}
-narrow1 = {v16..23}
-narrow2 = {v32..39}
-narrow3 = {v48..55}
-wide0   = {v8..15}
-wide1   = {v24..31}
-wide2   = {v40..47}
-wide3   = {v56..63}
-```
+Start and Stop controls the window of input values to participate in the
+matmul:
+- On vs1 this is in 4-byte words on all 8 vectors at the same time.
+- On vs3 this is the register number to use (vs3+0 to vs3+7).
+- The operation takes (stop - start + 1) ticks to complete.
+
+When using SIMD256, the folling operands are valid:
+- vd: v48
+- vs1: v0, v16, v32, v48
+- vs3: v8, v24, v40, v56
+
+Notes:
+- v48 is used as vd but never written to.
+- v48-v55 will always be overwritten upon VCGET.
 
 ### VCGET
 
@@ -830,6 +837,8 @@ for Y in [0..N]
 
 ```
 
+v48 is the only valid vd in this instruction.
+
 ### ACSET
 
 Copy general registers into convolution accumulators.
@@ -847,6 +856,8 @@ for Y in [0..N]
   Accum{Y} = vd{Y}
 ```
 
+Note that v48 is used as vd but never written to.
+
 --------------------------------------------------------------------------------
 
 ### ACTR
@@ -860,12 +871,14 @@ actr.[w].v.{m} vd, vs1
 **Operation**
 
 ```
-assert(vd in {v48})
+assert(vd == 48)
 assert(vs1 in {v0, v16, v32, v48}
 for I in i32.typelen
   for J in i32.typelen
     ACCUM[J][I] = vs1[I][J]
 ```
+
+Note that v48 is used as vd but never written to.
 
 --------------------------------------------------------------------------------
 
@@ -1813,7 +1826,7 @@ Vertical slide:
 
 vslidep.[b,h,w].[1,2,3,4].vv vd, vs1, vs2 \
 vslidevp.[b,h,w].[1,2,3,4].vv.m vd, vs1, vs2 \
-vslidevp.[b,h,w].[1,2,3,4].vv.m vd, vs1, xs2
+vslidevp.[b,h,w].[1,2,3,4].vx.m vd, vs1, xs2
 
 **Operation**
 
