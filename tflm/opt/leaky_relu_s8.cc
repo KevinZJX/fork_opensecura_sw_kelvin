@@ -22,19 +22,24 @@
 
 namespace kelvin::opt {
 
-void LeakyReluS8(const int8_t* input, int8_t* output, const int32_t block_size,
-                 const int32_t input_zero_point,
-                 const int32_t output_zero_point,
-                 const int32_t output_multiplier_alpha,
-                 const int32_t output_shift_alpha,
-                 const int32_t output_multiplier_identity,
-                 const int32_t output_shift_identity) {
+void LeakyReluS8(const tflite::LeakyReluParams& params,
+                 const tflite::RuntimeShape& input_shape, const int8_t* input,
+                 const tflite::RuntimeShape& output_shape, int8_t* output) {
+  const int32_t input_zero_point = params.input_offset;
+  const int32_t output_zero_point = params.output_offset;
+  const int32_t output_multiplier_alpha = params.output_multiplier_alpha;
+  const int32_t output_shift_alpha = params.output_shift_alpha;
+  const int32_t output_multiplier_identity = params.output_multiplier_identity;
+  const int32_t output_shift_identity = params.output_shift_identity;
+  const int block_size = MatchingFlatSize(input_shape, output_shape);
+
   constexpr int32_t quantized_output_min = std::numeric_limits<int16_t>::min();
   constexpr int32_t quantized_output_max = std::numeric_limits<int16_t>::max();
   int32_t right_shift_identity = std::min(output_shift_identity, 0L);
   int32_t left_shift_identity = std::max(output_shift_identity, 0L);
   int32_t right_shift_alpha = std::min(output_shift_alpha, 0L);
   int32_t left_shift_alpha = std::max(output_shift_alpha, 0L);
+
   int blocks = block_size;
   int vl;
   getmaxvl_b(vl);

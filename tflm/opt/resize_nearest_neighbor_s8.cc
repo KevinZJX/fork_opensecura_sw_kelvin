@@ -21,12 +21,12 @@ limitations under the License.
 #include "tensorflow/lite/kernels/internal/types.h"
 #include "tflm/opt/opt.h"
 
-inline int32_t KelvinGetNearestNeighbor(const int input_value,
-                                        const int32_t input_size,
-                                        const int32_t output_size,
-                                        const bool align_corners,
-                                        const bool half_pixel_centers,
-                                        const float scale, const float offset) {
+namespace kelvin::opt {
+namespace {
+int32_t GetNearestNeighbor(const int input_value, const int32_t input_size,
+                           const int32_t output_size, const bool align_corners,
+                           const bool half_pixel_centers, const float scale,
+                           const float offset) {
   int32_t output_value = std::min(
       align_corners
           ? static_cast<int32_t>(
@@ -39,14 +39,12 @@ inline int32_t KelvinGetNearestNeighbor(const int input_value,
   return output_value;
 }
 
-namespace kelvin::opt {
-
-void KelvinResizeNN2x(const tflite::ResizeNearestNeighborParams& op_params,
-                      const tflite::RuntimeShape& input_shape,
-                      const tflite::RuntimeShape& output_shape,
-                      const int32_t input_height, const int32_t input_width,
-                      const int32_t output_height, const int32_t output_width,
-                      const int8_t* input_data, int8_t* output_data) {
+void ResizeNN2x(const tflite::ResizeNearestNeighborParams& op_params,
+                const tflite::RuntimeShape& input_shape,
+                const tflite::RuntimeShape& output_shape,
+                const int32_t input_height, const int32_t input_width,
+                const int32_t output_height, const int32_t output_width,
+                const int8_t* input_data, int8_t* output_data) {
   int32_t batches = MatchingDim(input_shape, 0, output_shape, 0);
   int32_t depth = MatchingDim(input_shape, 3, output_shape, 3);
   const int col_offset = input_shape.Dims(3);
@@ -54,7 +52,6 @@ void KelvinResizeNN2x(const tflite::ResizeNearestNeighborParams& op_params,
   const int batch_offset = input_shape.Dims(1) * row_offset;
 
   const int8_t* input_ptr = input_data;
-  const int8_t* input_tmp_ptr = input_data;
   int8_t* output_ptr = output_data;
 
   for (int b = 0; b < batches; ++b) {
@@ -83,14 +80,12 @@ void KelvinResizeNN2x(const tflite::ResizeNearestNeighborParams& op_params,
   }
 }
 
-void KelvinResizeNNGeneric(const tflite::ResizeNearestNeighborParams& op_params,
-                           const tflite::RuntimeShape& input_shape,
-                           const tflite::RuntimeShape& output_shape,
-                           const int32_t input_height,
-                           const int32_t input_width,
-                           const int32_t output_height,
-                           const int32_t output_width, const int8_t* input_data,
-                           int8_t* output_data) {
+void ResizeNNGeneric(const tflite::ResizeNearestNeighborParams& op_params,
+                     const tflite::RuntimeShape& input_shape,
+                     const tflite::RuntimeShape& output_shape,
+                     const int32_t input_height, const int32_t input_width,
+                     const int32_t output_height, const int32_t output_width,
+                     const int8_t* input_data, int8_t* output_data) {
   int32_t batches = MatchingDim(input_shape, 0, output_shape, 0);
   int32_t depth = MatchingDim(input_shape, 3, output_shape, 3);
   const int col_offset = input_shape.Dims(3);
@@ -113,12 +108,12 @@ void KelvinResizeNNGeneric(const tflite::ResizeNearestNeighborParams& op_params,
 
   for (int b = 0; b < batches; ++b) {
     for (int y = 0; y < output_height; ++y) {
-      int32_t in_y = KelvinGetNearestNeighbor(
+      int32_t in_y = GetNearestNeighbor(
           y, input_height, output_height, op_params.align_corners,
           op_params.half_pixel_centers, y_scale, offset);
       const int8_t* y_input_ptr = input_ptr + in_y * row_offset;
       for (int x = 0; x < output_width; ++x) {
-        int32_t in_x = KelvinGetNearestNeighbor(
+        int32_t in_x = GetNearestNeighbor(
             x, input_width, output_width, op_params.align_corners,
             op_params.half_pixel_centers, x_scale, offset);
         const int8_t* x_input_ptr = y_input_ptr + in_x * col_offset;
@@ -130,8 +125,9 @@ void KelvinResizeNNGeneric(const tflite::ResizeNearestNeighborParams& op_params,
     input_ptr += batch_offset;
   }
 }
+}  // namespace
 
-void KelvinResizeNearestNeighbor(
+void ResizeNearestNeighborS8(
     const tflite::ResizeNearestNeighborParams& op_params,
     const tflite::RuntimeShape& unextended_input_shape,
     const int8_t* input_data, const tflite::RuntimeShape& output_size_shape,
@@ -153,14 +149,13 @@ void KelvinResizeNearestNeighbor(
   int32_t output_width = output_size_data[1];
 
   if (output_height == 2 * input_height && output_width == 2 * input_width) {
-    KelvinResizeNN2x(op_params, input_shape, output_shape, input_height,
-                     input_width, output_height, output_width, input_data,
-                     output_data);
+    ResizeNN2x(op_params, input_shape, output_shape, input_height, input_width,
+               output_height, output_width, input_data, output_data);
 
   } else {
-    KelvinResizeNNGeneric(op_params, input_shape, output_shape, input_height,
-                          input_width, output_height, output_width, input_data,
-                          output_data);
+    ResizeNNGeneric(op_params, input_shape, output_shape, input_height,
+                    input_width, output_height, output_width, input_data,
+                    output_data);
   }
 }
 

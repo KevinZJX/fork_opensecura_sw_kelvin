@@ -25,44 +25,36 @@
 
 namespace kelvin::opt {
 void* Memcpy(void* dst, const void* src, size_t n);
-void ElementwiseAddS8(const int8_t* input1, const int8_t* input2,
-                      const int32_t input1_offset, const int32_t input1_mult,
-                      const int32_t input1_shift, const int32_t input2_offset,
-                      const int32_t input2_mult, const int32_t input2_shift,
-                      const int32_t left_shift, int8_t* output,
-                      const int32_t output_offset, const int32_t output_mult,
-                      const int32_t output_shift,
-                      const int32_t output_activation_min,
-                      const int32_t output_activation_max,
-                      const int32_t block_size);
-void ElementwiseAddS16(const int16_t* input1, const int16_t* input2,
-                       const int32_t input1_offset, const int32_t input1_mult,
-                       const int32_t input1_shift, const int32_t input2_offset,
-                       const int32_t input2_mult, const int32_t input2_shift,
-                       const int32_t left_shift, int16_t* output,
-                       const int32_t output_offset, const int32_t output_mult,
-                       const int32_t output_shift,
-                       const int32_t output_activation_min,
-                       const int32_t output_activation_max,
-                       const int32_t block_size);
-void ElementwiseAddS32(const int32_t* input1, const int32_t* input2,
-                       int32_t* output, const int32_t output_activation_min,
-                       const int32_t output_activation_max,
-                       const int32_t block_size);
-void LeakyReluS8(const int8_t* input, int8_t* output, const int32_t block_size,
-                 const int32_t input_zero_point,
-                 const int32_t output_zero_point,
-                 const int32_t output_multiplier_alpha,
-                 const int32_t output_shift_alpha,
-                 const int32_t output_multiplier_identity,
-                 const int32_t output_shift_identity);
-void LeakyReluS16(const int16_t* input, int16_t* output,
-                  const int32_t block_size, const int32_t input_zero_point,
-                  const int32_t output_zero_point,
-                  const int32_t output_multiplier_alpha,
-                  const int32_t output_shift_alpha,
-                  const int32_t output_multiplier_identity,
-                  const int32_t output_shift_identity);
+void ElementwiseAddS8(const tflite::ArithmeticParams& params,
+                      const tflite::RuntimeShape& input1_shape,
+                      const int8_t* input1_data,
+                      const tflite::RuntimeShape& input2_shape,
+                      const int8_t* input2_data,
+                      const tflite::RuntimeShape& output_shape,
+                      int8_t* output_data);
+void ElementwiseAddS16(const tflite::ArithmeticParams& params,
+                       const tflite::RuntimeShape& input1_shape,
+                       const int16_t* input1_data,
+                       const tflite::RuntimeShape& input2_shape,
+                       const int16_t* input2_data,
+                       const tflite::RuntimeShape& output_shape,
+                       int16_t* output_data);
+void ElementwiseAddS32(const tflite::ArithmeticParams& params,
+                       const tflite::RuntimeShape& input1_shape,
+                       const int32_t* input1_data,
+                       const tflite::RuntimeShape& input2_shape,
+                       const int32_t* input2_data,
+                       const tflite::RuntimeShape& output_shape,
+                       int32_t* output_data);
+void LeakyReluS8(const tflite::LeakyReluParams& params,
+                 const tflite::RuntimeShape& input_shape,
+                 const int8_t* input_data,
+                 const tflite::RuntimeShape& output_shape, int8_t* output_data);
+void LeakyReluS16(const tflite::LeakyReluParams& params,
+                  const tflite::RuntimeShape& input_shape,
+                  const int16_t* input_data,
+                  const tflite::RuntimeShape& output_shape,
+                  int16_t* output_data);
 void ConvS16B32(const tflite::ConvParams& params,
                 const int32_t* output_multiplier, const int32_t* output_shift,
                 const tflite::RuntimeShape& input_shape,
@@ -109,26 +101,12 @@ void LogisticS8(int32_t input_zero_point, int32_t input_range_radius,
                 int32_t input_multiplier, int32_t input_left_shift,
                 int32_t input_size, const int8_t* input_data,
                 int8_t* output_data);
-void KelvinResizeNearestNeighbor(
+void ResizeNearestNeighborS8(
     const tflite::ResizeNearestNeighborParams& op_params,
     const tflite::RuntimeShape& unextended_input_shape,
     const int8_t* input_data, const tflite::RuntimeShape& output_size_shape,
     const int32_t* output_size_data,
     const tflite::RuntimeShape& unextended_output_shape, int8_t* output_data);
-void KelvinResizeNN2x(const tflite::ResizeNearestNeighborParams& op_params,
-                      const tflite::RuntimeShape& input_shape,
-                      const tflite::RuntimeShape& output_shape,
-                      const int32_t input_height, const int32_t input_width,
-                      const int32_t output_height, const int32_t output_width,
-                      const int8_t* input_data, int8_t* output_data);
-void KelvinResizeNNGeneric(const tflite::ResizeNearestNeighborParams& op_params,
-                           const tflite::RuntimeShape& input_shape,
-                           const tflite::RuntimeShape& output_shape,
-                           const int32_t input_height,
-                           const int32_t input_width,
-                           const int32_t output_height,
-                           const int32_t output_width, const int8_t* input_data,
-                           int8_t* output_data);
 
 }  // namespace kelvin::opt
 
