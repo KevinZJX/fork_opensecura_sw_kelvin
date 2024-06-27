@@ -20,16 +20,28 @@
 
 namespace kelvin::opt {
 
-void ElementwiseAddS8(const int8_t* input1, const int8_t* input2,
-                      const int32_t input1_offset, const int32_t input1_mult,
-                      const int32_t input1_shift, const int32_t input2_offset,
-                      const int32_t input2_mult, const int32_t input2_shift,
-                      const int32_t left_shift, int8_t* output,
-                      const int32_t output_offset, const int32_t output_mult,
-                      const int32_t output_shift,
-                      const int32_t output_activation_min,
-                      const int32_t output_activation_max,
-                      const int32_t block_size) {
+void ElementwiseAddS8(const tflite::ArithmeticParams& params,
+                      const tflite::RuntimeShape& input1_shape,
+                      const int8_t* input1,
+                      const tflite::RuntimeShape& input2_shape,
+                      const int8_t* input2,
+                      const tflite::RuntimeShape& output_shape,
+                      int8_t* output) {
+  const int32_t input1_offset = params.input1_offset;
+  const int32_t input1_mult = params.input1_multiplier;
+  const int32_t input1_shift = params.input1_shift;
+  const int32_t input2_offset = params.input2_offset;
+  const int32_t input2_mult = params.input2_multiplier;
+  const int32_t input2_shift = params.input2_shift;
+  const int32_t left_shift = params.left_shift;
+  const int32_t output_offset = params.output_offset;
+  const int32_t output_mult = params.output_multiplier;
+  const int32_t output_shift = params.output_shift;
+  const int32_t output_activation_min = params.quantized_activation_min;
+  const int32_t output_activation_max = params.quantized_activation_max;
+  const int block_size =
+      MatchingElementsSize(input1_shape, input2_shape, output_shape);
+
   int blocks = block_size;
 
   const int32_t input1_shift_mul = 1 << LEFT_SHIFT(input1_shift);

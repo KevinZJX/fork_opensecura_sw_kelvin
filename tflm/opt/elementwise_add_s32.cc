@@ -18,10 +18,18 @@
 #include "tflm/opt/opt.h"
 
 namespace kelvin::opt {
-void ElementwiseAddS32(const int32_t* input1, const int32_t* input2,
-                       int32_t* output, const int32_t output_activation_min,
-                       const int32_t output_activation_max,
-                       const int32_t block_size) {
+void ElementwiseAddS32(const tflite::ArithmeticParams& params,
+                       const tflite::RuntimeShape& input1_shape,
+                       const int32_t* input1,
+                       const tflite::RuntimeShape& input2_shape,
+                       const int32_t* input2,
+                       const tflite::RuntimeShape& output_shape,
+                       int32_t* output) {
+  const int32_t output_activation_min = params.quantized_activation_min;
+  const int32_t output_activation_max = params.quantized_activation_max;
+  const int block_size =
+      MatchingElementsSize(input1_shape, input2_shape, output_shape);
+
   int blocks = block_size;
   int vl;
   getmaxvl_w_m(vl);
