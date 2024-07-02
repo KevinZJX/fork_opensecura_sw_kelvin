@@ -25,6 +25,7 @@ namespace {
 
 // Reorders a vector to match the pattern after double-widening.
 // N must be a multiple of 4.
+// Working only for mutliples of 32
 void VectorSwizzle(const int32_t* input, int32_t* output, int N) {
   assert(N >= 4 && N % 4 == 0);
   const int32_t(&in)[N] = *(int32_t(*)[N])input;
@@ -2673,6 +2674,118 @@ void DepthwiseConvS8D32(
   }
 }
 
+void DepthwiseConvS8D16(
+    const tflite::DepthwiseParams& params, const int32_t* output_multiplier,
+    const int32_t* output_shift, const tflite::RuntimeShape& input_shape,
+    const int8_t* input_data, const tflite::RuntimeShape& filter_shape,
+    const int8_t* filter_data, const tflite::RuntimeShape& bias_shape,
+    const int32_t* bias_data, const tflite::RuntimeShape& output_shape,
+    int8_t* output_data
+
+) {
+  const int stride_width = params.stride_width;
+  const int stride_height = params.stride_height;
+  const int pad_width = params.padding_values.width;
+  const int pad_height = params.padding_values.height;
+  const int32_t input_offset = params.input_offset;
+  const int32_t output_offset = params.output_offset;
+  const int32_t output_activation_min = params.quantized_activation_min;
+  const int32_t output_activation_max = params.quantized_activation_max;
+  const int batches = MatchingDim(input_shape, 0, output_shape, 0);
+  const int input_height = input_shape.Dims(1);
+  const int input_width = input_shape.Dims(2);
+  const int input_depth = input_shape.Dims(3);
+  const int filter_height = filter_shape.Dims(1);
+  const int filter_width = filter_shape.Dims(2);
+  const int output_height = output_shape.Dims(1);
+  const int output_width = output_shape.Dims(2);
+  const int output_depth = output_shape.Dims(3);
+  for (int in_channel = 0; in_channel + 16 <= input_depth; in_channel += 16) {
+    const int output_channel = in_channel;
+
+    vld_w_x(v24, output_multiplier);
+    vld_w_x(v25, output_multiplier + 8);
+    vld_w_x(v28, output_shift);
+    vld_w_x(v29, output_shift + 8);
+    vrsub_w_vx(v28, v28, 0);
+    vrsub_w_vx(v29, v29, 0);
+
+    for (int batch = 0; batch < batches; ++batch) {
+      const int8_t* p_output =
+          output_data + (batch * output_width * output_height * output_depth) +
+          output_channel;
+      for (int out_y = 0; out_y < output_height; ++out_y) {
+        for (int out_x = 0; out_x < output_width; ++out_x) {
+          const int in_x_origin = (out_x * stride_width) - pad_width;
+          const int in_y_origin = (out_y * stride_height) - pad_height;
+          const int y_offset = (output_depth * output_width * out_y);
+
+          if (bias_data) {
+            vld_w_x(v48, bias_data);
+            vld_w_x(v49, bias_data + 8);
+          } else {
+            vdup_w_x(v48, 0);
+            vdup_w_x(v49, 0);
+          }
+
+          for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
+            const int in_y = in_y_origin + filter_y;
+            if ((in_y < 0) || (in_y >= input_height)) {
+              continue;
+            }
+            for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
+              const int in_x = in_x_origin + filter_x;
+              if ((in_x < 0) || (in_x >= input_width)) {
+                continue;
+              }
+
+              const int8_t* in_p =
+                  input_data +
+                  (batch * input_height * input_width * input_depth) +
+                  (in_y * input_width * input_depth) + (in_x * input_depth) +
+                  in_channel;
+
+              const int8_t* fl_p = filter_data +
+                                   (filter_y * filter_width * input_depth) +
+                                   (filter_x * input_depth) + in_channel;
+
+              vld_b_l_xx(v0, in_p, 16);
+              vld_b_l_xx(v4, fl_p, 16);
+
+              vaddw_h_vx(v0, v0, 0);
+              vadd_h_vx(v0, v0, static_cast<int16_t>(input_offset));
+              vadd_h_vx(v1, v1, static_cast<int16_t>(input_offset));
+              vzip_h_vv(v0, v0, v1);
+
+              vaddw_h_vx(v4, v4, static_cast<int16_t>(0));
+              vzip_h_vv(v4, v4, v5);
+              vmulw_w_vv(v8, v0, v4);
+
+              vadd_w_vv(v48, v48, v8);
+              vadd_w_vv(v49, v49, v9);
+            }
+          }
+
+          vdmulh_w_rn_vv(v48, v48, v24);
+          vdmulh_w_rn_vv(v49, v49, v25);
+          vsha_w_r_vv(v48, v48, v28);
+          vsha_w_r_vv(v49, v49, v29);
+
+          vadd_w_vx(v48, v48, output_offset);
+          vadd_w_vx(v49, v49, output_offset);
+          vmax_w_vx(v48, v48, output_activation_min);
+          vmax_w_vx(v49, v49, output_activation_min);
+          vmin_w_vx(v48, v48, output_activation_max);
+          vmin_w_vx(v49, v49, output_activation_max);
+          vsraqs_b_vx_m(v48, v48, 0);
+          vsraqs_b_vx(v49, v49, 0);
+          vst_b_l_xx(v48, p_output + (out_x * output_depth) + y_offset, 16);
+        }
+      }
+    }
+  }
+}
+
 // generic implementation based on Kelvin ops
 void DepthwiseConvS8Generic(
     const tflite::DepthwiseParams& params, const int32_t* output_multiplier,
@@ -2746,8 +2859,9 @@ void DepthwiseConvS8(
         RUN_KERNEL(DepthwiseConvS83x3D32);
       }
       RUN_KERNEL(DepthwiseConvS8D32);
+    } else if (output_depth % 16 == 0) {
+      RUN_KERNEL(DepthwiseConvS8D16);
     }
-
     RUN_KERNEL(DepthwiseConvS8Generic);
   }
 
