@@ -2614,11 +2614,14 @@ void DepthwiseConvS8D32(
 
   for (int in_channel = 0; in_channel + 32 <= input_depth; in_channel += 32) {
     const int output_channel = in_channel;
-    VectorSwizzle(bias_data + output_channel, swizzled_bias_data, 32);
+
+    if (bias_data) {
+      VectorSwizzle(bias_data + output_channel, swizzled_bias_data, 32);
+    }
+
     VectorSwizzle(output_multiplier + output_channel, swizzled_output_multi, 32);
     VectorSwizzle(output_shift + output_channel, swizzled_shift_multi, 32);
 
-    vld_w_x_m(v20, swizzled_bias_data);
     vld_w_x_m(v24, swizzled_output_multi);
     vld_w_x_m(v28, swizzled_shift_multi);
     vrsub_w_vx_m(v28, v28, 0);
@@ -2629,7 +2632,12 @@ void DepthwiseConvS8D32(
           const int in_x_origin = (out_x * stride_width) - pad_width;
           const int in_y_origin = (out_y * stride_height) - pad_height;
 
-          vdup_w_x_m(v48, 0);
+          if (bias_data) {
+            vld_w_x_m(v48, swizzled_bias_data);
+          } else {
+            vdup_w_x_m(v48, 0);
+          }
+
           for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
             const int in_y = in_y_origin + filter_y;
             if ((in_y < 0) || (in_y >= input_height)) {
@@ -2640,12 +2648,18 @@ void DepthwiseConvS8D32(
               if ((in_x < 0) || (in_x >= input_width)) {
                 continue;
               }
+              const int8_t* in_p =
+                  input_data +
+                  (batch * input_height * input_width * input_depth) +
+                  (in_y * input_width * input_depth) + (in_x * input_depth) +
+                  in_channel;
 
-              vld_b_x(v0, &input_data[tflite::Offset(input_shape, batch, in_y,
-                                                     in_x, in_channel)]);  // xp
-              vld_b_x(v4, &filter_data[tflite::Offset(filter_shape, 0, filter_y,
-                                                      filter_x, in_channel)]);
+              const int8_t* fl_p = filter_data +
+                                   (filter_y * filter_width * input_depth) +
+                                   (filter_x * input_depth) + in_channel;
 
+              vld_b_x(v0, in_p);
+              vld_b_x(v4, fl_p);
               vaddw_h_vx(v0, v0, 0);
               vadd_h_vx(v0, v0, static_cast<int16_t>(input_offset));
               vadd_h_vx(v1, v1,
@@ -2659,12 +2673,10 @@ void DepthwiseConvS8D32(
             }
           }
 
-          vadd_w_vv_m(v48, v48, v20);  // add bias
-          vdmulh_w_rn_vv_m(v48, v48, v24);
-          vsha_w_r_vv_m(v48, v48, v28);
-          vadd_w_vx_m(v48, v48, output_offset);
-          vmax_w_vx_m(v48, v48, output_activation_min);
-          vmin_w_vx_m(v48, v48, output_activation_max);
+          INT32_TO_INT8_OUTPUT_PIPELINE_INPLACE(
+              v48, v24, v28, output_activation_min, output_activation_max,
+              output_offset);
+
           vsraqs_b_vx(v48, v48, 0);
           vst_b_x(v48, &output_data[tflite::Offset(output_shape, batch, out_y,
                                                    out_x, output_channel)]);
