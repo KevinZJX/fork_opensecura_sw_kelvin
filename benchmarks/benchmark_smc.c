@@ -23,6 +23,7 @@
 #include "sw/device/lib/dif/dif_ml_top.h"
 #include "sw/device/lib/dif/dif_rv_plic.h"
 #include "sw/device/lib/dif/dif_rv_timer.h"
+#include "sw/device/lib/dif/dif_tlul_mailbox.h"
 #include "sw/device/lib/runtime/hart.h"
 #include "sw/device/lib/runtime/irq.h"
 #include "sw/device/lib/runtime/log.h"
@@ -41,6 +42,7 @@ static dif_rv_plic_t plic_smc;
 static dif_rv_timer_t rv_timer;
 static dif_uart_t smc_uart;
 static dif_ml_top_t ml_top;
+static dif_tlul_mailbox_t tlul_mailbox;
 
 volatile bool ml_top_finish_done = false;
 
@@ -113,9 +115,18 @@ void _ottf_main(void) {
   irq_global_ctrl(true);
   irq_external_ctrl(true);
 
+  // Configure Mailbox.
+  CHECK_DIF_OK(dif_tlul_mailbox_init(
+      mmio_region_from_addr(TOP_MATCHA_TLUL_MAILBOX_SMC_BASE_ADDR),
+      &tlul_mailbox));
+  {
+    uint32_t msg = 1;
+    CHECK_DIF_OK(dif_tlul_mailbox_send_message(&tlul_mailbox, &msg));
+  }
+
   LOG_INFO("========== Begin Benchmark (%s) ==========", STR(BENCHMARK_NAME));
 
-  // start kelvin
+  // start kelvin and pulse GPIO for data logger (Kibble)
   ml_top_finish_done = false;
   uint64_t timer_start;
   CHECK_DIF_OK(dif_rv_timer_counter_read(&rv_timer, 0, &timer_start));
@@ -142,6 +153,13 @@ void _ottf_main(void) {
   uint64_t average_cycles = udiv64_slow(cycles, iterations, NULL);
   uint64_t wall_time_us = timer_finish - timer_start;
   uint64_t average_wall_time_us = udiv64_slow(wall_time_us, iterations, NULL);
+
+  // End Test Pulse
+  {
+    uint32_t msg = 0;
+    CHECK_DIF_OK(dif_tlul_mailbox_send_message(&tlul_mailbox, &msg));
+  }
+
   LOG_INFO("Iterations: %d", iterations);
   _print64("Total Cycles", cycles);
   _print64("Average Cycles per Iteration", average_cycles);
