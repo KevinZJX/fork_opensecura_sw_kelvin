@@ -68,6 +68,7 @@ __attribute__((
     .iterations = 0,
     .cycles = 0,
     .mismatch_count = 0,
+    .gpio_toggle_per_inference = 0,
 };
 
 // This includes all ops currently used in the Kelvin model suite. More can be
@@ -167,6 +168,8 @@ int main(int argc, char** argv) {
 
   // TODO(michaelbrooks): Possibly set/verify test data?
   for (int i = 0; i < iterations; ++i) {
+    output_header.gpio_toggle_per_inference =
+        !output_header.gpio_toggle_per_inference;
 #if (TEST_DATA_INPUT == 1)
     memcpy(tflite::GetTensorData<uint8_t>(input), g_benchmark_input,
            input->bytes);

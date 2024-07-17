@@ -119,12 +119,18 @@ void _ottf_main(void) {
   CHECK_DIF_OK(dif_tlul_mailbox_init(
       mmio_region_from_addr(TOP_MATCHA_TLUL_MAILBOX_SMC_BASE_ADDR),
       &tlul_mailbox));
-  {
-    uint32_t msg = 1;
-    CHECK_DIF_OK(dif_tlul_mailbox_send_message(&tlul_mailbox, &msg));
-  }
+
+  BenchmarkOutputHeader* output_header_ptr =
+      (BenchmarkOutputHeader*)((TOP_MATCHA_ML_TOP_DMEM_BASE_ADDR +
+                                TOP_MATCHA_RAM_ML_DMEM_SIZE_BYTES) -
+                               0x40);
 
   LOG_INFO("========== Begin Benchmark (%s) ==========", STR(BENCHMARK_NAME));
+  {
+    uint32_t value = 1;
+    uint32_t tx = ML_RUN_INDICATOR_IO << 16 | value;
+    CHECK_DIF_OK(dif_tlul_mailbox_send_message(&tlul_mailbox, &tx));
+  }
 
   // start kelvin and pulse GPIO for data logger (Kibble)
   ml_top_finish_done = false;
@@ -133,16 +139,20 @@ void _ottf_main(void) {
   CHECK_DIF_OK(dif_ml_top_release_ctrl_en(&ml_top));
 
   // wfi
+  uint32_t gpio_toggle_per_inference_prev = 0;
+  uint32_t tx;
   while (!ml_top_finish_done) {
-    wait_for_interrupt();
+    uint32_t gpio_toggle_per_inference =
+        output_header_ptr->gpio_toggle_per_inference;
+    if (gpio_toggle_per_inference != gpio_toggle_per_inference_prev) {
+      tx = ML_TOGGLE_PER_INF_IO << 16 | gpio_toggle_per_inference;
+      gpio_toggle_per_inference_prev = gpio_toggle_per_inference;
+      CHECK_DIF_OK(dif_tlul_mailbox_send_message(&tlul_mailbox, &tx));
+    }
+    // wait_for_interrupt();
   }
   uint64_t timer_finish;
   CHECK_DIF_OK(dif_rv_timer_counter_read(&rv_timer, 0, &timer_finish));
-
-  BenchmarkOutputHeader* output_header_ptr =
-      (BenchmarkOutputHeader*)((TOP_MATCHA_ML_TOP_DMEM_BASE_ADDR +
-                                TOP_MATCHA_RAM_ML_DMEM_SIZE_BYTES) -
-                              0x40);
 
   if (output_header_ptr->return_code) {
     LOG_FATAL("Kelvin returned an error: %d", output_header_ptr->return_code);
@@ -156,8 +166,9 @@ void _ottf_main(void) {
 
   // End Test Pulse
   {
-    uint32_t msg = 0;
-    CHECK_DIF_OK(dif_tlul_mailbox_send_message(&tlul_mailbox, &msg));
+    uint32_t value = 0;
+    uint32_t tx = ML_RUN_INDICATOR_IO << 16 | value;
+    CHECK_DIF_OK(dif_tlul_mailbox_send_message(&tlul_mailbox, &tx));
   }
 
   LOG_INFO("Iterations: %d", iterations);

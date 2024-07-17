@@ -28,11 +28,12 @@
 #include "sw/device/lib/testing/test_framework/check.h"
 #include "sw/device/lib/testing/test_framework/ottf_test_config.h"
 #include "sw/device/lib/testing/test_framework/test_util.h"
+/* clang-format off */
+#include "benchmarks/benchmark.h"
+/* clang-format on */
 
 #define STRINGIZE(x) #x
 #define STR(x) STRINGIZE(x)
-
-#define TRIGGER_GPIO 16
 
 // In order to include the model data generate from Bazel, include the header
 // using the name passed as a macro. For some reason this binary (vs Kelvin)
@@ -65,7 +66,9 @@ void ottf_external_isr(void) {
       CHECK_DIF_OK(dif_tlul_mailbox_irq_acknowledge(&tlul_mailbox,
                                                     kDifTlulMailboxIrqRtirq));
       CHECK_DIF_OK(dif_tlul_mailbox_read_message(&tlul_mailbox, &rx));
-      CHECK_DIF_OK(dif_gpio_write(&gpio, TRIGGER_GPIO, rx));
+      uint32_t pin = rx >> 16;
+      uint32_t value = rx & 0xFFFF;
+      CHECK_DIF_OK(dif_gpio_write(&gpio, pin, value));
       break;
     }
     default:
@@ -88,18 +91,27 @@ void _ottf_main(void) {
   CHECK_DIF_OK(dif_smc_ctrl_init(
       mmio_region_from_addr(TOP_MATCHA_SMC_CTRL_BASE_ADDR), &smc_ctrl));
 
-// PinMux: J52.5 for Sparrow (IOR7) :: PMOD3.7 on Nexus (IOD4)
+// PinMux: Total inference GPIO J52.5/CS  Sparrow (IOR7) :: PMOD3.7 on Nexus
+// (IOD4)
+//           Per inference GPIO J52.7/SCK Sparrow (IOR7) :: PMOD3.8 on Nexus
+//           (IOD5)
 #if defined(MATCHA_SPARROW)
   CHECK_DIF_OK(dif_pinmux_output_select(&pinmux, kTopMatchaPinmuxMioOutIor7,
                                         kTopMatchaPinmuxOutselGpioGpio16));
+  CHECK_DIF_OK(dif_pinmux_output_select(&pinmux, kTopMatchaPinmuxMioOutIoa1,
+                                        kTopMatchaPinmuxOutselGpioGpio17));
 #else
   CHECK_DIF_OK(dif_pinmux_output_select(&pinmux, kTopMatchaPinmuxMioOutIod4,
                                         kTopMatchaPinmuxOutselGpioGpio16));
+  CHECK_DIF_OK(dif_pinmux_output_select(&pinmux, kTopMatchaPinmuxMioOutIod5,
+                                        kTopMatchaPinmuxOutselGpioGpio17));
 #endif
   CHECK_DIF_OK(
       dif_gpio_init(mmio_region_from_addr(TOP_MATCHA_GPIO_BASE_ADDR), &gpio));
-  CHECK_DIF_OK(
-      dif_gpio_output_set_enabled(&gpio, TRIGGER_GPIO, kDifToggleEnabled));
+  CHECK_DIF_OK(dif_gpio_output_set_enabled(&gpio, ML_RUN_INDICATOR_IO,
+                                           kDifToggleEnabled));
+  CHECK_DIF_OK(dif_gpio_output_set_enabled(&gpio, ML_TOGGLE_PER_INF_IO,
+                                           kDifToggleEnabled));
 
   LOG_INFO("Loading Kelvin binary");
   spi_flash_init();

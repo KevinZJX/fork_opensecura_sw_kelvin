@@ -17,11 +17,15 @@
 #ifndef BENCHMARKS_BENCHMARK_H_
 #define BENCHMARKS_BENCHMARK_H_
 
+#define ML_RUN_INDICATOR_IO 16
+#define ML_TOGGLE_PER_INF_IO 17
+
 typedef struct {
   uint32_t return_code;
   uint32_t iterations;
   uint64_t cycles;
   uint32_t mismatch_count;
+  uint32_t gpio_toggle_per_inference;
 } BenchmarkOutputHeader;
 
-#endif // #ifndef BENCHMARKS_BENCHMARK_H_
+#endif  // BENCHMARKS_BENCHMARK_H_
