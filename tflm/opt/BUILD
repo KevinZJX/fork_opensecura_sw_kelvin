@@ -21,6 +21,7 @@ cc_library(
         "conv_s16_b64.cc",
         "conv_s8.cc",
         "conv_s8_1x1.cc",
+        "conv_s8_I3xD8.cc",
         "conv_s8_3x1_d48.cc",
         "conv_s8_d1.cc",
         "conv_s8_d32.cc",

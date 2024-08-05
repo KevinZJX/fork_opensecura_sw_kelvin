@@ -202,6 +202,13 @@ void ConvS8(const tflite::ConvParams& params, const int32_t* output_multiplier,
   return; \
 }
 
+  if (dilation_width_factor == 1 && dilation_height_factor == 1 &&
+      stride_width == 2 && stride_height == 2 && filter_depth == 3 &&
+      input_depth == 3 && output_depth % 8 == 0 && output_width % 4 == 0 &&
+      output_height % 2 == 0 && pad_height == 0 && pad_width == 0) {
+    RUN_KERNEL(kelvin::opt::ConvS8I3xD8);
+  }
+
   // special case of filter size 1x1
   if (filter_height == 1 && filter_width == 1 && stride_height == 1 &&
       stride_width == 1 && dilation_height_factor == 1 &&
