@@ -57,8 +57,13 @@ _start:
         mv   t6, zero
 
         ###############################################
-        # Zero out all kelvin registers               #
+        # Check for the X extension, and if present,  #
+        # zero out all kelvin registers               #
         ###############################################
+        csrr a0, misa
+        srli a0, a0, 23
+        andi a0, a0, 1
+        beqz a0, vector_zero_end
         vdup.w.x.m v0, zero
         vdup.w.x.m v4, zero
         vdup.w.x.m v8, zero
@@ -77,6 +82,7 @@ _start:
         vdup.w.x.m v60, zero
         acset.v v48, v0
         adwinit.v v48, v0
+vector_zero_end:
 
         # Zero out the bss section
         la   a0, __bss_start__
