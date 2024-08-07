@@ -44,6 +44,12 @@ def kelvin_sw_repos():
         sha256 = "1c7eb58edd7399b3ad2f9624a2003862cd87a6904237a737f39cd3978bab46a8",
         urls = ["https://github.com/riscv-software-src/riscv-tests/archive/d4eaa5bd6674b51d3b9b24913713c4638e99cdd9.tar.gz"],
         strip_prefix = "riscv-tests-d4eaa5bd6674b51d3b9b24913713c4638e99cdd9",
+        patch_args = [
+            "-p1",
+        ],
+        patches = [
+            "//tests/riscv-tests:0001-mcsr.patch",
+        ],
     )
 
 def tflm_repos():

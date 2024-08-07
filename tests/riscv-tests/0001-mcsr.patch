@@ -1,0 +1,17 @@
+diff --git a/isa/rv64mi/mcsr.S b/isa/rv64mi/mcsr.S
+index 03cf29a..729889f 100644
+--- a/isa/rv64mi/mcsr.S
++++ b/isa/rv64mi/mcsr.S
+@@ -21,7 +21,11 @@ RVTEST_CODE_BEGIN
+ #endif
+ 
+   # Check that mhartid reports 0
+-  TEST_CASE(3, a0, 0x0, csrr a0, mhartid)
++  # TEST_CASE(3, a0, 0x0, csrr a0, mhartid)
++  # For Kelvin, just check that the CSR doosen't cause an exception.
++  # Depending on how the core is instantiated, this may have
++  # differing values.
++  csrr a0, mhartid
+ 
+   # Check that reading the following CSRs doesn't cause an exception
+   csrr a0, mimpid
