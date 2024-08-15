@@ -21,6 +21,8 @@ load("//platforms:registration.bzl", "kelvin_register_toolchain")
 kelvin_register_toolchain()
 
 tflm_repos()
+load("@rules_python//python:repositories.bzl", "py_repositories")
+py_repositories()
 
 load("@tflite-micro//tensorflow:workspace.bzl", "tf_repositories")
 tf_repositories()
