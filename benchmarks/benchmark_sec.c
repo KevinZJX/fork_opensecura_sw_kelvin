@@ -114,7 +114,10 @@ void _ottf_main(void) {
                                            kDifToggleEnabled));
 
   LOG_INFO("Loading Kelvin binary");
-  spi_flash_init();
+  const uintptr_t spi_host_addr = TOP_MATCHA_SPI_HOST0_BASE_ADDR;
+  const uintptr_t flash_ctrl_addr = TOP_MATCHA_FLASH_CTRL_CORE_BASE_ADDR;
+  const uintptr_t otp_addr = TOP_MATCHA_OTP_CTRL_CORE_BASE_ADDR;
+  spi_flash_init(spi_host_addr, flash_ctrl_addr, otp_addr);
   CHECK_DIF_OK(load_file_from_tar(
       "kelvin.bin", (void*)TOP_MATCHA_ML_TOP_DMEM_BASE_ADDR,
       (TOP_MATCHA_ML_TOP_DMEM_BASE_ADDR + TOP_MATCHA_RAM_ML_DMEM_SIZE_BYTES)));
