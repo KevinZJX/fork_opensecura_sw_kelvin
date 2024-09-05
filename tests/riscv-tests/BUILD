@@ -14,6 +14,7 @@
 
 # Build riscv-tests based on Kelvin linker script and termination condition.
 
+package(default_visibility = ["//visibility:public"])
 load("//build_tools/bazel:kelvin.bzl", "kelvin_test")
 
 cc_library(
@@ -160,6 +161,45 @@ kelvin_test(
     deps = [
         ":riscv_tests_base",
     ],
+)
+
+cc_library(
+    name = "dhrystone_lib",
+    srcs = [
+        "@riscv-tests//:benchmarks/dhrystone/dhrystone.c",
+    ],
+    hdrs = [
+        "@riscv-tests//:benchmarks/dhrystone/dhrystone.h",
+    ],
+    copts = [
+        "-Wno-error",
+        "-Wno-implicit-int",
+        "-Wno-implicit-function-declaration",
+    ],
+)
+
+kelvin_test(
+    name = "rv_dhrystone",
+    srcs = [
+        "@riscv-tests//:benchmarks/dhrystone/dhrystone_main.c",
+    ],
+    hdrs =[
+        "@riscv-tests//:benchmarks/common/util.h",
+        "@riscv-tests//:env/encoding.h",
+    ],
+    deps = [
+        ":dhrystone_lib",
+        "//crt",
+        "//benchmarks:benchmark_header",
+    ],
+    copts = [
+        "-Iexternal/riscv-tests/benchmarks/common",
+        "-Iexternal/riscv-tests/env",
+        "-Wno-error",
+        "-Wno-implicit-int",
+        "-Wno-implicit-function-declaration",
+    ],
+    hw_test_size = "large",
 )
 
 kelvin_test(

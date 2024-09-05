@@ -1,0 +1,139 @@
+From da120fa80fa754ec650d4aaea0d5bbc791de6caa Mon Sep 17 00:00:00 2001
+From: Naveen Dodda <ndodda@google.com>
+Date: Thu, 5 Sep 2024 20:16:34 +0000
+Subject: [PATCH 2/2] fixes for kelvin
+
+---
+ benchmarks/Makefile                   | 26 ++++------------------
+ benchmarks/dhrystone/dhrystone.h      |  2 +-
+ benchmarks/dhrystone/dhrystone_main.c | 32 ++++++++++++++++++++++-----
+ 3 files changed, 32 insertions(+), 28 deletions(-)
+
+diff --git a/benchmarks/Makefile b/benchmarks/Makefile
+index fde4f23..849c024 100644
+--- a/benchmarks/Makefile
++++ b/benchmarks/Makefile
+@@ -4,7 +4,7 @@
+ # Yunsup Lee (yunsup@cs.berkeley.edu)
+ #
+ 
+-XLEN ?= 64
++XLEN = 32
+ 
+ default: all
+ 
+@@ -17,33 +17,15 @@ instbasedir = $(UCB_VLSI_HOME)/install
+ # Sources
+ #--------------------------------------------------------------------
+ 
+-bmarks = \
+-	median \
+-	qsort \
+-	rsort \
+-	towers \
+-	vvadd \
+-	memcpy \
+-	multiply \
+-	mm \
+-	dhrystone \
+-	spmv \
+-	mt-vvadd \
+-	mt-matmul \
+-	mt-memcpy \
+-	pmp \
+-	vec-memcpy \
+-	vec-daxpy \
+-	vec-sgemm \
+-	vec-strcmp \
++bmarks = dhrystone
+ 
+ #--------------------------------------------------------------------
+ # Build rules
+ #--------------------------------------------------------------------
+ 
+-RISCV_PREFIX ?= riscv$(XLEN)-unknown-elf-
++RISCV_PREFIX = /opt/riscv2/bin/riscv32-unknown-elf-
+ RISCV_GCC ?= $(RISCV_PREFIX)gcc
+-RISCV_GCC_OPTS ?= -DPREALLOCATE=1 -mcmodel=medany -static -std=gnu99 -O2 -ffast-math -fno-common -fno-builtin-printf -fno-tree-loop-distribute-patterns -march=rv$(XLEN)gcv -mabi=lp64d
++RISCV_GCC_OPTS ?= -DPREALLOCATE=1 -mcmodel=medany -static -std=gnu99 -O2 -ffast-math -fno-common -fno-builtin-printf -fno-tree-loop-distribute-patterns -march=rv32i2p1m_zicsr_zifencei_zbb -mabi=ilp32d
+ RISCV_LINK ?= $(RISCV_GCC) -T $(src_dir)/common/test.ld $(incs)
+ RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lm -lgcc -T $(src_dir)/common/test.ld
+ RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all --disassemble-zeroes --section=.text --section=.text.startup --section=.text.init --section=.data
+diff --git a/benchmarks/dhrystone/dhrystone.h b/benchmarks/dhrystone/dhrystone.h
+index e350c17..3401d65 100644
+--- a/benchmarks/dhrystone/dhrystone.h
++++ b/benchmarks/dhrystone/dhrystone.h
+@@ -381,7 +381,7 @@ extern clock_t	clock();
+ 
+ #elif defined(__riscv)
+ 
+-#define HZ 1000000
++#define HZ 10000000
+ #define Too_Small_Time 1
+ #define CLOCK_TYPE "rdcycle()"
+ #define Start_Timer() Begin_Time = read_csr(mcycle)
+diff --git a/benchmarks/dhrystone/dhrystone_main.c b/benchmarks/dhrystone/dhrystone_main.c
+index 9c7bcf5..c948f0e 100644
+--- a/benchmarks/dhrystone/dhrystone_main.c
++++ b/benchmarks/dhrystone/dhrystone_main.c
+@@ -11,12 +11,32 @@
+ 
+ #include "dhrystone.h"
+ 
+-void debug_printf(const char* str, ...);
+-
++// void debug_printf(const char* str, ...);
++#define debug_printf printf
+ #include "util.h"
+ 
+ #include <alloca.h>
+ 
++#define NUM_COUNTERS 2
++static uintptr_t counters[NUM_COUNTERS];
++static char* counter_names[NUM_COUNTERS];
++
++void setStats(int enable)
++{
++  int i = 0;
++#define READ_CTR(name) do { \
++    while (i >= NUM_COUNTERS) ; \
++    uintptr_t csr = read_csr(name); \
++    if (!enable) { csr -= counters[i]; counter_names[i] = #name; } \
++    counters[i++] = csr; \
++  } while (0)
++
++  READ_CTR(mcycle);
++  READ_CTR(minstret);
++
++#undef READ_CTR
++}
++
+ /* Global Variables: */
+ 
+ Rec_Pointer     Ptr_Glob,
+@@ -171,9 +191,9 @@ int main (int argc, char** argv)
+ 
+     if (User_Time < Too_Small_Time)
+     {
+-      printf("Measured time too small to obtain meaningful results\n");
++      // printf("Measured time too small to obtain meaningful results\n");
+       Number_Of_Runs = Number_Of_Runs * 10;
+-      printf("\n");
++      // printf("\n");
+     } else Done = true;
+   }
+ 
+@@ -231,7 +251,9 @@ int main (int argc, char** argv)
+ 
+   Microseconds = ((User_Time / Number_Of_Runs) * Mic_secs_Per_Second) / HZ;
+   Dhrystones_Per_Second = (HZ * Number_Of_Runs) / User_Time;
+-
++  
++  printf(" Begin time %ld\n", Begin_Time);
++  printf(" End time %ld\n", End_Time);
+   printf("Microseconds for one run through Dhrystone: %ld\n", Microseconds);
+   printf("Dhrystones per Second:                      %ld\n", Dhrystones_Per_Second);
+ 
+-- 
+2.46.0.469.g59c65b2a67-goog
+

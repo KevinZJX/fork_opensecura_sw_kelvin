@@ -15,6 +15,7 @@
 """Kelvin dependency repository setup."""
 
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def kelvin_sw_repos():
@@ -37,18 +38,20 @@ def kelvin_sw_repos():
         strip_prefix = "crt-0.3.4",
     )
 
-    # risc-v isa test
-    http_archive(
+    #risc-v isa test
+    git_repository(
         name = "riscv-tests",
         build_file = "@kelvin_sw//third_party/riscv:BUILD.riscv-tests",
-        sha256 = "1c7eb58edd7399b3ad2f9624a2003862cd87a6904237a737f39cd3978bab46a8",
-        urls = ["https://github.com/riscv-software-src/riscv-tests/archive/d4eaa5bd6674b51d3b9b24913713c4638e99cdd9.tar.gz"],
-        strip_prefix = "riscv-tests-d4eaa5bd6674b51d3b9b24913713c4638e99cdd9",
+        remote = "https://github.com/riscv-software-src/riscv-tests",
+        commit = "d4eaa5bd6674b51d3b9b24913713c4638e99cdd9",
+        recursive_init_submodules = True,
         patch_args = [
             "-p1",
         ],
         patches = [
-            "//tests/riscv-tests:0001-mcsr.patch",
+            "@kelvin_sw//tests/riscv-tests:0001-mcsr.patch",
+            "@kelvin_sw//tests/riscv-tests:0002-fixes-for-kelvin.patch",
+            "@kelvin_sw//tests/riscv-tests:0003-dhrystone-test-on-fpga.patch",
         ],
     )
 

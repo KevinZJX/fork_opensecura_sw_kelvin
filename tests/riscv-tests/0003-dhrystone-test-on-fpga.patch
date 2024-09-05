@@ -1,0 +1,160 @@
+diff --git a/benchmarks/dhrystone/dhrystone_main.c b/benchmarks/dhrystone/dhrystone_main.c
+index c948f0e..83409ef 100644
+--- a/benchmarks/dhrystone/dhrystone_main.c
++++ b/benchmarks/dhrystone/dhrystone_main.c
+@@ -14,8 +14,10 @@
+ // void debug_printf(const char* str, ...);
+ #define debug_printf printf
+ #include "util.h"
++#include "benchmarks/benchmark.h"
+ 
+ #include <alloca.h>
++#include <stdint.h>
+ 
+ #define NUM_COUNTERS 2
+ static uintptr_t counters[NUM_COUNTERS];
+@@ -69,9 +71,33 @@ long            Begin_Time,
+                 User_Time;
+ long            Microseconds,
+                 Dhrystones_Per_Second;
+-
++uint64_t        start_cycle,
++                end_cycle,
++                cycle_result;
+ /* end of variables for time measurement */
+ 
++__attribute__((
++    section(".model_output_header"))) BenchmarkOutputHeader output_header = {
++    .return_code = 0,  // Set by kelvin_start based on return value in main.
++    .iterations = 0,
++    .cycles = 0,
++};
++
++static inline uint64_t mcycle_read() {
++  uint32_t cycle_low = 0;
++  uint32_t cycle_high = 0;
++  uint32_t cycle_high_2 = 0;
++  uint64_t result = 0;
++  asm volatile(
++      "1:"
++      "  csrr %0, mcycleh;"  // Read `mcycleh`.
++      "  csrr %1, mcycle;"   // Read `mcycle`.
++      "  csrr %2, mcycleh;"  // Read `mcycleh` again.
++      "  bne  %0, %2, 1b;"
++      : "=r"(cycle_high), "=r"(cycle_low), "=r"(cycle_high_2)
++      :);
++  return result << 32 | cycle_low;
++}
+ 
+ int main (int argc, char** argv)
+ /*****/
+@@ -95,6 +121,7 @@ int main (int argc, char** argv)
+ 
+   Next_Ptr_Glob = (Rec_Pointer) alloca (sizeof (Rec_Type));
+   Ptr_Glob = (Rec_Pointer) alloca (sizeof (Rec_Type));
++  
+ 
+   Ptr_Glob->Ptr_Comp                    = Next_Ptr_Glob;
+   Ptr_Glob->Discr                       = Ident_1;
+@@ -133,6 +160,7 @@ int main (int argc, char** argv)
+ 
+     setStats(1);
+     Start_Timer();
++    start_cycle = mcycle_read();
+ 
+     for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
+     {
+@@ -179,6 +207,11 @@ int main (int argc, char** argv)
+ 	/* Int_1_Loc == 5 */
+ 
+     } /* loop "for Run_Index" */
++    
++    end_cycle = mcycle_read();
++
++
++    
+ 
+     /**************/
+     /* Stop timer */
+@@ -195,69 +228,22 @@ int main (int argc, char** argv)
+       Number_Of_Runs = Number_Of_Runs * 10;
+       // printf("\n");
+     } else Done = true;
+-  }
+ 
+-  debug_printf("Final values of the variables used in the benchmark:\n");
+-  debug_printf("\n");
+-  debug_printf("Int_Glob:            %d\n", Int_Glob);
+-  debug_printf("        should be:   %d\n", 5);
+-  debug_printf("Bool_Glob:           %d\n", Bool_Glob);
+-  debug_printf("        should be:   %d\n", 1);
+-  debug_printf("Ch_1_Glob:           %c\n", Ch_1_Glob);
+-  debug_printf("        should be:   %c\n", 'A');
+-  debug_printf("Ch_2_Glob:           %c\n", Ch_2_Glob);
+-  debug_printf("        should be:   %c\n", 'B');
+-  debug_printf("Arr_1_Glob[8]:       %d\n", Arr_1_Glob[8]);
+-  debug_printf("        should be:   %d\n", 7);
+-  debug_printf("Arr_2_Glob[8][7]:    %d\n", Arr_2_Glob[8][7]);
+-  debug_printf("        should be:   Number_Of_Runs + 10\n");
+-  debug_printf("Ptr_Glob->\n");
+-  debug_printf("  Ptr_Comp:          %d\n", (long) Ptr_Glob->Ptr_Comp);
+-  debug_printf("        should be:   (implementation-dependent)\n");
+-  debug_printf("  Discr:             %d\n", Ptr_Glob->Discr);
+-  debug_printf("        should be:   %d\n", 0);
+-  debug_printf("  Enum_Comp:         %d\n", Ptr_Glob->variant.var_1.Enum_Comp);
+-  debug_printf("        should be:   %d\n", 2);
+-  debug_printf("  Int_Comp:          %d\n", Ptr_Glob->variant.var_1.Int_Comp);
+-  debug_printf("        should be:   %d\n", 17);
+-  debug_printf("  Str_Comp:          %s\n", Ptr_Glob->variant.var_1.Str_Comp);
+-  debug_printf("        should be:   DHRYSTONE PROGRAM, SOME STRING\n");
+-  debug_printf("Next_Ptr_Glob->\n");
+-  debug_printf("  Ptr_Comp:          %d\n", (long) Next_Ptr_Glob->Ptr_Comp);
+-  debug_printf("        should be:   (implementation-dependent), same as above\n");
+-  debug_printf("  Discr:             %d\n", Next_Ptr_Glob->Discr);
+-  debug_printf("        should be:   %d\n", 0);
+-  debug_printf("  Enum_Comp:         %d\n", Next_Ptr_Glob->variant.var_1.Enum_Comp);
+-  debug_printf("        should be:   %d\n", 1);
+-  debug_printf("  Int_Comp:          %d\n", Next_Ptr_Glob->variant.var_1.Int_Comp);
+-  debug_printf("        should be:   %d\n", 18);
+-  debug_printf("  Str_Comp:          %s\n",
+-                                Next_Ptr_Glob->variant.var_1.Str_Comp);
+-  debug_printf("        should be:   DHRYSTONE PROGRAM, SOME STRING\n");
+-  debug_printf("Int_1_Loc:           %d\n", Int_1_Loc);
+-  debug_printf("        should be:   %d\n", 5);
+-  debug_printf("Int_2_Loc:           %d\n", Int_2_Loc);
+-  debug_printf("        should be:   %d\n", 13);
+-  debug_printf("Int_3_Loc:           %d\n", Int_3_Loc);
+-  debug_printf("        should be:   %d\n", 7);
+-  debug_printf("Enum_Loc:            %d\n", Enum_Loc);
+-  debug_printf("        should be:   %d\n", 1);
+-  debug_printf("Str_1_Loc:           %s\n", Str_1_Loc);
+-  debug_printf("        should be:   DHRYSTONE PROGRAM, 1'ST STRING\n");
+-  debug_printf("Str_2_Loc:           %s\n", Str_2_Loc);
+-  debug_printf("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
+-  debug_printf("\n");
++    cycle_result = end_cycle - start_cycle ;
+ 
++    output_header.iterations = NUMBER_OF_RUNS;
++    output_header.cycles = cycle_result;
++    asm volatile("flushall");
+ 
+-  Microseconds = ((User_Time / Number_Of_Runs) * Mic_secs_Per_Second) / HZ;
+-  Dhrystones_Per_Second = (HZ * Number_Of_Runs) / User_Time;
+-  
+-  printf(" Begin time %ld\n", Begin_Time);
+-  printf(" End time %ld\n", End_Time);
+-  printf("Microseconds for one run through Dhrystone: %ld\n", Microseconds);
+-  printf("Dhrystones per Second:                      %ld\n", Dhrystones_Per_Second);
++    // if this test is running in a simulator
++    uint64_t average_cycles = cycle_result/NUMBER_OF_RUNS;
++    printf("Total Iterations: %ld", output_header.iterations);
++    printf("Total Cycles: %ld ", output_header.cycles);
++    printf("Average Cycles per Iteration: %ld ", average_cycles);
++    printf("========== End Benchmark ==========");
++    return 0;
++  }
+ 
+-  return 0;
+ }
+ 
+ 
