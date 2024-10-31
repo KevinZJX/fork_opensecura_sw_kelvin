@@ -45,7 +45,6 @@ RV32UI_TESTS = [
     "blt",
     "bltu",
     "bne",
-    "fence_i",
     "jalr",
     "jal",
     "lb",
@@ -96,6 +95,28 @@ RV32UI_TESTS = [
         ":riscv_tests_base",
     ],
 ) for test in RV32UI_TESTS]
+
+kelvin_test(
+    name = "rv32ui_fence_i",
+    srcs = [
+        "@riscv-tests//:isa/rv64ui/fence_i.S",
+    ],
+    # The include paths are set explicitly because riscv-tests has special
+    # include dependencies.
+    copts = [
+        "-Itests/riscv-tests",
+        "-Iexternal/riscv-tests/isa/macros/scalar",
+        "-Wno-variadic-macros",
+    ],
+    defines = [
+        "RVTEST_RV64U=RVTEST_RV32U",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":riscv_tests_base",
+    ],
+    tags = ["tcm-incompatible"],
+)
 
 RV32UM_TESTS = [
     "div",
@@ -176,6 +197,7 @@ cc_library(
         "-Wno-implicit-int",
         "-Wno-implicit-function-declaration",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -200,6 +222,7 @@ kelvin_test(
         "-Wno-implicit-function-declaration",
     ],
     hw_test_size = "large",
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -211,6 +234,7 @@ kelvin_test(
     deps = [
         "//crt",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -222,6 +246,7 @@ kelvin_test(
     deps = [
         "//crt",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -233,4 +258,5 @@ kelvin_test(
     deps = [
         "//crt",
     ],
+    tags = ["tcm-incompatible"],
 )

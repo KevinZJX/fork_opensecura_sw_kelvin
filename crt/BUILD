@@ -16,7 +16,10 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "kelvin_linker",
-    srcs = ["kelvin.ld"],
+    srcs = select({
+        "//:link_tcm_config": ["kelvin_tcm.ld"],
+        "//conditions:default": ["kelvin.ld"],
+    }),
 )
 
 cc_library(

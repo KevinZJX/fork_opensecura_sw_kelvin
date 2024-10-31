@@ -223,6 +223,7 @@ def kelvin_test(
       **kwargs: Agruments that will be forwarded to kelvin_binary
     """
 
+    tags = kwargs.get("tags", [])
     kelvin_elf = "{}_elf".format(name)
     kelvin_binary(
         name = kelvin_elf,
@@ -242,7 +243,7 @@ def kelvin_test(
         data = [
             "{}.elf".format(kelvin_elf),
         ],
-        tags = ["iss"] + iss_test_tags,
+        tags = ["iss"] + iss_test_tags + tags,
     )
 
     hw_test = "{}_hw".format(name)
@@ -256,7 +257,7 @@ def kelvin_test(
         data = [
             "{}.bin".format(kelvin_elf),
         ],
-        tags = ["systemc"] + hw_test_tags,
+        tags = ["systemc"] + hw_test_tags + tags,
     )
 
     native.test_suite(
@@ -265,6 +266,7 @@ def kelvin_test(
             iss_test,
             hw_test,
         ],
+        tags = tags
     )
 
 # From @tflite-micro//tensorflow/lite/micro/build_def.bzl, and paths
