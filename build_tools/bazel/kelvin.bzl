@@ -208,6 +208,9 @@ def kelvin_test(
         hw_test_tags = [],
         iss_test_size = "small",
         iss_test_tags = [],
+        expect_success = True,
+        hw = True,
+        iss = True,
         **kwargs):
     """A sh_test wrapper for kelvin binaries
 
@@ -230,42 +233,46 @@ def kelvin_test(
         **kwargs
     )
 
+    tests = []
+
     iss_test = "{}_iss".format(name)
-    native.sh_test(
-        name = iss_test,
-        size = iss_test_size,
-        srcs = [
-            "@kelvin_sw//build_tools:test_runner.sh",
-        ],
-        args = [
-            "$(location %s.elf)" % kelvin_elf,
-        ],
-        data = [
-            "{}.elf".format(kelvin_elf),
-        ],
-        tags = ["iss"] + iss_test_tags + tags,
-    )
+    if iss:
+        native.sh_test(
+            name = iss_test,
+            size = iss_test_size,
+            srcs = [
+                "@kelvin_sw//build_tools:test_runner.sh",
+            ],
+            args = [
+                "$(location %s.elf)" % kelvin_elf,
+            ],
+            data = [
+                "{}.elf".format(kelvin_elf),
+            ],
+            tags = ["iss"] + iss_test_tags + tags,
+        )
+        tests.append(iss_test)
 
     hw_test = "{}_hw".format(name)
-    native.sh_test(
-        name = hw_test,
-        size = hw_test_size,
-        srcs = ["@kelvin_sw//build_tools:core_sim_test_runner.sh"],
-        args = [
-            "$(location %s.bin)" % kelvin_elf,
-        ],
-        data = [
-            "{}.bin".format(kelvin_elf),
-        ],
-        tags = ["systemc"] + hw_test_tags + tags,
-    )
+    if hw:
+        native.sh_test(
+            name = hw_test,
+            size = hw_test_size,
+            srcs = ["@kelvin_sw//build_tools:core_sim_test_runner.sh"],
+            args = [
+                "$(location %s.bin)" % kelvin_elf,
+                str(expect_success),
+            ],
+            data = [
+                "{}.bin".format(kelvin_elf),
+            ],
+            tags = ["systemc"] + hw_test_tags + tags,
+        )
+        tests.append(hw_test)
 
     native.test_suite(
         name = name,
-        tests = [
-            iss_test,
-            hw_test,
-        ],
+        tests = tests,
         tags = tags
     )
 

@@ -16,7 +16,7 @@
 # Test runner for SystemC simulator. Note the input should be the .bin file.
 
 function print_usage {
-  echo "Usage: core_sim_test_runner.sh <bin location> [extra flags]"
+  echo "Usage: core_sim_test_runner.sh <bin location> <expected result>"
 }
 
 if [[ $1 == "--help" ]]; then
@@ -42,8 +42,19 @@ fi
 
 BIN_FILE=$(realpath $1)
 shift 1
-SIM_OUT=$(${CORE_SIM} "${BIN_FILE}" $@)
+EXPECTED_RESULT=${1:-True}
+shift 1
+
+SIM_OUT=$(${CORE_SIM} "${BIN_FILE}")
 RESULT=$?
 echo "${SIM_OUT}"
 
-exit ${RESULT}
+if [[ "${EXPECTED_RESULT}" == "True" ]]; then
+  exit ${RESULT}
+elif [[ "${EXPECTED_RESULT}" == "False" ]]; then
+  if [[ ${RESULT} -eq 0 ]]; then
+    exit -1
+  else
+    exit 0
+  fi
+fi

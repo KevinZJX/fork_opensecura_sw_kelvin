@@ -33,6 +33,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -47,6 +48,132 @@ kelvin_test(
 )
 
 kelvin_test(
+    name = "instr_fault",
+    srcs = [
+        "instr_fault.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    expect_success = False,
+    tags = ["intentional_failure"],
+)
+
+kelvin_test(
+    name = "illegal",
+    srcs = [
+        "illegal.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    expect_success = False,
+    tags = ["intentional_failure"],
+)
+
+kelvin_test(
+    name = "instr_align_0",
+    srcs = [
+        "instr_align_0.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    expect_success = False,
+    tags = ["intentional_failure"],
+)
+
+kelvin_test(
+    name = "instr_align_1",
+    srcs = [
+        "instr_align_1.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    expect_success = False,
+    tags = ["intentional_failure"],
+)
+
+kelvin_test(
+    name = "instr_align_2",
+    srcs = [
+        "instr_align_2.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    expect_success = False,
+    tags = ["intentional_failure"],
+)
+
+kelvin_test(
+    name = "load_fault_0",
+    srcs = [
+        "load_fault_0.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    expect_success = False,
+    tags = ["intentional_failure"],
+)
+
+kelvin_test(
+    name = "load_fault_1",
+    srcs = [
+        "load_fault_1.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    expect_success = False,
+    tags = ["intentional_failure"],
+)
+
+kelvin_test(
+    name = "store_fault_0",
+    srcs = [
+        "store_fault_0.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    # This passes on core_sim, but should fail on core_mini_sim.
+    # expect_success = False,
+)
+
+kelvin_test(
+    name = "store_fault_1",
+    srcs = [
+        "store_fault_1.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    expect_success = False,
+    tags = ["intentional_failure"],
+)
+
+kelvin_test(
     name = "acset",
     srcs = [
         "acset.cc",
@@ -55,6 +182,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -66,6 +194,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -79,6 +208,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -89,6 +219,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -99,6 +230,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -109,6 +241,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -119,6 +252,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -129,6 +263,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 cc_library(
@@ -147,6 +282,7 @@ kelvin_test(
         ":kelvin_test",
         ":vdwconv_data",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -157,6 +293,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -167,6 +304,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -177,6 +315,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -188,6 +327,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -199,6 +339,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -210,6 +351,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -220,6 +362,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -230,6 +373,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -240,6 +384,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -250,6 +395,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -260,6 +406,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )
 
 kelvin_test(
@@ -271,4 +418,5 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    tags = ["tcm-incompatible"],
 )

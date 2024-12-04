@@ -24,10 +24,12 @@ SECTIONS {
 
     .init.array : ALIGN(16) {
       __init_array_start = .;
+      __init_array_start__ = .;
       *(.init_array)
       *(.init_array.*)
       . = ALIGN(16);
       __init_array_end = .;
+      __init_array_end__ = .;
     } > ITCM
 
     .rodata : ALIGN(16) {
@@ -52,6 +54,11 @@ SECTIONS {
       *(.sdata.*)
       *(.data)
       *(.data.*)
+      /**
+       * Memory location for the return value from main,
+       * which could be inspected by another core in the system.
+       **/
+      _ret = .;
       . = ALIGN(16);
         __data_end__ = .;
     } > DTCM
