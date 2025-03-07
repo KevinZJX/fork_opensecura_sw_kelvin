@@ -66,11 +66,15 @@ int main(void) {
     cycle_hi = cycle >> 32;
     cycle2_hi = cycle2 >> 32;
     if (cycle2_hi == cycle_hi) {
+#if !defined(LINK_TCM)
         printf("mcycleh did not increment\r\n");
+#endif
         exit(-1);
     }
     if (cycle2_lo > cycle_lo) {
+#if !defined(LINK_TCM)
         printf("mcycle did not wrap\r\n");
+#endif
         exit(-1);
     }
 
@@ -90,11 +94,15 @@ int main(void) {
     instret_hi = instret >> 32;
     instret2_hi = instret2 >> 32;
     if (instret2_hi == instret_hi) {
+#if !defined(LINK_TCM)
         printf("minstreth did not increment\r\n");
+#endif
         exit(-1);
     }
     if (instret2_lo > instret_lo) {
+#if !defined(LINK_TCM)
         printf("minstret did not wrap\r\n");
+#endif
         exit(-1);
     }
 

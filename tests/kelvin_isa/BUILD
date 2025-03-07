@@ -33,7 +33,10 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
-    tags = ["tcm-incompatible"],
+    copts = select({
+        "//:link_tcm_config": ["-DLINK_TCM"],
+        "//conditions:default": [],
+    }),
 )
 
 kelvin_test(
