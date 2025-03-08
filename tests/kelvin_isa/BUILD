@@ -51,6 +51,20 @@ kelvin_test(
 )
 
 kelvin_test(
+    name = "mret_fault",
+    srcs = [
+        "mret_fault.cc",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":kelvin_test",
+    ],
+    iss = False,
+    expect_success = False,
+    tags = ["intentional_failure"],
+)
+
+kelvin_test(
     name = "instr_fault",
     srcs = [
         "instr_fault.cc",
