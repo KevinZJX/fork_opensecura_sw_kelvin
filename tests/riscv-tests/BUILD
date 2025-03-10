@@ -145,6 +145,61 @@ RV32UM_TESTS = [
     ],
 ) for test in RV32UM_TESTS]
 
+# andn.S  clz.S  cpop.S  ctz.S  Makefrag  max.S  maxu.S  min.S  minu.S  orc_b.S  orn.S  rev8.S  rol.S  rori.S  ror.S  sext_b.S  sext_h.S  xnor.S  zext_h.S
+RV32UZBB_TESTS_64 = [
+    "andn",
+    "max",
+    "maxu",
+    "min",
+    "minu",
+    "orn",
+    "sext_b",
+    "sext_h",
+    "xnor",
+    "zext_h",
+]
+
+[kelvin_test(
+    name = "rv32uzbb_{}".format(test),
+    srcs = [
+        "@riscv-tests//:isa/rv64uzbb/{}.S".format(test),
+    ],
+    copts = [
+        "-Itests/riscv-tests",
+        "-Iexternal/riscv-tests/isa/macros/scalar",
+        "-Wno-variadic-macros",
+    ],
+    defines = [
+        "RVTEST_RV64U=RVTEST_RV32U"
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":riscv_tests_base",
+    ],
+) for test in RV32UZBB_TESTS_64]
+
+RV32UZBB_TESTS = [
+    "clz",
+    "cpop",
+    "ctz",
+]
+
+[kelvin_test(
+    name = "rv32uzbb_{}".format(test),
+    srcs = [
+        "@riscv-tests//:isa/rv32uzbb/{}.S".format(test),
+    ],
+    copts = [
+        "-Itests/riscv-tests",
+        "-Iexternal/riscv-tests/isa/macros/scalar",
+        "-Wno-variadic-macros",
+    ],
+    hw_test_size = "small",
+    deps = [
+        ":riscv_tests_base",
+    ],
+) for test in RV32UZBB_TESTS]
+
 kelvin_test(
     name = "rv32mi_mcsr",
     srcs = [

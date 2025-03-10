@@ -43,7 +43,7 @@ def kelvin_sw_repos():
         name = "riscv-tests",
         build_file = "@kelvin_sw//third_party/riscv:BUILD.riscv-tests",
         remote = "https://github.com/riscv-software-src/riscv-tests",
-        commit = "d4eaa5bd6674b51d3b9b24913713c4638e99cdd9",
+        commit = "a3498c6d2f770af95964a0a7ba46f285cecd1eb3",
         recursive_init_submodules = True,
         patch_args = [
             "-p1",
