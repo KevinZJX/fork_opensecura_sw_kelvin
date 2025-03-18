@@ -145,7 +145,6 @@ RV32UM_TESTS = [
     ],
 ) for test in RV32UM_TESTS]
 
-# andn.S  clz.S  cpop.S  ctz.S  Makefrag  max.S  maxu.S  min.S  minu.S  orc_b.S  orn.S  rev8.S  rol.S  rori.S  ror.S  sext_b.S  sext_h.S  xnor.S  zext_h.S
 RV32UZBB_TESTS_64 = [
     "andn",
     "max",
@@ -182,6 +181,11 @@ RV32UZBB_TESTS = [
     "clz",
     "cpop",
     "ctz",
+    "orc_b",
+    "rev8",
+    "rol",
+    "ror",
+    "rori",
 ]
 
 [kelvin_test(
