@@ -17,6 +17,7 @@ package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "kelvin_linker",
     srcs = select({
+        "//:link_tcm_highmem_config": ["kelvin_tcm_highmem.ld"],
         "//:link_tcm_config": ["kelvin_tcm.ld"],
         "//conditions:default": ["kelvin.ld"],
     }),

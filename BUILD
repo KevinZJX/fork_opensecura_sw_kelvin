@@ -18,9 +18,21 @@ bool_flag(
     build_setting_default = False,
 )
 
+bool_flag(
+    name = "link_tcm_highmem",
+    build_setting_default = False,
+)
+
 config_setting(
     name = "link_tcm_config",
     flag_values = {
         ":link_tcm": "True",
+    },
+)
+
+config_setting(
+    name = "link_tcm_highmem_config",
+    flag_values = {
+        ":link_tcm_highmem": "True",
     },
 )
