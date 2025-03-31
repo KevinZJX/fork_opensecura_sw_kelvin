@@ -12,7 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cstdint>
+
+extern "C" {
+void isr_wrapper(void);
+__attribute__((naked)) void isr_wrapper(void) {
+  asm volatile(
+      "csrr t0, mepc \n"
+      "addi t0, t0, 4 \n"
+      "csrw mepc, t0 \n"
+      "csrr t0, mcause \n"
+      "li t1, 1 \n"
+      "beq t0, t1, 0f \n"
+      "ebreak \n"
+      "0: mpause \n"
+  );
+}
+
+}  // extern "C"
+   //
 int main(int argc, char** argv) {
+  asm volatile("csrw mtvec, %0" :: "rK"((uint32_t)(&isr_wrapper)));
   asm volatile("la ra, 0x40000000; jalr ra, ra");
 
   return 0;

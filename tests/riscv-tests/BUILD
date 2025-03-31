@@ -223,6 +223,25 @@ kelvin_test(
     ],
 )
 
+# kelvin_test(
+#     name = "rv32mi_illegal",
+#     srcs = [
+#         "@riscv-tests//:isa/rv64mi/illegal.S",
+#     ],
+#     copts = [
+#         "-Itests/riscv-tests",
+#         "-Iexternal/riscv-tests/isa/macros/scalar",
+#         "-Wno-variadic-macros",
+#     ],
+#     defines = [
+#         "RVTEST_RV64M=RVTEST_RV32M",
+#     ],
+#     hw_test_size = "small",
+#     deps = [
+#         ":riscv_tests_base",
+#     ],
+# )
+
 kelvin_test(
     name = "rv32mi_csr",
     srcs = [

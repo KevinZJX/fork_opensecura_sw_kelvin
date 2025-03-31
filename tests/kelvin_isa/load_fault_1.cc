@@ -14,10 +14,32 @@
 
 #include <cstdint>
 
+extern "C" {
+void isr_wrapper(void);
+__attribute__((naked)) void isr_wrapper(void) {
+  asm volatile(
+      "csrr t0, mepc \n"
+      "addi t0, t0, 4 \n"
+      "csrw mepc, t0 \n"
+      "csrr t0, mcause \n"
+      "li t1, 5 \n"
+      "bne t0, t1, 0f \n"
+      "csrr t0, mtval \n"
+      "la t1, 0xA0000000 \n"
+      "bne t0, t1, 0f \n"
+      "mpause \n"
+      "0: ebreak \n"
+  );
+}
+
+}  // extern "C"
+
 int main(int argc, char** argv) {
+  asm volatile("csrw mtvec, %0" :: "rK"((uint32_t)(&isr_wrapper)));
   volatile uint32_t* load_bad_addr = (uint32_t*)0xA0000000;
   volatile uint32_t foo = *load_bad_addr;
   (void)foo;
+  asm volatile("ebreak");
 
   return 0;
 }
