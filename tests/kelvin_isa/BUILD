@@ -310,6 +310,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    hw_test_size = "large",
     tags = ["tcm-incompatible"],
 )
 
@@ -412,6 +413,7 @@ kelvin_test(
     deps = [
         ":kelvin_test",
     ],
+    hw_test_size = "large",
     tags = ["tcm-incompatible"],
 )
 
