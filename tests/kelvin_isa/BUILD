@@ -51,20 +51,6 @@ kelvin_test(
 )
 
 kelvin_test(
-    name = "mret_fault",
-    srcs = [
-        "mret_fault.cc",
-    ],
-    hw_test_size = "small",
-    deps = [
-        ":kelvin_test",
-    ],
-    iss = False,
-    expect_success = False,
-    tags = ["intentional_failure"],
-)
-
-kelvin_test(
     name = "instr_fault",
     srcs = [
         "instr_fault.cc",
@@ -74,8 +60,7 @@ kelvin_test(
         ":kelvin_test",
     ],
     iss = False,
-    expect_success = False,
-    tags = ["intentional_failure"],
+    tags = ["exceptions"],
 )
 
 kelvin_test(
@@ -88,8 +73,7 @@ kelvin_test(
         ":kelvin_test",
     ],
     iss = False,
-    expect_success = False,
-    tags = ["intentional_failure"],
+    tags = ["exceptions"],
 )
 
 kelvin_test(
@@ -102,8 +86,7 @@ kelvin_test(
         ":kelvin_test",
     ],
     iss = False,
-    expect_success = False,
-    tags = ["intentional_failure"],
+    tags = ["exceptions"],
 )
 
 kelvin_test(
@@ -116,8 +99,7 @@ kelvin_test(
         ":kelvin_test",
     ],
     iss = False,
-    expect_success = False,
-    tags = ["intentional_failure"],
+    tags = ["exceptions"],
 )
 
 kelvin_test(
@@ -130,8 +112,7 @@ kelvin_test(
         ":kelvin_test",
     ],
     iss = False,
-    expect_success = False,
-    tags = ["intentional_failure"],
+    tags = ["exceptions"],
 )
 
 kelvin_test(
@@ -144,8 +125,7 @@ kelvin_test(
         ":kelvin_test",
     ],
     iss = False,
-    expect_success = False,
-    tags = ["intentional_failure"],
+    tags = ["exceptions"],
 )
 
 kelvin_test(
@@ -158,8 +138,7 @@ kelvin_test(
         ":kelvin_test",
     ],
     iss = False,
-    expect_success = False,
-    tags = ["intentional_failure"],
+    tags = ["exceptions"],
 )
 
 kelvin_test(
@@ -172,8 +151,9 @@ kelvin_test(
         ":kelvin_test",
     ],
     iss = False,
-    # This passes on core_sim, but should fail on core_mini_sim.
-    # expect_success = False,
+    # This fails on core_sim, but should pass on core_mini_sim.
+    expect_success = False,
+    tags = ["exceptions"],
 )
 
 kelvin_test(
@@ -186,8 +166,7 @@ kelvin_test(
         ":kelvin_test",
     ],
     iss = False,
-    expect_success = False,
-    tags = ["intentional_failure"],
+    tags = ["exceptions"],
 )
 
 kelvin_test(

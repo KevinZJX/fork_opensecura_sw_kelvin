@@ -14,9 +14,27 @@
 
 #include <cstdint>
 
+extern "C" {
+void isr_wrapper(void);
+__attribute__((naked)) void isr_wrapper(void) {
+  asm volatile(
+      "csrr t0, mepc \n"
+      "addi t0, t0, 4 \n"
+      "csrw mepc, t0 \n"
+      "csrr t0, mcause \n"
+      "li t1, 0 \n"
+      "beq t0, t1, 0f \n"
+      "ebreak \n"
+      "0: mpause \n"
+  );
+}
+
+}  // extern "C"
+
 int main(int argc, char** argv) {
   // Instruction address misaligned
-  asm volatile("la ra, 0x3; jalr ra,ra");
+  asm volatile("csrw mtvec, %0" :: "rK"((uint32_t)(&isr_wrapper)));
+  asm volatile("la ra, 0x3; nop; nop; nop; nop; jalr ra,ra");
 
   return 0;
 }
