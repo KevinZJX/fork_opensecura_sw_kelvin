@@ -19,6 +19,7 @@ filegroup(
     srcs = select({
         "//:link_tcm_highmem_config": ["kelvin_tcm_highmem.ld"],
         "//:link_tcm_config": ["kelvin_tcm.ld"],
+        "//:link_tcm_cv_config": ["kelvin_tcm_cv.ld"],
         "//conditions:default": ["kelvin.ld"],
     }),
 )
