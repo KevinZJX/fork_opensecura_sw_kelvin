@@ -102,4 +102,51 @@ int op_yu12_to_nv12(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::s
     return 0;
 }
 
+int op_nv12_to_nv21(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::size_t &out_len)
+{
+    uint32_t vl = 0;
+    uint32_t n = 0;
+    /* Y plane length */
+    const uint32_t Y_len = in_hdr.width * in_hdr.height;
+    /* U plane or V plane length */
+    const uint32_t UV_len = (in_hdr.width * in_hdr.height)/4;
+
+    /* copy Y plane */
+    n = Y_len;
+    do {
+        getvl_b_x_m(vl, n);
+        n -= vl;
+        vld_b_lp_xx_m(vm1, in, vl);
+        vst_b_lp_xx_m(vm1, out, vl);
+    } while( n > 0);
+
+    n = UV_len;
+    /* input increase to input + Y_len, so do output */
+    uint8_t *input_UV_base = in;
+    uint8_t *output_VU_base = out;
+
+    getmaxvl_b_m(vl);
+    std::size_t simd_cycles = UV_len / (vl);
+    std::size_t scalar_cycles = UV_len % (vl);
+    for (uint32_t c=0; c < simd_cycles; c++) {
+        vld_b_p_x_m(vm0, input_UV_base);
+        vld_b_p_x_m(vm1, input_UV_base);
+
+        vevnodd_b_vv_m(vm2, vm0, vm1);
+        vzip_b_vv_m(vm0, vm3, vm2);
+
+        vst_b_p_x_m(vm0, output_VU_base);
+        vst_b_p_x_m(vm1, output_VU_base);
+    }
+
+    // for (uint32_t i = 0; i < scalar_cycles; i++) {
+    //     *(output_VU_base + 2*i) = *(input_U_plane_base + i);
+    //     *(output_VU_base + 2*i + 1) = *(input_V_plane_base + i);
+    // }
+
+    out_len = Y_len + UV_len*2;
+
+    return 0;
+}
+
 }

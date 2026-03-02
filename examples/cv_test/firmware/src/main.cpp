@@ -33,6 +33,9 @@ int main(int argc, char **argv)
     case OP_YU12_TO_NV12:
         ret_status = op_yu12_to_nv12(*in_hdr, in_buf, out_buf, out_len);
         break;
+    case OP_NV12_TO_NV21:
+        ret_status = op_nv12_to_nv21(*in_hdr, in_buf, out_buf, out_len);
+        break;
     default:
         ret_status = -1;
         break;
