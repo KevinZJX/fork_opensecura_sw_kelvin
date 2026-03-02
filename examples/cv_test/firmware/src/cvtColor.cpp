@@ -139,10 +139,10 @@ int op_nv12_to_nv21(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::s
         vst_b_p_x_m(vm1, output_VU_base);
     }
 
-    // for (uint32_t i = 0; i < scalar_cycles; i++) {
-    //     *(output_VU_base + 2*i) = *(input_U_plane_base + i);
-    //     *(output_VU_base + 2*i + 1) = *(input_V_plane_base + i);
-    // }
+    for (uint32_t i = 0; i < scalar_cycles; i++) {
+        *(output_VU_base + 2*i) = *(input_UV_base + 2*i + 1);
+        *(output_VU_base + 2*i + 1) = *(input_UV_base + 2*i);
+    }
 
     out_len = Y_len + UV_len*2;
 
