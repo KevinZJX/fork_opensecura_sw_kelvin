@@ -17,9 +17,15 @@ enum Opcode : uint32_t {
     OP_NV21_TO_NV12,
     OP_NV21_TO_YU12,
     OP_NV21_TO_YV12,
-    OP_BGR_TO_GRAY,
+    OP_CVTSCALEABS,
     OP_SOBEL,
-    OP_CONV2D       = 10
+    OP_CONV2D,
+};
+
+union Arg {
+    uint32_t u;
+    int32_t i;
+    float f;
 };
 
 typedef struct InputHeader {
@@ -29,7 +35,7 @@ typedef struct InputHeader {
     uint32_t channels;
     uint32_t stride;        // 图像对齐步长
     uint32_t format;        // 预留图像格式字段
-    uint32_t params[10];    // 给不同算子的参数
+    Arg      params[10];    // 给不同算子的参数
 } InputHeader_t;
 
 typedef struct OutputHeader {

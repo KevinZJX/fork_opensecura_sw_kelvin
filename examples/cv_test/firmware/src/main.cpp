@@ -36,6 +36,10 @@ int main(int argc, char **argv)
     case OP_NV12_TO_NV21:
         ret_status = op_nv12_to_nv21(*in_hdr, in_buf, out_buf, out_len);
         break;
+    case OP_CVTSCALEABS:
+        ret_status = op_convertScaleAbs(*in_hdr, in_buf, out_buf, out_len);
+    case OP_SOBEL:
+        ret_status = op_sobel(*in_hdr, in_buf, out_buf, out_len);
     default:
         ret_status = -1;
         break;

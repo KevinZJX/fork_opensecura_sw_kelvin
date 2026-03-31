@@ -6,6 +6,7 @@ kelvin_binary(
     srcs = [
         "src/main.cpp",
         "src/cvtColor.cpp",
+        "src/imgProc.cpp",
     ],
     hdrs = [
         "include/common.h",
