@@ -38,8 +38,13 @@ int main(int argc, char **argv)
         break;
     case OP_CVTSCALEABS:
         ret_status = op_convertScaleAbs(*in_hdr, in_buf, out_buf, out_len);
+        break;
+    case OP_THRESHOLD:
+        ret_status = op_threshold(*in_hdr, in_buf, out_buf, out_len);
+        break;
     case OP_SOBEL:
         ret_status = op_sobel(*in_hdr, in_buf, out_buf, out_len);
+        break;
     default:
         ret_status = -1;
         break;

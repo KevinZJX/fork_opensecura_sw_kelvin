@@ -52,6 +52,51 @@ int op_convertScaleAbs(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std
     return 0;
 }
 
+/* 给定全局阈值处理二值化图像 */
+int op_threshold(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::size_t &out_len)
+{
+    uint32_t vl = 0;
+    uint32_t n = 0;
+    /* Y plane length */
+    const uint32_t Y_len = in_hdr.width * in_hdr.height;
+    /* U plane or V plane length */
+    const uint32_t UV_len = (in_hdr.width * in_hdr.height)/4;
+
+    int threshold = (int)in_hdr.params[0].i;
+
+    /* cvt Y plane */
+    n = Y_len;
+    do {
+        getvl_b_x_m(vl, n);
+        n -= vl;
+        vld_b_lp_xx_m(vm0, in, vl);
+        vge_b_u_vx_m(vm1, vm0, threshold);
+        vdup_b_x_m(vm0, 255);
+        vsel_b_vx_m(vm0, vm1, 0);
+        vst_b_lp_xx_m(vm0, out, vl);
+    } while( n > 0);
+
+    n = UV_len;
+    /* input increase to input + Y_len, so do output */
+    /* copy UV plane */
+    uint8_t *input_U_plane_base = in;
+    uint8_t *input_V_plane_base = in + UV_len;
+    uint8_t *output_U_plane_base = out;
+    uint8_t *output_V_plane_base = out + UV_len;
+    do {
+        getvl_b_x_m(vl, n);
+        n -= vl;
+        vld_b_lp_xx_m(vm1, input_U_plane_base, vl);
+        vld_b_lp_xx_m(vm2, input_V_plane_base, vl);
+        vst_b_lp_xx_m(vm1, output_U_plane_base, vl);
+        vst_b_lp_xx_m(vm2, output_V_plane_base, vl);
+    } while(n > 0);
+
+    out_len = Y_len + UV_len*2;
+
+    return 0;
+}
+
 int op_sobel(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::size_t &out_len)
 {
     /* 0. 加载X和Y方向的卷积核 */

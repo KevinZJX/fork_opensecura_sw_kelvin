@@ -18,6 +18,7 @@ enum Opcode : uint32_t {
     OP_NV21_TO_YU12,
     OP_NV21_TO_YV12,
     OP_CVTSCALEABS,
+    OP_THRESHOLD,
     OP_SOBEL,
     OP_CONV2D,
 };
