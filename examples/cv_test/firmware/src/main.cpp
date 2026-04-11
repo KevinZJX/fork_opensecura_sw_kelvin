@@ -42,6 +42,9 @@ int main(int argc, char **argv)
     case OP_THRESHOLD:
         ret_status = op_threshold(*in_hdr, in_buf, out_buf, out_len);
         break;
+    case OP_BLUR:
+        ret_status = op_blur(*in_hdr, in_buf, out_buf, out_len);
+        break;
     case OP_SOBEL:
         ret_status = op_sobel(*in_hdr, in_buf, out_buf, out_len);
         break;

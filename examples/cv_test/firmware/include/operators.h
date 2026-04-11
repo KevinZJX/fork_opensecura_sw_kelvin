@@ -10,6 +10,7 @@ int op_nv12_to_nv21(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::s
 int op_convertScaleAbs(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::size_t &out_len);
 int op_sobel(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::size_t &out_len);
 int op_threshold(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::size_t &out_len);
+int op_blur(const InputHeader& in_hdr, uint8_t* in, uint8_t* out, std::size_t &out_len);
 } // namespace kelvin_cv
 
 
